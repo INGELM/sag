@@ -21,7 +21,7 @@ class clientesForm(FlaskForm):
     codigo = StringField('Código', validators=[DataRequired(message='El código es obligatorio.')],  render_kw={"placeholder": "CÓDIGO DEL CLIENTE", "class": "form-control", "style": "text-transform:uppercase;"})
     empresa = StringField('Empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"placeholder": "Empresa del cliente", "class": "form-control", "style": "text-transform:uppercase;"})
     direccion = StringField('Dirección', render_kw={"placeholder": "Dirección del cliente", "class": "form-control"})
-    ciudad = QuerySelectField('Ciudad', query_factory=get_ciudades, get_label='nombre', render_kw={"placeholder": "Ciudad del cliente", "class": "form-control"})
+    ciudad = QuerySelectField('Ciudad', query_factory=get_ciudades, get_label='nombre', allow_blank=True, blank_text='Seleccione una ciudad', render_kw={"placeholder": "Ciudad del cliente", "class": "form-control"})
     email = StringField('Email', render_kw={"placeholder": "Email del cliente", "autocomplete": "off", "class": "form-control", "style": "text-transform:lowercase;"})
     telefono = StringField('Teléfono', render_kw={"id": "telefono-clientes", "class": "telefono form-control", "placeholder": "(04XX)-XXX-XXXX"})
     submit = SubmitField('Guardar')

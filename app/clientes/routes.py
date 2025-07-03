@@ -25,14 +25,14 @@ def clientes():
     form = clientesForm()
     
     cliente_data = request.get_json() if request.method in ['PUT', 'DELETE'] else form.data
-    current_app.debug(f'Datos recibidos del formulario: {cliente_data}')
-    
+    current_app.logger.info(f'Datos recibidos del formulario: {cliente_data}')
+
     # if 'ciudad' in cliente_data and cliente_data['ciudad']:
     #     cliente_data['ciudad'] = cliente_data['ciudad'].id
 
     if request.method == 'PUT' and form.validate_on_submit():
         
-        current_app.debug(f'Recibido datos de cliente para actualizar: {cliente_data}')
+        current_app.logger.debug(f'Recibido datos de cliente para actualizar: {cliente_data}')
         
         if not cliente_data or 'id' not in cliente_data:
             return jsonify(success=False, mensaje='Datos de cliente inválidos.')
@@ -45,17 +45,17 @@ def clientes():
         # Eliminar campos no relacionados con el modelo antes de actualizar
         
         for field in ['csrf_token', 'validar_contrasena', 'submit', 'id']:
-            current_app.debug(f'Campos eliminados: {field}')
+            current_app.logger.debug(f'Campos eliminados: {field}')
             cliente_data.pop(field, None)
            
 
         try:
             cliente.update(**cliente_data)
-            current_app.debug(f'Datos de cliente después de eliminar campos no relacionados: {cliente_data}')
+            current_app.logger.debug(f'Datos de cliente después de eliminar campos no relacionados: {cliente_data}')
             return jsonify(success=True, mensaje='cliente actualizado exitosamente.')
         
         except Exception as e:
-            current_app.debug(f'Error al actualizar cliente: {e}')
+            current_app.logger.debug(f'Error al actualizar cliente: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar el cliente.',
@@ -65,7 +65,7 @@ def clientes():
             
     elif request.method == 'DELETE':
         cliente_id = request.get_json().get('id')
-        current_app.debug(f'Recibido ID de cliente para eliminar: {cliente_id}')
+        current_app.logger.debug(f'Recibido ID de cliente para eliminar: {cliente_id}')
         
         if not cliente_id:
             return jsonify(success=False, mensaje='ID de cliente inválido.')
@@ -84,7 +84,7 @@ def clientes():
       
         
         except Exception as e:
-            current_app.debug(f'Error al eliminar cliente: {e}')
+            current_app.logger.debug(f'Error al eliminar cliente: {e}')
             
             if '1452' in str(e).lower():
                 mensaje='No se puede eliminar el cliente porque tiene registros relacionados.'
@@ -94,8 +94,8 @@ def clientes():
                 'mensaje': mensaje,
                 'error': str(e)
             }), 500
-        
-    elif form.validate_on_submit():
+
+    elif request.method == 'POST' and form.validate_on_submit():
         cliente = {**form.data}
         # Eliminar campos no relacionados con el modelo antes de crear el cliente
         for field in ['csrf_token',  'submit', 'id']:
@@ -111,14 +111,14 @@ def clientes():
             db.session.commit()
             return jsonify(success=True, mensaje='cliente registrado exitosamente.')
         except Exception as e:
-            # current_app.debug(f'Error al registrar cliente: {e}')
+            current_app.logger.debug(f'Error al registrar cliente: {e}')
             return jsonify(success=False, mensaje='Error al registrar el cliente.', errores=str(e))
 
     elif form.errors:
  
         first_field, first_errors = next(iter(form.errors.items()))
-        error_messages = f"{first_errors[0]}"
-        # current_app.debug(f'Errores en el formulario: {error_messages}')
+        error_messages = f"{first_field}: {first_errors[0]}"
+        current_app.logger.debug(f'Errores en el formulario: {error_messages}')
         return jsonify(success=False, mensaje='Error al registrar el cliente.', errores=error_messages)
 
     return render_template('clientes.html', year=datetime.now().year, form=clientesForm(), User=current_user)
@@ -127,7 +127,7 @@ def clientes():
 @clientes_bp.route('clientes/get/<int:id>', methods=['GET'])
 # @login_required
 def handle_clientes(id):
-    current_app.debug(f'ID recibido en handle_clientes: {id}')
+    current_app.logger.debug(f'ID recibido en handle_clientes: {id}')
     try:
         if not id:
             clientes = clientesModel.query.all()
@@ -157,7 +157,7 @@ def handle_clientes(id):
         elif 'timeout' in error.lower():
             return jsonify(success=False, mensaje='Tiempo de espera agotado al intentar acceder a la base de datos.')
         else:
-            # current_app.debug(f'Error desconocido: {error}')
+            # current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
 @staticmethod
@@ -172,7 +172,7 @@ def crear_recargo_sedan(nuevo_cliente):
         recargo_sedan.save()
         return recargo_sedan
     except Exception as e:
-        current_app.debug(f'Error al crear recargo Sedan: {e}')
+        current_app.logger.debug(f'Error al crear recargo Sedan: {e}')
         raise ValueError(f'Error Inesperado al crear recargo para Sedan')
 
 # PASAJEROS
@@ -182,14 +182,14 @@ def pasajeros():
     
     form = pasajerosForm()
     pasajero_data = request.get_json() if request.method in ['PUT', 'DELETE'] else form.data
-    current_app.debug(f'Datos recibidos del formulario: {pasajero_data}')
+    # current_app.logger.info(f'Datos recibidos del formulario: {pasajero_data}')
 
     # if 'ciudad' in pasajero_data and pasajero_data['ciudad']:
     #     pasajero_data['ciudad'] = pasajero_data['ciudad'].id
 
     if request.method == 'PUT' and form.validate_on_submit():
 
-        current_app.debug(f'Recibido datos de pasajero para actualizar: {pasajero_data}')
+        current_app.logger.debug(f'Recibido datos de pasajero para actualizar: {pasajero_data}')
         if not pasajero_data or 'id' not in pasajero_data:
             return jsonify(success=False, mensaje='Datos de pasajero inválidos.')
 
@@ -203,17 +203,17 @@ def pasajeros():
         for field in ['csrf_token', 'validar_contrasena', 'submit', 'id']:
             pasajero_data.pop(field, None)
 
-        pasajero_data['empresa_id'] = pasajero_data.get('empresa', pasajero.empresa_id)
-        pasajero_data['ciudad_id'] = pasajero_data.get('ciudad', pasajero.ciudad_id)
+        pasajero_data['empresa_id'] = pasajero_data.get('empresa', pasajero.empresa)
+        pasajero_data['ciudad_id'] = pasajero_data.get('ciudad', pasajero.ciudad)
 
-        current_app.debug(f'Datos de pasajero después de eliminar campos no relacionados: {pasajero_data}')
+        current_app.logger.info(f'Datos de pasajero después de eliminar campos no relacionados: {pasajero_data}')
 
         try:
             pasajero.update(**pasajero_data)
             return jsonify(success=True, mensaje='pasajero actualizado exitosamente.')
 
         except Exception as e:
-            current_app.debug(f'Error al actualizar pasajero: {e}')
+            current_app.logger.debug(f'Error al actualizar pasajero: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar el pasajero.',
@@ -222,9 +222,9 @@ def pasajeros():
             
             
     if request.method == 'DELETE':
-            current_app.debug('Recibida solicitud de eliminación de pasajero')
+            current_app.logger.debug('Recibida solicitud de eliminación de pasajero')
             pasajero_id = request.get_json().get('id')
-            current_app.debug(f'Recibido ID de pasajero para eliminar: {pasajero_id}')
+            current_app.logger.debug(f'Recibido ID de pasajero para eliminar: {pasajero_id}')
             if not pasajero_id:
                 return jsonify(success=False, mensaje='ID de pasajero inválido.')
 
@@ -238,7 +238,7 @@ def pasajeros():
                 return jsonify(success=True, mensaje='pasajero eliminado exitosamente.')
 
             except Exception as e:
-                # current_app.debug(f'Error al eliminar cliente: {e}')
+                current_app.logger.debug(f'Error al eliminar cliente: {e}')
                 return jsonify({
                     'success': False,
                     'mensaje': 'Error al eliminar el cliente.',
@@ -255,14 +255,14 @@ def pasajeros():
             nuevo_cliente.save()
             return jsonify(success=True, mensaje='cliente registrado exitosamente.')
         except Exception as e:
-            # current_app.debug(f'Error al registrar cliente: {e}')
+            current_app.logger.debug(f'Error al registrar cliente: {e}')
             return jsonify(success=False, mensaje='Error al registrar el cliente.', errores=str(e))
 
     elif form.errors:
  
         first_field, first_errors = next(iter(form.errors.items()))
-        error_messages = f"{first_errors[0]}"
-        # current_app.debug(f'Errores en el formulario: {error_messages}')
+        error_messages = f"{first_field[0]}: {first_errors[0]}"
+        current_app.logger.debug(f'Errores en el formulario: {error_messages}')
         return jsonify(success=False, mensaje='Error al registrar el cliente.', errores=error_messages)
 
     return render_template('pasajeros.html', year=datetime.now().year, form=pasajerosForm(), User=current_user)
@@ -270,7 +270,7 @@ def pasajeros():
 @clientes_bp.route('pasajeros/all', defaults={'id': None}, methods=['GET'])
 @clientes_bp.route('pasajeros/get/<int:id>', methods=['GET'])
 def handle_pasajeros(id):
-    current_app.debug(f'ID recibido en handle_pasajeros: {id}')
+    current_app.logger.debug(f'ID recibido en handle_pasajeros: {id}')
     try:
         if not id:
             pasajeros = pasajerosModel.query.all()
@@ -286,9 +286,9 @@ def handle_pasajeros(id):
                 'data': [],
                 'mensaje': 'No se encontraron pasajeros.'
             }
-            current_app.debug('No se encontraron pasajeros.')
+            current_app.logger.debug('No se encontraron pasajeros.')
         else:
-            current_app.debug(f'Pasajeros encontrados: {len(pasajeros_serialized)}')
+            current_app.logger.debug(f'Pasajeros encontrados: {len(pasajeros_serialized)}')
             response_data = {
                 'success': True,
             'data': pasajeros_serialized,
@@ -308,28 +308,28 @@ def handle_pasajeros(id):
         elif 'timeout' in error.lower():
             return jsonify(success=False, mensaje='Tiempo de espera agotado al intentar acceder a la base de datos.')
         else:
-            # current_app.debug(f'Error desconocido: {error}')
+            # current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
 
 @clientes_bp.route('/empresas/pasajeros', methods=['GET'])
 def obtener_pasajeros():
     empresa_id = request.args.get('empresa', type=int)
-    current_app.debug(f'ID de empresa recibido: {empresa_id}')
+    current_app.logger.debug(f'ID de empresa recibido: {empresa_id}')
     if not empresa_id:
-        current_app.debug('ID de empresa no proporcionado o inválido.')
+        current_app.logger.debug('ID de empresa no proporcionado o inválido.')
         return jsonify(success=False, data=[], mensaje='ID de empresa no proporcionado o inválido.')
 
     try:
         pasajeros = pasajerosModel.query.filter_by(empresa=empresa_id).all()
         if not pasajeros:
-            current_app.debug(f'No se encontraron pasajeros para la empresa con ID {empresa_id}')
+            current_app.logger.debug(f'No se encontraron pasajeros para la empresa con ID {empresa_id}')
             return jsonify(success=False, mensaje='No se encontraron pasajeros para esta empresa.')
-        current_app.debug(f'Pasajeros encontrados para la empresa con ID {empresa_id}: {len(pasajeros)}')
+        current_app.logger.debug(f'Pasajeros encontrados para la empresa con ID {empresa_id}: {len(pasajeros)}')
         return jsonify(success=True, data=[p.serialize() for p in pasajeros])
     
     except Exception as e:
-        current_app.debug(f'Error al obtener pasajeros por empresa: {e}')
+        current_app.logger.debug(f'Error al obtener pasajeros por empresa: {e}')
         return jsonify(success=False, mensaje='Error al obtener pasajeros por empresa.', error=str(e))
 
 
@@ -340,14 +340,14 @@ def tarifas():
     
     form = tarifasForm()
     tarifa_data = request.get_json() if request.method in ['PUT', 'DELETE'] else form.data
-    current_app.debug(f'Datos recibidos del formulario: {tarifa_data}')
+    current_app.logger.debug(f'Datos recibidos del formulario: {tarifa_data}')
 
     # if 'ciudad' in pasajero_data and pasajero_data['ciudad']:
     #     pasajero_data['ciudad'] = pasajero_data['ciudad'].id
 
     if request.method == 'PUT' and form.validate_on_submit():
 
-        current_app.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data}')
+        current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data}')
         if not tarifa_data or 'id' not in tarifa_data:
             return jsonify(success=False, mensaje='Datos de tarifa inválidos.')
 
@@ -366,7 +366,7 @@ def tarifas():
             return jsonify(success=True, mensaje='tarifa actualizado exitosamente.')
 
         except Exception as e:
-            current_app.debug(f'Error al actualizar tarifa: {e}')
+            current_app.logger.debug(f'Error al actualizar tarifa: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar la tarifa.',
@@ -375,9 +375,9 @@ def tarifas():
 
 
     if request.method == 'DELETE':
-            current_app.debug('Recibida solicitud de eliminación de tarifa')
+            current_app.logger.debug('Recibida solicitud de eliminación de tarifa')
             tarifa_id = request.get_json().get('id')
-            current_app.debug(f'Recibido ID de tarifa para eliminar: {tarifa_id}')
+            current_app.logger.debug(f'Recibido ID de tarifa para eliminar: {tarifa_id}')
             if not tarifa_id:
                 return jsonify(success=False, mensaje='ID de tarifa inválido.')
 
@@ -391,7 +391,7 @@ def tarifas():
                 return jsonify(success=True, mensaje='tarifa eliminada exitosamente.')
 
             except Exception as e:
-                # current_app.debug(f'Error al eliminar cliente: {e}')
+                # current_app.logger.debug(f'Error al eliminar cliente: {e}')
                 return jsonify({
                     'success': False,
                     'mensaje': 'Error al eliminar la tarifa.',
@@ -412,7 +412,7 @@ def tarifas():
             nuevo_tarifa.save()
             return jsonify(success=True, mensaje='tarifa registrada exitosamente.')
         except Exception as e:
-            # current_app.debug(f'Error al registrar cliente: {e}')
+            # current_app.logger.debug(f'Error al registrar cliente: {e}')
             return jsonify(success=False, mensaje='Error al registrar la tarifa.', errores=str(e))
 
     elif form.errors:
@@ -421,7 +421,7 @@ def tarifas():
         field_label = getattr(form, first_field).label.text
         error_messages = f"{first_errors[0]}"
         errores = f'{field_label}: {error_messages}'
-        current_app.debug(f'Errores en el formulario: {field_label}: {error_messages}')
+        current_app.logger.debug(f'Errores en el formulario: {field_label}: {error_messages}')
         return jsonify(success=False, mensaje='Error al registrar la tarifa.', errores=errores)
 
     return render_template('tarifas.html', year=datetime.now().year, form=tarifasForm(), User=current_user)
@@ -430,7 +430,7 @@ def tarifas():
 @clientes_bp.route('/get/tarifas', methods=['GET'])
 def handle_tarifas():
     empresa_id = request.args.get('empresa', type=int)
-    current_app.debug(f'ID recibido en handle_tarifas: {empresa_id}')
+    current_app.logger.debug(f'ID recibido en handle_tarifas: {empresa_id}')
     try:
         if not empresa_id:
             tarifas = tarifasModel.query.all()
@@ -439,7 +439,7 @@ def handle_tarifas():
 
         tarifas = tarifas if isinstance(tarifas, list) else [tarifas]
         tarifas_serialized = [e.serialize() for e in tarifas]
-        # current_app.debug(f'Tarifas encontradas: {len(tarifas_serialized)}')
+        # current_app.logger.debug(f'Tarifas encontradas: {len(tarifas_serialized)}')
       
 
         response_data = {
@@ -460,7 +460,7 @@ def handle_tarifas():
         elif 'timeout' in error.lower():
             return jsonify(success=False, mensaje='Tiempo de espera agotado al intentar acceder a la base de datos.')
         else:
-            # current_app.debug(f'Error desconocido: {error}')
+            # current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
 
@@ -470,7 +470,7 @@ def handle_tarifas():
 def recargo_vehiculos():
     form = recargoVehiculosForm()
     formData = form.data
-    current_app.debug(f'Datos recibidos del formulario: {formData}')
+    current_app.logger.debug(f'Datos recibidos del formulario: {formData}')
     
     if request.method == 'GET':
         
@@ -489,12 +489,12 @@ def recargo_vehiculos():
             nuevo_recargo.save()
             return jsonify(success=True, mensaje='Recargo de vehículo registrado exitosamente.')
         except Exception as e:
-            current_app.debug(f'Error al registrar recargo de vehículo: {e}')
+            current_app.logger.debug(f'Error al registrar recargo de vehículo: {e}')
             return jsonify(success=False, mensaje='Error al registrar el recargo de vehículo.', errores="Falla al registrar el recargo de vehículo. Asegúrese de que el vehículo y la empresa existan en la base de datos.")
     elif request.method == 'DELETE':
         # Lógica para eliminar un recargo de vehículo
         recargo_id = request.get_json().get('id')
-        current_app.debug(f'Recibido ID de recargo para eliminar: {recargo_id}')
+        current_app.logger.debug(f'Recibido ID de recargo para eliminar: {recargo_id}')
         if not recargo_id:
             return jsonify(success=False, mensaje='ID de recargo inválido.')
 
@@ -507,7 +507,7 @@ def recargo_vehiculos():
             recargo.delete()
             return jsonify(success=True, mensaje='Recargo de vehículo eliminado exitosamente.')
         except Exception as e:
-            current_app.debug(f'Error al eliminar recargo de vehículo: {e}')
+            current_app.logger.debug(f'Error al eliminar recargo de vehículo: {e}')
             return jsonify(success=False, mensaje='Error al eliminar el recargo de vehículo.', error=str(e))
         
     elif request.method == 'PUT':
@@ -549,31 +549,31 @@ def handle_recargos(id):
 @clientes_bp.route('/vehiculos', methods=['GET'])
 def vehiculos_empresa():
     empresa_id = request.args.get('empresa', type=int)
-    current_app.debug(f'ID de empresa recibido: {empresa_id}')
+    current_app.logger.debug(f'ID de empresa recibido: {empresa_id}')
    
     if not empresa_id:
-        current_app.debug('ID de empresa no proporcionado o inválido.')
+        current_app.logger.debug('ID de empresa no proporcionado o inválido.')
         return jsonify(success=False, data=[], mensaje='ID de empresa no proporcionado o inválido.')
 
     try:
         recargo_vehiculos = recargoVehiculosModel.query.filter_by(cliente=empresa_id).all()
         vehiculos_ids = [v.vehiculo for v in recargo_vehiculos]
-        current_app.debug(f'IDs de vehículos para la empresa {empresa_id}: {vehiculos_ids}')
+        current_app.logger.debug(f'IDs de vehículos para la empresa {empresa_id}: {vehiculos_ids}')
 
         vehiculos = vehiculosModel.query.filter(vehiculosModel.id.in_(vehiculos_ids)).all()
-        current_app.debug(f'Vehículos encontrados: {len(vehiculos)}')
+        current_app.logger.debug(f'Vehículos encontrados: {len(vehiculos)}')
         
         if not vehiculos:
-            current_app.debug(f'No se encontraron vehículos para la empresa con ID {empresa_id}')
+            current_app.logger.debug(f'No se encontraron vehículos para la empresa con ID {empresa_id}')
             return jsonify(success=False, mensaje='No se encontraron vehículos para esta empresa.')
         
-        current_app.debug(f'Vehículos encontrados para la empresa con ID {empresa_id}: {len(vehiculos)}')
+        current_app.logger.debug(f'Vehículos encontrados para la empresa con ID {empresa_id}: {len(vehiculos)}')
         data = [v.serialize() for v in vehiculos]
         # data.sort(key=lambda x: x['vehiculo']['codigo'])  # Ordenar por código del vehículo
-        current_app.debug(f'Datos de vehículos serializados: {data}')
+        current_app.logger.debug(f'Datos de vehículos serializados: {data}')
         
         return jsonify(success=True, data=data)
 
     except Exception as e:
-        current_app.debug(f'Error al obtener vehículos por empresa: {e}')
+        current_app.logger.debug(f'Error al obtener vehículos por empresa: {e}')
         return jsonify(success=False, mensaje='Error al obtener vehículos por empresa.', error=str(e))

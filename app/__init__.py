@@ -25,9 +25,8 @@ def create_app():
     @app.errorhandler(Exception)
     def handle_exception(e):
         app.logger.error(f'Unhandled exception: {str(e)}', exc_info=True)
-        return "Internal Server Error", 500
-    
-    
+        return f'{"Error Interno del Servidor:"} {str(e)}, 500'
+
     app.config.from_object('config.Config')
 
     

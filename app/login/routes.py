@@ -23,7 +23,7 @@ def login():
        
 
         if empleado  and empleado.contrasena and empleado.check_password(password) != None:
-            # current_app.debug(f'Empleado encontrado: {empleado.contrasena}')
+            # current_app.logger.debug(f'Empleado encontrado: {empleado.contrasena}')
             login_user(empleado, remember=form.remember.data)
             
             if hasattr(empleado, 'rol') and empleado.rol == 'admin':

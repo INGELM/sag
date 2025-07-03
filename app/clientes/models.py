@@ -40,7 +40,7 @@ class clientesModel(db.Model):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            current_app.debug(f'Error al guardar cliente: {e}')
+            current_app.logger.debug(f'Error al guardar cliente: {e}')
             raise ValueError("Error inesperado al guardar el cliente.")
 
     def update(self, **kwargs):
@@ -52,7 +52,7 @@ class clientesModel(db.Model):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            current_app.debug(f'Error al actualizar cliente: {e}')
+            current_app.logger.debug(f'Error al actualizar cliente: {e}')
             raise ValueError("Error inesperado al actualizar el cliente.")
 
     def delete(self):
@@ -166,9 +166,17 @@ class tarifasModel(db.Model):
         db.session.commit()
 
     def update(self, **kwargs):
+        # Actualiza los atributos antes de recalcular el código
         for key, value in kwargs.items():
             if hasattr(self, key) and value is not None:
                 setattr(self, key, value)
+        # Obtiene los objetos relacionados si es necesario
+        empresa_obj = self.cliente if hasattr(self, 'cliente') and self.cliente else None
+        origen_obj = self.origen_rel if hasattr(self, 'origen_rel') and self.origen_rel else None
+        destino_obj = self.destino_rel if hasattr(self, 'destino_rel') and self.destino_rel else None
+        # Recalcula el código si los objetos existen
+        if empresa_obj and origen_obj and destino_obj:
+            self.codigo = f"{empresa_obj.codigo}{origen_obj.codigo}{destino_obj.codigo}".upper()
         db.session.commit()
 
     def delete(self):
@@ -192,7 +200,7 @@ class tarifasModel(db.Model):
             elif len(tarifas_operadores) > 1:
                 color = 'green'
         except Exception as e:
-            current_app.debug(f'Error al obtener color de tarifa: {e}')
+            current_app.logger.debug(f'Error al obtener color de tarifa: {e}')
             color = 'gray'  
             raise ValueError("Error inesperado al obtener el color de la tarifa.")
         return color

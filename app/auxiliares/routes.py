@@ -47,7 +47,7 @@ def ciudades():
             return jsonify(success=True, mensaje='Ciudad actualizada exitosamente.')
 
         except Exception as e:
-            current_app.debug(f'Error al actualizar ciudad: {e}')
+            current_app.logger.debug(f'Error al actualizar ciudad: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar la ciudad.',
@@ -57,7 +57,7 @@ def ciudades():
             
     if request.method == 'DELETE':
             ciudad_id = request.get_json().get('id')
-            current_app.debug(f'Recibido ID de ciudad para eliminar: {ciudad_id}')
+            current_app.logger.debug(f'Recibido ID de ciudad para eliminar: {ciudad_id}')
             if not ciudad_id:
                 return jsonify(success=False, mensaje='ID de ciudad inválido.')
 
@@ -71,7 +71,7 @@ def ciudades():
                 return jsonify(success=True, mensaje='Ciudad eliminada exitosamente.')
 
             except Exception as e:
-                # current_app.debug(f'Error al eliminar ciudad: {e}')
+                # current_app.logger.debug(f'Error al eliminar ciudad: {e}')
                 return jsonify({
                     'success': False,
                     'mensaje': 'Error al eliminar la ciudad.',
@@ -88,14 +88,14 @@ def ciudades():
             nueva_ciudad.save()
             return jsonify(success=True, mensaje='Ciudad registrada exitosamente.')
         except Exception as e:
-            current_app.debug(f'Error al registrar ciudad: {e}')
+            current_app.logger.debug(f'Error al registrar ciudad: {e}')
             return jsonify(success=False, mensaje='Error al registrar la ciudad.', errores=str(e))
 
     elif form.errors:
  
         first_field, first_errors = next(iter(form.errors.items()))
         error_messages = f"{first_errors[0]}"
-        # current_app.debug(f'Errores en el formulario: {error_messages}')
+        # current_app.logger.debug(f'Errores en el formulario: {error_messages}')
         return jsonify(success=False, mensaje='Error al registrar la ciudad.', errores=error_messages)
 
     return render_template('ciudades.html', year=datetime.now().year, form=ciudadesForm(), User=current_user)
@@ -128,7 +128,7 @@ def all_ciudades():
         elif 'timeout' in error.lower():
             return jsonify(success=False, mensaje='Tiempo de espera agotado al intentar acceder a la base de datos.')
         else:
-            # current_app.debug(f'Error desconocido: {error}')
+            # current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
 
@@ -167,7 +167,7 @@ def get_ciudad_destino():
     try:
         tarifas = tarifasModel.query.filter_by(empresa=empresa_id, origen=origen_id).all()
         
-        current_app.debug(f'Tarifas encontradas: {tarifas}')
+        current_app.logger.debug(f'Tarifas encontradas: {tarifas}')
 
         ciudades = ciudadesModel.query.filter(ciudadesModel.id.in_([tarifa.destino for tarifa in tarifas if tarifa.destino])).all()
 
@@ -195,14 +195,14 @@ def vehiculos():
 
     if request.method == 'PUT' and form.validate_on_submit():
         vehiculo_data = request.get_json()
-        current_app.debug(f'Recibido datos de vehiculo para actualizar: {vehiculo_data}')
+        current_app.logger.debug(f'Recibido datos de vehiculo para actualizar: {vehiculo_data}')
        
         if not vehiculo_data or 'id' not in vehiculo_data:
             return jsonify(success=False, mensaje='Datos de vehiculo inválidos.')
 
         vehiculo_id = vehiculo_data.get('id')
         vehiculo = vehiculosModel.query.get(vehiculo_id)
-        current_app.debug(f'Vehiculo encontrado: {vehiculo.tipo}')
+        current_app.logger.debug(f'Vehiculo encontrado: {vehiculo.tipo}')
 
         if vehiculo.tipo == 'Sedan':
             return jsonify(success=False, errores='', mensaje="No se puede modificar vehiculo Sedan")
@@ -219,7 +219,7 @@ def vehiculos():
             return jsonify(success=True, mensaje='Vehiculo actualizado exitosamente.')
 
         except Exception as e:
-            current_app.debug(f'Error al actualizar vehiculo: {e}')
+            current_app.logger.debug(f'Error al actualizar vehiculo: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar la vehiculo.',
@@ -229,7 +229,7 @@ def vehiculos():
             
     if request.method == 'DELETE':
             vehiculo_id = request.get_json().get('id')
-            current_app.debug(f'Recibido ID de vehiculo para eliminar: {vehiculo_id}')
+            current_app.logger.debug(f'Recibido ID de vehiculo para eliminar: {vehiculo_id}')
             
             if not vehiculo_id:
                 return jsonify(success=False, mensaje='ID de vehiculo inválido.')
@@ -247,7 +247,7 @@ def vehiculos():
                 return jsonify(success=True, mensaje='Vehiculo eliminada exitosamente.')
 
             except Exception as e:
-                current_app.debug(f'Error al eliminar vehiculo: {e}')
+                current_app.logger.debug(f'Error al eliminar vehiculo: {e}')
                 return jsonify({
                     'success': False,
                     'mensaje': 'Error al eliminar la vehiculo.',
@@ -264,14 +264,14 @@ def vehiculos():
             nueva_ciudad.save()
             return jsonify(success=True, mensaje='Ciudad registrada exitosamente.')
         except Exception as e:
-            current_app.debug(f'Error al registrar vehiculo: {e}')
+            current_app.logger.debug(f'Error al registrar vehiculo: {e}')
             return jsonify(success=False, mensaje='Error al registrar la vehiculo.', errores=str(e))
 
     elif form.errors:
  
         first_field, first_errors = next(iter(form.errors.items()))
         error_messages = f"{first_errors[0]}"
-        # current_app.debug(f'Errores en el formulario: {error_messages}')
+        # current_app.logger.debug(f'Errores en el formulario: {error_messages}')
         return jsonify(success=False, mensaje='Error al registrar la vehiculo.', errores=error_messages)
 
     
@@ -304,7 +304,7 @@ def all_vehiculos():
         elif 'timeout' in error.lower():
             return jsonify(success=False, mensaje='Tiempo de espera agotado al intentar acceder a la base de datos.')
         else:
-            current_app.debug(f'Error desconocido: {error}')
+            current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
 # TASA DE CAMBIO
@@ -338,7 +338,7 @@ def tasa():
             try:
                 nueva_tasa.save()
             except Exception as e:
-                current_app.debug(f'Error al guardar nueva tasa: {e}')
+                current_app.logger.debug(f'Error al guardar nueva tasa: {e}')
         
         tasa = data.tasa if data else tasa_bcv
 
@@ -357,13 +357,13 @@ def tasa():
                 flash('Tasa actualizada exitosamente.', 'success')
                 return jsonify(success=True, mensaje='Tasa actualizada exitosamente.')
             except Exception as e:
-                current_app.debug(f'Error al actualizar tasa: {e}')
+                current_app.logger.debug(f'Error al actualizar tasa: {e}')
                 return jsonify(success=False, mensaje='Error al actualizar la tasa.', errores=str(e))
 
         elif form.errors:
             first_field, first_errors = next(iter(form.errors.items()))
             error_messages = f"{first_errors[0]}"
-            current_app.debug(f'Errores en el formulario: {error_messages}')
+            current_app.logger.debug(f'Errores en el formulario: {error_messages}')
             return jsonify(success=False, mensaje='Atención', errores=error_messages)
 
 
@@ -382,6 +382,6 @@ def all_tasa():
 
         return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
     except Exception as e:
-        current_app.debug(f'Error al obtener tasas: {e}')
+        current_app.logger.debug(f'Error al obtener tasas: {e}')
         return jsonify(success=False, mensaje='Error al obtener las tasas.', errores=str(e))
     
