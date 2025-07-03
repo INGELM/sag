@@ -1,0 +1,84 @@
+{% extends 'base/dashboard_base.html' %}
+{% from "macros.html" import render_field %}
+
+{% block titulo %}
+  Tarifas Operadores
+{% endblock %}
+
+
+{% block nav_menu %}
+
+ {% include "nav-menu-empleados.html" %}
+  
+{% endblock nav_menu %}
+  
+
+
+
+{% block dashboard %}
+  <div class="row d-flex p-1">
+    <div class="col-xl-4 mb-3  formulario visually-hidden" id="">
+      <div class="justify-content-center">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="tituloForm" id="">Crear Tarifas</h4>
+            <i class="bx bx-x cerrar-form" type="button"></i>
+          </div>
+          <div class="card-body">
+            <form action="" method="POST" id="tarifasOperadoresForm" data-id="" novalidate>
+                <div class="alert alert-warning alert-dismissible fade visually-hidden" role="alert" id="erroresForm">
+                
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {{ form.csrf_token }}
+
+              <div class="row">
+                {% for f in form %}
+                 
+                  {{ render_field(f)}}
+ 
+                {% endfor %}
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 botonForm" id="">Guardar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg">
+      <div class="justify-content-center">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0 fw-bold">Tarifas Operadores</h3>
+            <!--<button type="button" class="btn btn-outline-primary" id="test-btn">Agregar</button>-->
+            <i class="bx bx-plus-circle bx-sm agregar" type="button"></i>
+          </div>
+          <div class="card-body">
+            <table class="table" id="tarifasOperadoresTable">
+              <thead>
+                <tr>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+{% block JS %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('empleados.static', filename='js/empleados.js') }}"></script>
+{% endblock %}

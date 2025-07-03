@@ -1,0 +1,7 @@
+---
+deployment:
+      tasks:
+        - export DEPLOYPATH=/home2/globalstweb/public_html/sag.globalst.com.ve  # Add /<app_folder> if required
+        - /bin/cp -r * $DEPLOYPATH                        #copy all recursively to $DEPLOYPATH
+        
+        

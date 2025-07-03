@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+{% from 'macros.html' import nav_link, dropdown_menu %}
+
+{% block contenido %}
+  <div class="container-fluid pt-3">
+
+    <nav class="navbar navbar-expand-lg bg-primary rounded-2 mb-3" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">GLOBAL S&T</a>
+       
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarColor03">
+          <ul class="navbar-nav me-auto">
+      
+
+           <!-- {{ nav_link('login.login', 'Inicio', 'bx bx-home-alt') }} -->
+
+            {{ dropdown_menu('empleadosMenu', 'Empleados', [
+              {'href': url_for('empleados.empleados'), 'text': 'Lista de Empleados', 'endpoint': 'empleados.empleados', 'icon': 'bx bx-list-ul'},
+              {'href': url_for('empleados.tarifas_operador'), 'text': 'Tarifas Operador', 'endpoint': 'empleados.tarifas_operador', 'icon': 'bx bx-dollar-circle'}
+            ], menu_icon='bx bx-user') }}
+            
+            {{ dropdown_menu('clientes.clientes', 'Clientes', [
+              {'href': url_for('clientes.clientes'), 'text': 'Lista de Clientes', 'endpoint': 'clientes.clientes', 'icon': 'bx bx-list-ul'},
+              {'href': url_for('clientes.tarifas'), 'text': 'Tarifas', 'endpoint': 'clientes.tarifas', 'icon': 'bx bx-dollar-circle'},
+              {'href': url_for('clientes.pasajeros'), 'text': 'Pasajeros', 'endpoint': 'clientes.pasajeros', 'icon': 'bx bx-user'},
+              {'href': url_for('clientes.recargo_vehiculos'), 'text': 'Recargo Vehículos', 'endpoint': 'clientes.recargo_vehiculos', 'icon': 'bx bx-car'}
+            ],
+            menu_icon='bx bx-buildings') }}
+
+            {{ nav_link('programacion.programacion', 'Programación', 'bx bx-calendar-alt') }}
+
+            {{ dropdown_menu('facturacion.facturacion', 'Facturación', [
+              {'href': url_for('facturacion.facturacion'), 'text': 'Facturas Clientes', 'endpoint': 'facturacion.facturacion', 'icon': 'bx bx-arrow-in-down-left-circle'},
+              {'href': url_for('facturacion.pagos_operadores'), 'text': 'Pagos Operadores', 'endpoint': 'facturacion.pagos_operadores', 'icon': 'bx bx-arrow-out-down-right-circle'}
+
+            ], menu_icon='bx bx-receipt') }}
+
+            {{ dropdown_menu('ciudades.ciudades', 'Ajustes', [
+              {'href': url_for('ciudades.ciudades'), 'text': 'Lista de Ciudades', 'endpoint': 'ciudades.ciudades', 'icon': 'bx bx-list-ul'},
+              {'href': url_for('vehiculos.vehiculos'), 'text': 'Vehículos', 'endpoint': 'vehiculos.vehiculos', 'icon': 'bx bx-car'},
+              {'href': url_for('tasa.tasa'), 'text': 'Tasa', 'endpoint': 'tasa.tasa', 'icon': 'bx bx-dollar-circle'}
+            ],
+            menu_icon='bx bx-slider') }}
+
+          </ul>
+          
+        </div>
+        <div class="ms-auto d-flex text-white align-content-center mt-2">
+            <div class="fw-bold">{{ User.nombres }} ({{ User.rol }})</div>
+            <a href="{{ url_for('login.logout') }}" class="text-white"><i class="bx bx-arrow-out-right-square-half bx-sm pe-2 ms-2"></i></a>
+          </div>
+
+      </div>
+    </nav>
+
+    
+
+    
+   
+
+    {% block dashboard %}
+
+    {% endblock %}
+  </div>
+{% endblock %}

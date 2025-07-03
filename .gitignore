@@ -1,0 +1,19 @@
+.venv/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.db
+*.sqlite3
+*.log
+*.env
+*.DS_Store
+notes.txt
+temporal.py
+migrations/
+app_org.js
+# Ignore Jupyter Notebook 
+temp/
+.log

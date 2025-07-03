@@ -1,0 +1,57 @@
+{# macros.html #}
+{% macro render_field(f) %}
+  {% if f.name not in ['submit', 'csrf_token', 'retorno'] %}
+    <div class="col-lg-6  {% if f.name == 'id' %} visually-hidden {% endif %}">
+      <div class="form-floating mb-3">
+        {{ f }}
+        
+        {% if f.name not in ['p', 'id'] %}
+            {{ f.label }}
+        {% endif %}
+          
+      
+      </div>
+        
+       {% if f.errors %}
+              <div class="invalid-feedback d-block">
+              {{ f.errors.0 }}
+              </div>
+            {% endif %}
+          
+    </div>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro nav_link(endpoint, text, icono) %}
+<li class="nav-item">
+  <a href="{{ url_for(endpoint) }}" class="nav-link {% if request.endpoint == endpoint %}active{% endif %}">
+    <i class="{{ icono }}"></i>
+    {{ text }}
+  </a>
+</li>
+{% endmacro %}
+
+{% macro dropdown_menu(menu_id, menu_text, items, menu_icon=None) %}
+  {% set is_active = items | selectattr('endpoint', 'equalto', request.endpoint) | list | length > 0 %}
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center {{ 'active' if is_active }}" href="#" id="{{ menu_id }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      {% if menu_icon %}
+        <i class="{{ menu_icon }} me-2"></i>
+      {% endif %}
+      <span class="d-flex align-items-center">{{ menu_text }}</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="{{ menu_id }}">
+      {% for item in items %}
+        <li>
+          <a class="dropdown-item d-flex justify-content-start align-items-center {{ 'active' if request.endpoint == item.endpoint }}" href="{{ item.href }}">
+            {% if item.icon %}
+              <i class="{{ item.icon }} me-2"></i>
+            {% endif %}
+            <span class="d-flex align-items-center">{{ item.text }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </li>
+{% endmacro %}

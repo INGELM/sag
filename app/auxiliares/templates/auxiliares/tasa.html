@@ -1,0 +1,86 @@
+{% extends 'base/dashboard_base.html' %}
+{% from "macros.html" import render_field %}
+
+{% block titulo %}
+  Tasa
+{% endblock %}
+
+
+{% block nav_menu %}
+
+{% include "nav-menu.html" %}
+  
+{% endblock nav_menu %}
+  
+
+
+
+{% block dashboard %}
+  <div class="row d-flex p-1">
+    <div class="col-xl-4 mb-3 formulario" id="">
+      <div class="justify-content-center">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="tituloForm" id="">Actualizar Tasa</h4>
+           <!-- <i class="bx bx-x cerrar-form" type="button"></i>-->
+          </div>
+          <div class="card-body">
+            <form action="" method="PUT" id="tasaForm" data-id="" novalidate>
+                <div class="alert alert-warning alert-dismissible fade visually-hidden" role="alert" id="erroresForm">
+                
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {{ form.csrf_token }}
+
+               <div class="row">
+                <div class="col-xl">
+                  <div class="form-floating form-group mb-3">{{ form.tasa }}
+                    {{ form.tasa.label }}</div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 botonForm" id="">Guardar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg">
+      <div class="justify-content-center">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0 fw-bold">Tasa Bs/$</h3>
+            <!--<button type="button" class="btn btn-outline-primary" id="test-btn">Agregar</button>
+            <i class="bx bx-plus agregar" type="button"></i>-->
+          </div>
+          <div class="card-body">
+
+            <h5 class="fw-bold">Fecha Actualización: <span class="text-primary">{{ fecha }}</span></h5>
+
+            <h5 class="fw-bold">Tasa: <span class="text-primary">{{ tasa }} Bs/$</span></h5>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold">Tasa Oficial BCV</h5>
+
+            <h5 class="fw-bold">Fecha Actualización: <span class="text-primary">{{ fecha_bcv }}</span></h5>
+
+            <h5 class="fw-bold">Tasa: <span class="text-primary">{{ tasa_bcv }} Bs/$</span></h5>
+
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+{% block JS %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('tasa.static', filename='js/auxiliares.js') }}"></script>
+{% endblock %}

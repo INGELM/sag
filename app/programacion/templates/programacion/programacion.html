@@ -1,0 +1,196 @@
+{% extends 'base/dashboard_base.html' %}
+{% from 'macros.html' import render_field %}
+
+{% block titulo %}
+  Programación
+{% endblock %}
+
+{% block nav_menu %}
+
+{% endblock %}
+
+{% block dashboard %}
+  <div class="row p-1">
+    <div class="col-xl mb-3 formulario visually-hidden" id="">
+      <div class="justify-content-center align-content-center">
+        <div class="card px-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="tituloForm" id="">Crear Programación</h4>
+            <i class="bx bx-x cerrar-form" type="button"></i>
+          </div>
+          <div class="card-body">
+            <form action="" method="POST" id="programacionForm" data-id="" novalidate>
+              <div class="alert alert-warning alert-dismissible fade visually-hidden" role="alert" id="erroresForm">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {{ form.csrf_token }}
+
+              <div class="row">
+                <div class="col-xl-12">
+                  <div class="mb-3 form-group text-end">
+                    <label class="form-check-label" for="formProgRetorno">{{ form.retorno.label }}</label>
+                    {{ form.retorno }}
+                  </div>
+                </div>
+                <div class="col-xl visually-hidden">
+                  <div class="mb-3 form-group text-end">
+                    <label class="form-check-label" for="formProgRetorno">{{ form.id.label }}</label>
+                    {{ form.id }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl">
+                  <div class="form-floating form-group mb-3">{{ form.fecha_salida }}
+                    {{ form.fecha_salida.label }}</div>
+                </div>
+
+                <div class="col-xl">
+                  <div class="form-floating form-group mb-3">{{ form.hora_salida }}
+                    {{ form.hora_salida.label }}</div>
+                </div>
+                <div class="col-xl-4 retorno visually-hidden" id="h-retorno">
+                  <div class="form-floating form-group mb-3">{{ form.hora_retorno }}
+                    {{ form.hora_retorno.label }}</div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-12">
+                  <div class="form-floating form-group mb-3">{{ form.guia }}
+                    {{ form.guia.label }}</div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.empresa.label }}</label>
+                    {{ form.empresa }}
+                  </div>
+                </div>
+
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.pasajeros.label }}</label>
+                    {{ form.pasajeros }}
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.operador.label }}</label>
+                    {{ form.operador }}
+                  </div>
+                </div>
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.vehiculo.label }}</label>
+                    {{ form.vehiculo }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.origen.label }}</label>
+                    {{ form.origen }}
+                  </div>
+                </div>
+
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.destino.label }}</label>
+                    {{ form.destino }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-6">
+                  <div class="mb-3 form-floating form-group">{{ form.distancia }}
+                    {{ form.distancia.label }}</div>
+                </div>
+
+                <div class="col-xl-6 visually-hidden finalizar" id="desvios">
+                  <div class="mb-3 form-floating form-group">{{ form.desvios }}
+                    {{ form.desvios.label }}</div>
+                </div>
+
+                <div class="col-xl-6 visually-hidden finalizar" id="t-espera">
+                  <div class="mb-3 form-floating form-group">{{ form.tiempo_espera }}
+                    {{ form.tiempo_espera.label }}</div>
+                </div>
+                <div class="col-xl-6">
+                  <div class="mb-3 form-floating form-group" id="">{{ form.status }}
+                    {{ form.status.label }}</div>
+                </div>
+              </div>
+
+              <div class="row"></div>
+
+              <div class="row-12">
+                <button type="submit" class="btn btn-primary w-100 botonForm" id="">Guardar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl">
+      <div class="justify-content-center">
+        <div class="card">
+          <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex flex-wrap gap-3">
+            <!-- Grupo Desde -->
+            <div class="d-flex align-items-center gap-2">
+              <label for="f-desde">Desde</label>
+              <input type="date" class="form-control rounded-1" id="f-desde" />
+            </div>
+
+            <!-- Grupo Hasta -->
+            <div class="d-flex align-items-center gap-2">
+              <label for="f-hasta">Hasta</label>
+              <input type="date" class="form-control rounded-1" id="f-hasta" />
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-primary btn-sm" id="f-filtrar">Filtrar</button>
+              <button type="button" class="btn btn-info btn-sm" id="f-limpiar">Limpiar</button>
+            </div>
+            </div>
+            <div>
+              <i class="bx bx-plus-circle bx-sm agregar" type="button"></i>
+              </div>
+          </div>
+
+
+          <div class="card-body">
+            <table class="table" id="programacionTable">
+              <thead>
+                <tr>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block JS %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('programacion.static', filename='js/programacion.js') }}"></script>
+{% endblock %}

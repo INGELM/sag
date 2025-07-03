@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+
+{% block titulo %}
+  Inicio de Sesión
+{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid vh-100 m-0 p-0 d-flex justify-content-center align-items-center">
+  <div class="card ">
+    <div class="card-header d-flex align-items-center bg-white">
+      <img src="/static/img/logo.webp" alt="" height="50rem" />
+      <div class="ms-4 text-end">
+        <h3 class="text-primary fw-bold mb-0">Global S&amp;T</h3>
+        <p class="mb-0 fw-light fs-7">Only For VIP</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <form action="" method="post" novalidate>
+        {{ form.csrf_token }}
+
+        <div class="form-group form-floating mb-3">
+          {{ form.username(class="form-control") }}
+          {{ form.username.label }}
+           {% if form.username.errors %}
+            <div class="invalid-feedback d-block">
+            {{ form.username.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="form-group form-floating mb-3">
+          {{ form.password(class="form-control") }}
+          {{ form.password.label }}
+          {% if form.password.errors %}
+            <div class="invalid-feedback d-block">
+            {{ form.password.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="form-check mb-3">
+          {{ form.remember(class="form-check-input") }}
+          {{ form.remember.label(class="form-check-label") }}
+        </div>
+        <div class="form-group form-floating mb-3">
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

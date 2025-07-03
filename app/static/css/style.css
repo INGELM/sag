@@ -1,0 +1,49 @@
+body {
+    background: #8e9eab;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #eef2f3, #8e9eab);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #eef2f3, #8e9eab); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+}
+
+th,
+td {
+  text-align: center !important;
+  vertical-align: middle !important;
+
+}
+
+th {
+  background-color: #f2f2f2 !important;
+  font-weight: bold !important;
+}
+
+  /* Cambia el ancho del offcanvas a 250px */
+  .offcanvas.offcanvas-start {
+    width: 250px !important;
+    max-width: 80vw;
+  }
+
+.separador-botones {
+  margin-right: 30px !important;
+}
+
+
+#programacionTable  th, #programacionTable  td {
+    font-size: 0.9rem; /* Cambia el tamaño de fuente según tus necesidades */
+}
+
+#facturasClientesTable  th, #facturasClientesTable  td {
+    font-size: 0.8rem; /* Cambia el tamaño de fuente según tus necesidades */
+}
+
+#pagosOperadoresTable  th, #pagosOperadoresTable  td {
+    font-size: 0.8rem; /* Cambia el tamaño de fuente según tus necesidades */
+}
+
+.dropdown-menu {
+  background-color: #f8f9fa; 
+}
+.dropdown-item {
+  color: #333; 
+}
+
