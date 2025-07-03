@@ -12,4 +12,4 @@ sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
 sys.path.append(os.getcwd())
 
 # Importamos la app Flask desde tu archivo principal
-from app import app as application
+from run import app as application
