@@ -5,6 +5,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'mysql+pymysql://globalstweb:globalst062022@localhost/globalstweb_sag'  
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
-    DEBUG = True
+    DEBUG = False
     PROPAGATE_EXCEPTIONS = True
     PYTHONIOENCODING = 'utf-8'

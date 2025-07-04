@@ -176,7 +176,9 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     const columnas = keys.map(campo => ({
         data: campo,
         title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
+       
         render: function (data_2) {
+            console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
             if (campo === 'pasajeros' && modelo === 'programacion') {
                 if (Array.isArray(data_2)) {
                     return data_2.map(p => `${p.nombre} (${p.telefono})`).join('<br>');
@@ -252,13 +254,40 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     };
 }
 
-function cargarTabla1(modelo, modulo = "") {
+function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
     baseTablas(modelo, modulo).then(({ tabla, columnas, columnDefs, jsonData }) => {
+
+    
+        // Si se especifican columnas visibles, actualiza columnDefs
+        let mobileColumnDefs = Array.isArray(columnDefs) ? [...columnDefs] : [];
+        if (Array.isArray(VisibleColumns) && VisibleColumns.length > 0) {
+            console.log("Columnas visibles:", VisibleColumns);
+            // Si columnDefs está vacío, agregamos un objeto por cada índice a ocultar
+            if (mobileColumnDefs.length === 0) {
+            mobileColumnDefs = [{
+                targets: VisibleColumns,
+                responsivePriority: 1,
+            }];
+            } else {
+            // Si ya hay reglas, agregamos/ajustamos la visibilidad
+            mobileColumnDefs.push({
+                targets: VisibleColumns,
+                responsivePriority: 1,
+            });
+            }
+        }
+
+        let AllColumnDefs = [columnDefs, ...mobileColumnDefs];
+
+
+
+
+
         $(tabla).DataTable({
             data: jsonData,
             columns: columnas,
             responsive: true,
-            columnDefs: columnDefs,
+            columnDefs: AllColumnDefs,
             paging: true,
             pageLength: 15,
             pagingType: "numbers"
@@ -268,14 +297,36 @@ function cargarTabla1(modelo, modulo = "") {
     });
 }
 
-function cargarTabla2(modelo, modulo = "", empresa_id = "") {
+function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = []) {
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
         // Configuración base de DataTable
+
+         // Si se especifican columnas visibles, actualiza columnDefs
+        let mobileColumnDefs = Array.isArray(columnDefs) ? [...columnDefs] : [];
+        if (Array.isArray(VisibleColumns) && VisibleColumns.length > 0) {
+            console.log("Columnas visibles:", VisibleColumns);
+            // Si columnDefs está vacío, agregamos un objeto por cada índice a ocultar
+            if (mobileColumnDefs.length === 0) {
+            mobileColumnDefs = [{
+                targets: VisibleColumns,
+                responsivePriority: 1,
+            }];
+            } else {
+            // Si ya hay reglas, agregamos/ajustamos la visibilidad
+            mobileColumnDefs.push({
+                targets: VisibleColumns,
+                responsivePriority: 1,
+            });
+            }
+        }
+
+        let AllColumnDefs = [columnDefs, ...mobileColumnDefs];
+
         let config = {
             data: jsonData,
             columns: columnas,
             responsive: true,
-            columnDefs: columnDefs,
+            columnDefs: AllColumnDefs,
             paging: true,
             pageLength: 15,
             pagingType: "numbers",

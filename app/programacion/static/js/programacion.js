@@ -15,7 +15,7 @@ $(document).ready(function () {
 
     window.tablaId = `#${lastSegment}Table`;
 
-    cargarTabla2(lastSegment);
+    cargarTabla2(lastSegment, "", "", [1, 3, 5, 15]);
     console.log("Tabla cargada para:", formulario);
 
     $(formulario).submit(function (e) {

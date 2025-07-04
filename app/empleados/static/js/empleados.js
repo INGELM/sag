@@ -5,8 +5,8 @@ $(document).ready(function () {
     var EMPRESA_SELECT = $('#empresa-tarifa');
     var CODIGO_SELECT = $('#codigo-tarifa');
     var URL_TARIFAS = `/clientes/get/tarifas?empresa=`;
-    
-    cargarTabla1(lastSegment, 'empleados');
+
+    cargarTabla1(lastSegment, 'empleados', [1, 8]);
 
     EMPRESA_SELECT.selectize(selectizeConfig);
     CODIGO_SELECT.selectize(selectizeConfig);
