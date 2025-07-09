@@ -218,6 +218,8 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
         data: null,
         title: "Acciones",
         orderable: false,
+        className: 'no-export',
+        searchable: false,
         render: function (data_4, type, row) {
             let acciones = `
                 <i class="bx bx-edit text-primary" style="cursor: pointer;" onClick="editar(${row.id}, '${modelo}')"></i>
@@ -289,7 +291,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
             responsive: true,
             columnDefs: AllColumnDefs,
             paging: true,
-            pageLength: 15,
+            pageLength: 20,
             pagingType: "numbers"
         });
     }).catch(err => {
@@ -328,7 +330,10 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             responsive: true,
             columnDefs: AllColumnDefs,
             paging: true,
-            pageLength: 15,
+            pageLength: 20,
+            // orderable: true,
+            // order: [[0, 'desc']], // Ordenar por la primera columna (id) de forma descendente
+
             pagingType: "numbers",
             layout: {
                 topStart: {
@@ -486,6 +491,7 @@ function botonesEspeciales() {
             titleAttr: 'Imprimir',
             className: 'btn btn-danger btn-sm mb-1',
             exportOptions: {
+                rows: { search: 'applied' },
                 columns: ':visible:not(.no-export)',
                 format: {
                     body: function (data) {

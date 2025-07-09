@@ -85,17 +85,17 @@ $(document).ready(function () {
 
     });
 
-    $("#status").change(function (e) {
-        e.preventDefault();
-        if ($(this).val() === "Finalizado") {
-            $("#desvios, #t-espera").removeClass("visually-hidden");
-            console.log($(this).val());
-        } else {
-            $("#desvios, #t-espera").addClass("visually-hidden");
-            console.log($(this).val());
-        }
+    // $("#status").change(function (e) {
+    //     e.preventDefault();
+    //     if ($(this).val() === "Finalizado") {
+    //         $("#desvios, #t-espera").removeClass("visually-hidden");
+    //         console.log($(this).val());
+    //     } else {
+    //         $("#desvios, #t-espera").addClass("visually-hidden");
+    //         console.log($(this).val());
+    //     }
 
-    });
+    // });
 
 });
 

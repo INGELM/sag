@@ -56,18 +56,24 @@ class programacionModel(db.Model):
         if self.pasajeros:
             codigo_tarifa = f"{self.pasajeros[0].cliente.codigo.upper()}{self.origen_rel.codigo}{self.destino_rel.codigo}"
             return codigo_tarifa
+    
+    @property
+    def codigo_desc(self):
+        if self.pasajeros:
+            codigo_desc = f"{self.pasajeros[0].cliente.codigo.upper()}{self.origen_rel.codigo}{self.destino_rel.codigo}-{self.vehiculo_rel.codigo}-{self.desplazamiento}-{self.turno}".upper()
+            return codigo_desc
 
     def f_desplazamiento(self):
         if self.retorno:
-            return "Ida y Vuelta"
-        return "Ida" 
-    
+            return "idav"
+        return "ida"
+
     def f_turno(self):
         if 6 <= self.hora_salida.hour < 18:
-            return "Diurno"
+            return "D"
         else:
-            return "Especial"
-    
+            return "E"
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -103,8 +109,8 @@ class programacionModel(db.Model):
             'operador_rel': self.operador,
             'vehiculo': self.vehiculo_rel.tipo if self.vehiculo_rel else None,
             'vehiculo_rel': self.vehiculo if self.vehiculo_rel else None,
-            'turno': self.turno,
-            'desplazamiento': self.desplazamiento,
+            'horario': "Diurno" if self.turno == "D" else "Especial",
+            'desplazamiento': "Ida y Vuelta" if self.desplazamiento == "idav" else "Ida",
             'tiempo_espera': self.tiempo_espera,
             'desvios': self.desvios,
             'status': self.status,

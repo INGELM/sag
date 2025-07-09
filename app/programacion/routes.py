@@ -2,6 +2,7 @@ from flask import Response, json, redirect, request, url_for, render_template, j
 from flask_login import current_user, login_required
 from app.clientes.models import tarifasModel
 from app.empleados.models import empleadosModel, tarifasOperadoresModel
+from app.facturacion.models import facturasClientesModel
 from app.facturacion.routes import crear_factura_cliente, crear_pago_operador
 from app.programacion import programacion_bp
 from app.programacion.form import programacionForm
@@ -24,13 +25,19 @@ def before_request():
 
 @staticmethod
 def validar_coherencias(form):
+    desplazamiento = "ida" if not form.retorno.data else "idav"
+    if 6 <= form.hora_salida.data.hour < 18:
+       horario =  "D"
+    else:
+       horario =  "E"
 
-    codigo_tarifa = f"{form.empresa.data.codigo.upper()}{form.origen.data.codigo}{form.destino.data.codigo}"
-    tarifa_base = tarifasModel.query.filter_by(codigo=codigo_tarifa).first()
+    codigo_tarifa = f"{form.empresa.data.codigo}{form.origen.data.codigo}{form.destino.data.codigo}-{form.vehiculo.data.codigo}-{desplazamiento}-{horario}".upper()
+    current_app.logger.debug("Código de tarifa generado:", codigo_tarifa)
+    tarifa_base = tarifasModel.query.filter_by(codigo_desc=codigo_tarifa).first()
     
     if not tarifa_base:
-        raise ValueError('No existe una tarifa base para la combinación de empresa, origen y destino seleccionados.')
-    
+        raise ValueError('No existe una tarifa base para la combinación del servicio seleccionado ({}).'.format(codigo_tarifa))
+
     if form.operador.data:
         tipo_operador = form.operador.data.tipo
         tarifa_operador = tarifasOperadoresModel.query.filter_by(
@@ -88,7 +95,7 @@ def validar_coherencias(form):
     if form.status.data in ['Programado', 'Pendiente']:
         if fecha_salida and fecha_salida < hoy:
             raise ValueError(
-                'La fecha de salida no puede ser menor que la fecha actual cuando el estado no es "Finalizado".')
+                'La fecha de salida no puede ser menor que la fecha actual, para un viaje programado o pendiente.')
 
     if form.status.data == 'Finalizado':
         if fecha_salida and fecha_salida > hoy:
@@ -106,6 +113,9 @@ def validar_coherencias(form):
         if hora_salida and hora_salida > ahora.time() and fecha_salida == hoy:
             raise ValueError(
                 'La hora de salida no puede ser mayor que la hora actual cuando el estado es "Finalizado".')
+    
+    if form.status.data == 'Finalizado' and not form.guia.data:
+        raise ValueError('La guía es obligatoria para finalizar un viaje.')
 
 
 @programacion_bp.route('/get_data', methods=['GET'])
@@ -137,7 +147,7 @@ def programacion():
             # Validar coherencias antes de guardar
             validar_coherencias(form)
         except ValueError as e:
-            current_app.logger.debug("Error de validación:", e)
+            current_app.logger.debug("Error de validación:", str(e))
             return jsonify(success=False, mensaje='Error de validación.', errores=str(e))
 
         # Eliminar campos que no son necesarios para el procesamiento
@@ -153,23 +163,32 @@ def programacion():
         
         try:
             nueva_programacion.save()
+            current_app.logger.debug("Programación guardada exitosamente:", nueva_programacion)
+            
+            return jsonify(success=True, mensaje='Programación guardada correctamente.')
 
             # Crear factura
-            if form.status.data == 'Finalizado':
-                try:
-                    crear_factura_cliente(form)
+            # if form.status.data == 'Finalizado':
+            #     try:
+            #         crear_factura_cliente(form)
                 
-                except Exception as e:
-                    current_app.logger.debug("Error al crear la factura del cliente:", e)
-                    raise ValueError(str(e))
-                try:
-                    crear_pago_operador(form)
+            #     except Exception as e:
+            #         current_app.logger.debug("Error al crear la factura del cliente:", e)
+            #         programacionModel.query.filter_by(guia=form.guia.data).delete()
+            #         raise ValueError(str(e))
+            #     try:
+            #         # crear_pago_operador(form)
 
-                except Exception as e:
-                    current_app.logger.debug("Error al crear el pago del operador:", e)
-                    raise ValueError(str(e))
+            #     except Exception as e:
+            #         current_app.logger.debug("Error al crear el pago del operador:", e)
+            #         programacionModel.query.filter_by(guia=form.guia.data).delete()
+            #         # Eliminar facturas de clientes asociadas a la programación
+            #         # Esto es necesario para evitar inconsistencias si la factura no se pudo crear
+            #         programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
+            #         facturasClientesModel.query.filter_by(programacion=programacion.id).delete()
+            #         raise ValueError(str(e))
 
-            return jsonify(success=True, data='Formulario enviado correctamente.')
+            # return jsonify(success=True, data='Formulario enviado correctamente.')
         
         except Exception as e:
             current_app.logger.debug("Error al guardar la programación:", e)
@@ -177,7 +196,6 @@ def programacion():
 
     elif request.method == 'PUT' and form.validate_on_submit():
         if not current_user.is_admin:
-
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
 
         programacion_data = form.data
@@ -223,24 +241,25 @@ def programacion():
             db.session.add(programacion)
             db.session.commit()
             
-            if form.status.data == 'Finalizado':
-                try:
-                    crear_factura_cliente(form)
+            # if form.status.data == 'Finalizado':
+            #     try:
+            #         # crear_factura_cliente(form)
                 
-                except Exception as e:
-                    current_app.logger.debug("Error al crear la factura del cliente:", e)
-                    raise ValueError(str(e))
-                try:
-                    crear_pago_operador(form)
+            #     except Exception as e:
+            #         current_app.logger.debug("Error al crear la factura del cliente:", e)
+            #         raise ValueError(str(e))
+            #     try:
+            #         crear_pago_operador(form)
 
-                except Exception as e:
-                    current_app.logger.debug("Error al crear el pago del operador:", e)
-                    raise ValueError(str(e))
+            #     except Exception as e:
+            #         current_app.logger.debug("Error al crear el pago del operador:", e)
+            #         raise ValueError(str(e))
 
             return jsonify(success=True, mensaje='Programación actualizada correctamente.')
         
         except Exception as e:
             db.session.rollback()
+
             current_app.logger.debug("Error al actualizar la programación:", e)
             return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 

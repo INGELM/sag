@@ -19,15 +19,15 @@ def before_request():
 @staticmethod
 def crear_factura_cliente(form):
     
-    
     programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
-    current_app.logger.debug(f"Programación para factura encontrada: {programacion}")
-    
-    tarifas = tarifasModel.query.filter_by(codigo=programacion.codigo_tarifa).first()
-    current_app.logger.debug(f"Tarifas para factura encontradas: {tarifas}")
-    recargo_vehiculo = recargoVehiculosModel.query.filter_by(cliente=form.empresa.data.id, vehiculo=form.vehiculo.data.id).first()
-    current_app.logger.debug(f"Recargo de vehículo para factura encontrado: {recargo_vehiculo}")
+    current_app.logger.debug(f"Programación encontrada: {programacion}")
 
+    codigo_desc = programacion.codigo_desc if programacion else None
+    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
+
+    tarifas = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
+    current_app.logger.debug(f"Tarifas para factura encontradas: {tarifas}")
+   
     factura_existente = facturasClientesModel.query.join(
         facturasClientesModel.programacion_rel
     ).filter(
@@ -36,46 +36,35 @@ def crear_factura_cliente(form):
     
     if factura_existente:
         current_app.logger.debug(f"Ya existe una factura para la Guia: {programacion.guia}")
-        raise ValueError(f"Ya existe una factura para la Guia: {programacion.guia}")
+        raise ValueError(f"Ya existe una factura para la Guia: {programacion.guia}, elimínela para modificar la programación.")
 
+    if not programacion:
+        raise ValueError("No se encontró una programación con la guía proporcionada.")
 
     if not tarifas:
         raise ValueError("No se encontraron tarifas con el código proporcionado.")
 
-    if not recargo_vehiculo:
-        raise ValueError("No se encontró un recargo de vehículo para el cliente proporcionado.")
-    
-    if not programacion:
-        raise ValueError("No se encontró una programación con la guía proporcionada.")
-
-    if not programacion:
-        raise ValueError("No se encontró una programación con la guía proporcionada.")
-
-    costo_vehiculo = recargo_vehiculo.recargo/100 if recargo_vehiculo.recargo else 0
+   
     costo_desvios = tarifas.desvios if tarifas.desvios else 0
     costo_espera = tarifas.espera if tarifas.espera else 0
     costo_base = tarifas.base if tarifas.base else 0
-    costo_especial = tarifas.especial if programacion.turno == 'especial' else 0
     costo_distancia = tarifas.tarifa_km if tarifas.tarifa_km else 0
   
 
     total_desvios = form.desvios.data * costo_desvios
     total_espera = form.tiempo_espera.data * costo_espera
     total_distancia = form.distancia.data * costo_distancia if form.distancia.data else 0
-    total_distancia = total_distancia*2 if programacion.retorno else total_distancia
-    total_base = costo_base*2 if programacion.retorno else costo_base
+    total_base = costo_base
 
 
     costo_total = total_base + total_desvios + total_espera + total_distancia
-    costo_total += costo_total*costo_vehiculo
-    costo_total += costo_total*costo_especial/100
 
-    current_app.logger.info(f"Costos calculados: Base: {total_base}, Desvios: {total_desvios}, Espera: {total_espera}, Recargo Vehiculo: {costo_total*costo_vehiculo}, Especial: {costo_total*costo_especial/100}, Costo Total: {costo_total}")
+
+  
 
     current_app.logger.info(f"Creando factura con los siguientes datos: \n"
           f"Programación ID: {programacion.id}, "
           f"Tarifas ID: {tarifas.id}, "
-          f"Recargo Vehículo ID: {recargo_vehiculo.id}, "
           f"Total Desvíos: {total_desvios}, "
           f"Total Espera: {total_espera}, "
           f"Costo Total: {costo_total}")
@@ -84,7 +73,9 @@ def crear_factura_cliente(form):
     nueva_factura = {
         "programacion":  programacion.id,
         "tarifas_cliente": tarifas.id,
-        "recargo_vehiculo": recargo_vehiculo.id,
+        "costos_desvios": costo_desvios,
+        "costos_espera": costo_espera,
+        "costos_distancia": costo_distancia,
         "total_desvios": total_desvios,
         "total_espera": total_espera,
         "costo_total": costo_total,
@@ -248,15 +239,15 @@ def pagos_operadores_all():
 def crear_pago_operador(form):
     programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
     current_app.logger.debug(f"Programación encontrada: {programacion}")
+    
     tipo_operador = programacion.operador_rel.tipo if programacion and programacion.operador_rel else None
     current_app.logger.debug(f"Tipo de operador: {tipo_operador}")
-    tarifas_clientes = tarifasModel.query.filter_by(codigo=programacion.codigo_tarifa).first()
+    
+    tarifas_clientes = tarifasModel.query.filter_by(codigo=programacion.codigo_desc).first()
     tarifa_cliente_id = tarifas_clientes.id if tarifas_clientes else None
     tarifas_operador = tarifasOperadoresModel.query.filter_by(codigo=tarifa_cliente_id, tipo=tipo_operador).first()
-    current_app.logger.debug(f"Tarifas Operador encontradas: {tarifas_operador}")
-    recargo_vehiculo = recargoVehiculosModel.query.filter_by(cliente=form.empresa.data.id, vehiculo=form.vehiculo.data.id).first()
-    current_app.logger.debug(f"Recargo de vehículo encontrado: {recargo_vehiculo}")
     
+    current_app.logger.debug(f"Tarifas Operador encontradas: {tarifas_operador}")
 
     if not tarifas_clientes:
         raise ValueError("No se encontraron tarifas para Clientes con el código proporcionado.")
@@ -264,36 +255,27 @@ def crear_pago_operador(form):
     if not tarifas_operador:
         raise ValueError("No se encontraron tarifas para Operador con la ruta proporcionada.")
 
-    if not recargo_vehiculo:
-        raise ValueError("No se encontró un recargo de vehículo para el cliente proporcionado.")
-    
     if not programacion:
         raise ValueError("No se encontró una programación con la guía proporcionada.")
     
-    costo_vehiculo = recargo_vehiculo.recargo/100 if recargo_vehiculo.recargo else 0
+
     costo_desvios = tarifas_operador.desvios if tarifas_operador.desvios else 0
     costo_espera = tarifas_operador.espera if tarifas_operador.espera else 0
     costo_base = tarifas_operador.base if tarifas_operador.base else 0
-    costo_especial = tarifas_clientes.especial if programacion.turno == 'especial' else 0
     # costo_distancia = tarifas_clientes.tarifa_km 
 
-    total_desvios = form.desvios.data * costo_desvios
-    total_espera = form.tiempo_espera.data * costo_espera
+   
     # total_distancia = form.distancia.data * costo_distancia if form.distancia.data else 0
 
-    costo_total = costo_base + total_desvios + total_espera #+ total_distancia
-    costo_total += costo_total*costo_vehiculo
-    costo_total += costo_total*costo_especial/100
-    
    
+       
     
     nuevo_pago = {
         "programacion":  programacion.id,
         "tarifas_operador": tarifas_operador.id,
-        "recargo_vehiculo": recargo_vehiculo.id,
-        "total_desvios": total_desvios,
-        "total_espera": total_espera,
-        "costo_total": costo_total
+        "costo_desvios": costo_desvios,
+        "costo_espera": costo_espera,
+        "costo_base": costo_base,
     }
     
  

@@ -32,6 +32,10 @@ class facturasClientesModel(db.Model):
     def __repr__(self):
         return f"<Facturacion {self.id} - Programacion: {self.programacion}, Costo Total: {self.costo_total}>"
     
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+    
     def serialize(self):
         
         return {
@@ -67,27 +71,30 @@ class pagosOperadoresModel(db.Model):
     # recargo_vehiculo = db.Column(db.Integer, db.ForeignKey("recargos_vehiculos.id"), nullable=False)
     costo_desvios = db.Column(db.Float, nullable=True)
     costo_espera = db.Column(db.Float, nullable=True)
-    costo_total = db.Column(db.Float, nullable=True)
+    costo_base = db.Column(db.Float, nullable=True)
     
     programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref='facturas_operadores')
     tarifas_operador_rel = db.relationship('tarifasOperadoresModel', foreign_keys=[tarifas_operador], backref='facturas_operadores')
     # recargo_vehiculo_rel = db.relationship('recargoVehiculosModel', foreign_keys=[recargo_vehiculo], backref='facturas_operadores')
 
-    def __init__(self, programacion, tarifas_operador, recargo_vehiculo, costo_desvios, costo_espera, costo_total):
+    def __init__(self, programacion, tarifas_operador, recargo_vehiculo, costo_desvios, costo_espera, costo_base):
         self.programacion = programacion
         self.tarifas_operador = tarifas_operador
         self.recargo_vehiculo = recargo_vehiculo
         self.costo_desvios = costo_desvios
         self.costo_espera = costo_espera
-        self.costo_total = costo_total
+        self.costo_base = costo_base
 
     def __repr__(self):
-        return f"<Facturacion {self.id} - Programacion: {self.programacion}, Costo Total: {self.costo_total}>"
+        return f"<Facturacion {self.id} - Programacion: {self.programacion}, Costo Base: {self.costo_base}>"
 
     def serialize(self):
+        total_desvios = self.costo_desvios * self.programacion_rel.desvios if self.programacion_rel.desvios else 0
+        total_espera = self.costo_espera * self.programacion_rel.tiempo_espera if self.programacion_rel.tiempo_espera else 0
+        costo_total = self.costo_base + total_desvios + total_espera
+        
         return {
-            
-             "id": self.id,
+            "id": self.id,
             "fecha": self.programacion_rel.fecha_salida.strftime('%d-%m-%Y') if self.programacion_rel else None,
             "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
             "pasajeros": [{'id': p.id, 'nombre': p.nombres.title(), 'telefono': p.telefono} for p in self.programacion_rel.pasajeros] if self.programacion_rel and self.programacion_rel.pasajeros else [],
@@ -103,10 +110,10 @@ class pagosOperadoresModel(db.Model):
             # "total distancia": self.total_distancia if self.total_distancia else "--",
             "tiempo_espera": self.programacion_rel.tiempo_espera if self.programacion_rel.tiempo_espera else "--",
             # "Costo espera": self.tarifas_cliente_rel.espera if self.tarifas_cliente_rel.espera else "--",
-            "total_espera": self.total_espera if self.total_espera else "--",
+            "total_espera": self.costo_espera * self.programacion_rel.tiempo_espera if self.programacion_rel.tiempo_espera else "--",
             "desvíos": self.programacion_rel.desvios if self.programacion_rel.desvios else "--",
             # "Costo Desvíos": self.tarifas_cliente_rel.desvios if self.tarifas_cliente_rel.desvios else "--",
-            "total_desvios": self.total_desvios if self.total_desvios else "--",
-            "costo_base": self.tarifas_operador_rel.base if self.tarifas_operador_rel.base else "--",
-            "total_": self.costo_total if self.costo_total else "--",
+            "total_desvios": self.costo_desvios * self.programacion_rel.desvios if self.programacion_rel.desvios else "--",
+            "costo_base": self.costo_base if self.costo_base else "--",
+            "total_": costo_total if costo_total else "--",
         }
