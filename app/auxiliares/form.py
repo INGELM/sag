@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, FloatField, DateField
 from wtforms.validators import EqualTo, Length
 from wtforms.validators import DataRequired
 
@@ -17,6 +17,6 @@ class vehiculosForm(FlaskForm):
     submit = SubmitField('Guardar', render_kw={"class": "form-control"})
 
 class tasaForm(FlaskForm):
-    id = StringField('ID', render_kw={"class": "form-control", "readonly": True})
+    id = StringField('ID', render_kw={"class": "form-control", "readonly": True})   
     tasa = FloatField('Tasa', validators=[DataRequired(message="El campo Tasa es obligatorio.")], render_kw={"class": "form-control"})
     submit = SubmitField('Guardar', render_kw={"class": "form-control"})

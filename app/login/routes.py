@@ -20,6 +20,10 @@ def login():
         password = form.password.data
 
         empleado = empleadosModel.query.filter_by(usuario=username).first()
+        
+        if empleado.rol == 'Operador':
+            flash('Usuario no autorizado. Por favor, contacte al administrador.', 'warning')
+            return render_template('login.html', form=form, year=datetime.now().year)
        
 
         if empleado  and empleado.contrasena and empleado.check_password(password) != None:

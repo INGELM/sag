@@ -8,6 +8,9 @@ class facturasClientesModel(db.Model):
     programacion = db.Column(db.Integer, db.ForeignKey('programacion.id'), nullable=False)
     tarifas_cliente = db.Column(db.Integer, db.ForeignKey("tarifas.id"), nullable=False)
     recargo_vehiculo = db.Column(db.Integer, db.ForeignKey("recargos_vehiculos.id"), nullable=False)
+    costo_desvios = db.Column(db.Float, nullable=True)
+    costo_espera = db.Column(db.Float, nullable=True)
+    costo_distancia = db.Column(db.Float, nullable=True)
     total_desvios = db.Column(db.Float, nullable=True)
     total_espera = db.Column(db.Float, nullable=True)
     total_distancia = db.Column(db.Float, nullable=True)
@@ -17,13 +20,13 @@ class facturasClientesModel(db.Model):
     tarifas_cliente_rel = db.relationship('tarifasModel', foreign_keys=[tarifas_cliente], backref='facturas_clientes')
     recargo_vehiculo_rel = db.relationship('recargoVehiculosModel', foreign_keys=[recargo_vehiculo], backref='facturas_clientes')
 
-    def __init__(self, programacion, tarifas_cliente, recargo_vehiculo, total_desvios = 0.0, total_espera = 0.0, total_distancia = 0.0, costo_total = 0.0):
+    def __init__(self, programacion, tarifas_cliente, recargo_vehiculo, costo_desvios = 0.0, costo_espera = 0.0, costo_distancia = 0.0, costo_total = 0.0):
         self.programacion = programacion
         self.tarifas_cliente = tarifas_cliente
         self.recargo_vehiculo = recargo_vehiculo
-        self.total_desvios = total_desvios
-        self.total_espera = total_espera
-        self.total_distancia = total_distancia
+        self.costo_desvios = costo_desvios
+        self.costo_espera = costo_espera
+        self.costo_distancia = costo_distancia
         self.costo_total = costo_total
     
     def __repr__(self):
@@ -61,21 +64,21 @@ class pagosOperadoresModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     programacion = db.Column(db.Integer, db.ForeignKey('programacion.id'), nullable=False)
     tarifas_operador = db.Column(db.Integer, db.ForeignKey("tarifas_operadores.id"), nullable=False)
-    recargo_vehiculo = db.Column(db.Integer, db.ForeignKey("recargos_vehiculos.id"), nullable=False)
-    total_desvios = db.Column(db.Float, nullable=True)
-    total_espera = db.Column(db.Float, nullable=True)
+    # recargo_vehiculo = db.Column(db.Integer, db.ForeignKey("recargos_vehiculos.id"), nullable=False)
+    costo_desvios = db.Column(db.Float, nullable=True)
+    costo_espera = db.Column(db.Float, nullable=True)
     costo_total = db.Column(db.Float, nullable=True)
     
     programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref='facturas_operadores')
     tarifas_operador_rel = db.relationship('tarifasOperadoresModel', foreign_keys=[tarifas_operador], backref='facturas_operadores')
-    recargo_vehiculo_rel = db.relationship('recargoVehiculosModel', foreign_keys=[recargo_vehiculo], backref='facturas_operadores')
+    # recargo_vehiculo_rel = db.relationship('recargoVehiculosModel', foreign_keys=[recargo_vehiculo], backref='facturas_operadores')
 
-    def __init__(self, programacion, tarifas_operador, recargo_vehiculo, total_desvios, total_espera, costo_total):
+    def __init__(self, programacion, tarifas_operador, recargo_vehiculo, costo_desvios, costo_espera, costo_total):
         self.programacion = programacion
         self.tarifas_operador = tarifas_operador
         self.recargo_vehiculo = recargo_vehiculo
-        self.total_desvios = total_desvios
-        self.total_espera = total_espera
+        self.costo_desvios = costo_desvios
+        self.costo_espera = costo_espera
         self.costo_total = costo_total
 
     def __repr__(self):

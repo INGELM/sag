@@ -15,8 +15,8 @@
 
            <!-- {{ nav_link('login.login', 'Inicio', 'bx bx-home-alt') }} -->
 
-            {{ dropdown_menu('empleadosMenu', 'Empleados', [
-              {'href': url_for('empleados.empleados'), 'text': 'Lista de Empleados', 'endpoint': 'empleados.empleados', 'icon': 'bx bx-list-ul'},
+            {{ dropdown_menu('empleadosMenu', 'Usuarios', [
+              {'href': url_for('empleados.empleados'), 'text': 'Lista de Usuarios', 'endpoint': 'empleados.empleados', 'icon': 'bx bx-list-ul'},
               {'href': url_for('empleados.tarifas_operador'), 'text': 'Tarifas Operador', 'endpoint': 'empleados.tarifas_operador', 'icon': 'bx bx-dollar-circle'}
             ], menu_icon='bx bx-user') }}
             
@@ -24,7 +24,7 @@
               {'href': url_for('clientes.clientes'), 'text': 'Lista de Clientes', 'endpoint': 'clientes.clientes', 'icon': 'bx bx-list-ul'},
               {'href': url_for('clientes.pasajeros'), 'text': 'Pasajeros', 'endpoint': 'clientes.pasajeros', 'icon': 'bx bx-user'},
               {'href': url_for('clientes.tarifas'), 'text': 'Tarifas', 'endpoint': 'clientes.tarifas', 'icon': 'bx bx-dollar-circle'},
-              {'href': url_for('clientes.recargo_vehiculos'), 'text': 'Recargo Vehículos', 'endpoint': 'clientes.recargo_vehiculos', 'icon': 'bx bx-car'}
+            
             ],
             menu_icon='bx bx-buildings') }}
 

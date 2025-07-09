@@ -610,6 +610,8 @@ async function guardarRegistro(modelo, varModulo = "") {
                     title: data.mensaje || "Ocurrió un error al guardar el registro",
                     text: data.errores || "Ocurrió un error al guardar el registro",
                     icon: 'error',
+                    timer: 10000,
+                    timerProgressBar: true,
                     confirmButtonText: 'Aceptar',
                 });
             }

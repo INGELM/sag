@@ -107,7 +107,7 @@ def clientes():
                 raise ValueError("El código ya existe.")
             
             db.session.add(nuevo_cliente)
-            crear_recargo_sedan(nuevo_cliente)  # Crear un vehículo tipo Sedan al registrar un cliente
+            # crear_recargo_sedan(nuevo_cliente)  # Crear un vehículo tipo Sedan al registrar un cliente
             db.session.commit()
             return jsonify(success=True, mensaje='cliente registrado exitosamente.')
         except Exception as e:
@@ -556,8 +556,8 @@ def vehiculos_empresa():
         return jsonify(success=False, data=[], mensaje='ID de empresa no proporcionado o inválido.')
 
     try:
-        recargo_vehiculos = recargoVehiculosModel.query.filter_by(cliente=empresa_id).all()
-        vehiculos_ids = [v.vehiculo for v in recargo_vehiculos]
+        vehiculos_empresa = tarifasModel.query.filter_by(empresa=empresa_id).all()
+        vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
         current_app.logger.debug(f'IDs de vehículos para la empresa {empresa_id}: {vehiculos_ids}')
 
         vehiculos = vehiculosModel.query.filter(vehiculosModel.id.in_(vehiculos_ids)).all()

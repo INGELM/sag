@@ -127,17 +127,24 @@ class tarifasModel(db.Model):
     __tablename__ = 'tarifas'
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(50), unique=True, nullable=False)
+    codigo_desc = db.Column(db.String(50), nullable=True)
     empresa = db.Column(db.Integer, db.ForeignKey(
         'clientes.id'), nullable=False)
     origen = db.Column(db.Integer, db.ForeignKey(
         'ciudades.id'), nullable=False)
     destino = db.Column(db.Integer, db.ForeignKey(
         'ciudades.id'), nullable=False)
-    espera = db.Column(db.Integer, nullable=True, default=0)
-    desvios = db.Column(db.Integer, nullable=True, default=0)
-    especial = db.Column(db.Integer, nullable=True, default=0)
+    vehiculo = db.Column(db.Integer, db.ForeignKey(
+        'vehiculos.id'), nullable=True)  # Clave foránea opcional
+    desplazamiento = db.Column(db.String(10), nullable=True)
+    horario = db.Column(db.String(50), nullable=True)
+    espera = db.Column(db.Float, nullable=True, default=0.0)
+    desvios = db.Column(db.Float, nullable=True, default=0.0)
+    # especial = db.Column(db.Float, nullable=True, default=0.0)
     tarifa_km = db.Column(db.Float, nullable=True, default=0.0)
     base = db.Column(db.Float, nullable=True, default=0.0)
+
+    vehiculo_rel = db.relationship('vehiculosModel', back_populates='tarifas', lazy=True)
 
     cliente = db.relationship('clientesModel', back_populates='tarifas')
     origen_rel = db.relationship('ciudadesModel', foreign_keys=[
@@ -147,23 +154,36 @@ class tarifasModel(db.Model):
     tarifas_operadores = db.relationship(
         'tarifasOperadoresModel', back_populates='codigo_rel', lazy=True)
 
-    def __init__(self, empresa, origen, destino, espera=0, desvios=0, base=0.0, tarifa_km=0.0, especial=0):
+    def __init__(self, empresa, origen, destino, espera=0, desvios=0, base=0.0, tarifa_km=0.0, vehiculo=None, desplazamiento=None, horario=None):
         self.empresa = empresa.id if hasattr(empresa, 'id') else empresa
         self.origen = origen.id if hasattr(origen, 'id') else origen
         self.destino = destino.id if hasattr(destino, 'id') else destino
+        self.vehiculo = vehiculo.id if hasattr(vehiculo, 'id') else vehiculo
+        self.desplazamiento = desplazamiento if desplazamiento else ''
+        self.horario = horario if horario else ''
         self.espera = espera
         self.desvios = desvios
         self.base = base
-        self.codigo = f"{empresa.codigo}{origen.codigo}{destino.codigo}".upper()
+        self.codigo = self.generate_code(empresa.codigo)
+        self.codigo_desc = f"{empresa.codigo}{origen.codigo}{destino.codigo}-{vehiculo.codigo}-{desplazamiento}-{horario}".upper()
         self.tarifa_km = tarifa_km
-        self.especial = especial
 
+    def generate_code(self, empresa_codigo):
+        length = tarifasModel.query.count() + 1
+        return f"{empresa_codigo}{length:04d}".upper() if empresa_codigo else None
+        
+        
     def save(self):
-        existing = tarifasModel.query.filter_by(codigo=self.codigo).first()
+        existing = tarifasModel.query.filter_by(codigo_desc=self.codigo_desc).first()
         if existing:
-            raise ValueError("El código de tarifa ya existe.")
-        db.session.add(self)
-        db.session.commit()
+            raise ValueError("Esta tarifa ya existe.")
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error al guardar tarifa: {e}")
+            raise ValueError("Error inesperado al guardar la tarifa.")
 
     def update(self, **kwargs):
         # Actualiza los atributos antes de recalcular el código
@@ -215,11 +235,14 @@ class tarifasModel(db.Model):
             'origen_rel': self.origen,
             'destino': self.destino_rel.nombre if self.destino_rel else None,
             'destino_rel': self.destino,
+            'vehiculo': self.vehiculo_rel.tipo if self.vehiculo_rel else None,
+            'vehiculo_rel': self.vehiculo,
+            'desplazamiento': "Ida y Vuelta" if self.desplazamiento == 'idav' else "Ida",
+            'horario': self.horario.upper() if self.horario else None,
             'espera': self.espera,
             'desvios': self.desvios,
             'base': self.base,
             'tarifa_km': self.tarifa_km,
-            'especial': self.especial,
             'color_rel': self.color_code()
         }
 
@@ -235,8 +258,8 @@ class recargoVehiculosModel(db.Model):
 
     # Relaciones mejoradas con nombres más descriptivos
     # Línea modificada: nombre coherente
-    vehiculo_rel = db.relationship(
-        'vehiculosModel', back_populates='recargos_vehiculos')
+    # vehiculo_rel = db.relationship(
+    #     'vehiculosModel', back_populates='recargos_vehiculos')
     # Línea modificada: nombre coherente
     cliente_rel = db.relationship(
         'clientesModel', back_populates='recargos_vehiculos')

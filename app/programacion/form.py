@@ -19,7 +19,7 @@ def get_pasajeros():
     return pasajerosModel.query.all()
 
 def get_operadores():
-    return empleadosModel.query.filter_by(cargo='Operador').all()
+    return empleadosModel.query.filter_by(rol='Operador').all()
 
     
 class programacionForm(FlaskForm):

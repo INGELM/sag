@@ -13,18 +13,17 @@ class empleadosModel(db.Model, UserMixin):
     contrasena = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=True)
     telefono = db.Column(db.String(20), nullable=True)
-    cargo = db.Column(db.String(20), nullable=False)
-    tipo = db.Column(db.String(20), nullable=False)
+    # cargo = db.Column(db.String(20), nullable=True)
+    tipo = db.Column(db.String(20), nullable=True)
     rol = db.Column(db.String(20), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, nombres, usuario, contrasena, email=None, telefono=None, cargo=None, tipo=None, rol=None):
+    def __init__(self, nombres, usuario, contrasena, email=None, telefono=None, tipo=None, rol=None):
         self.nombres = nombres.title() if nombres else None
         self.usuario = usuario.lower() if usuario else None
         self.contrasena = self.hash_password(contrasena) if contrasena else None
         self.email = email.lower() if email else None
         self.telefono = telefono if telefono else None
-        self.cargo = cargo.title() if cargo else None
         self.tipo = tipo if tipo else None
         self.rol = rol if rol else None
         self.is_admin = self.check_admin()
@@ -102,7 +101,6 @@ class empleadosModel(db.Model, UserMixin):
             'usuario': self.usuario,
             'email': self.email,
             'telefono': self.telefono,
-            'cargo': self.cargo,
             'rol': self.rol,
             'tipo': self.tipo,
         }

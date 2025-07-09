@@ -313,11 +313,11 @@ def all_vehiculos():
 def tasa():
     if request.method == 'GET':
         data = tasaModel.query.first()
+       
         if data:
             tasa = data.tasa
-            fecha = data.fecha.strftime('%d-%m-%Y')
-        
-
+            fecha = data.fecha
+            
         response = requests.get("https://pydolarve.org/api/v2/dollar",
             params={
                 "page": "bcv",
@@ -351,9 +351,14 @@ def tasa():
         
         tasa = tasaModel.query.first()
         
+        tasa_updated = {
+            'tasa': form_data.get('tasa'),
+            'fecha': datetime.now().date()
+        }
+        
         if form.validate_on_submit():
             try:
-                tasa.update(**form.data)
+                tasa.update(**tasa_updated)
                 flash('Tasa actualizada exitosamente.', 'success')
                 return jsonify(success=True, mensaje='Tasa actualizada exitosamente.')
             except Exception as e:
