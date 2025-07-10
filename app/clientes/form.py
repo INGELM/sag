@@ -86,8 +86,8 @@ class tarifasForm(FlaskForm):
         validators=[DataRequired(message='El horario es obligatorio.')],
         render_kw={"placeholder": "Horario", "class": "form-control"}
     )
-    espera = DecimalField('Tarifa de Espera', validators=[DataRequired(message='La tarifa de espera es obligatoria.')], render_kw={"placeholder": "Tarifa de espera", "class": "form-control"}, default=0.0)
-    desvios = DecimalField('Tarifa de Desvíos', validators=[DataRequired(message='La tarifa de desvíos es obligatoria.')], render_kw={"placeholder": "Tarifa de desvíos", "class": "form-control"}, default=0.0)
+    espera = DecimalField('Tarifa de Espera', render_kw={"placeholder": "Tarifa de espera", "class": "form-control"}, default=0.0)
+    desvios = DecimalField('Tarifa de Desvíos', render_kw={"placeholder": "Tarifa de desvíos", "class": "form-control"}, default=0.0)
     # especial = DecimalField('Tarifa Especial', render_kw={"placeholder": "Tarifa especial", "class": "form-control"}, default=0.0)
     tarifa_km = DecimalField('Tarifa por KM', render_kw={"placeholder": "Tarifa por KM", "class": "form-control"}, default=0.0)
     base = DecimalField('Tarifa Base', render_kw={"placeholder": "Tarifa base", "class": "form-control"}, default=0.0)
