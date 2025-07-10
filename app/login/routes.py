@@ -5,6 +5,7 @@ from datetime import datetime
 from flask_login import login_user, current_user, logout_user
 from app.empleados.models import empleadosModel
 from flask import session
+from flask import current_app
 
 
 
@@ -21,13 +22,12 @@ def login():
 
         empleado = empleadosModel.query.filter_by(usuario=username).first()
         
-        if empleado.rol == 'Operador':
+        if empleado and empleado.rol == 'Operador':
             flash('Usuario no autorizado. Por favor, contacte al administrador.', 'warning')
             return render_template('login.html', form=form, year=datetime.now().year)
-       
 
-        if empleado  and empleado.contrasena and empleado.check_password(password) != None:
-            # current_app.logger.debug(f'Empleado encontrado: {empleado.contrasena}')
+        if empleado and empleado.contrasena and empleado.check_password(password):
+            current_app.logger.debug(f'Empleado encontrado: {empleado.usuario}')
             login_user(empleado, remember=form.remember.data)
             
             if hasattr(empleado, 'rol') and empleado.rol == 'admin':
