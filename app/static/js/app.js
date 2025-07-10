@@ -722,7 +722,7 @@ function llenarFormulario(modelo, rowData) {
         const $campo = $(`#${modelo}Form [name="${key}"]`);
         if ($campo.length) {
             $campo.val(rowData[key]);
-            // console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
+            console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
         }
         if (key.includes('_rel')) {
             const baseKey = key.replace('_rel', '');

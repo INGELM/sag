@@ -82,7 +82,7 @@ class tarifasForm(FlaskForm):
     )
     horario = SelectField(
         'Horario',
-        choices=[('d', 'Diurno'), ('e', 'Especial')],
+        choices=[('D', 'Diurno'), ('E', 'Especial')],
         validators=[DataRequired(message='El horario es obligatorio.')],
         render_kw={"placeholder": "Horario", "class": "form-control"}
     )
