@@ -281,17 +281,13 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
 
         let AllColumnDefs = [columnDefs, ...mobileColumnDefs];
 
-
-
-
-
         $(tabla).DataTable({
             data: jsonData,
             columns: columnas,
             responsive: true,
             columnDefs: AllColumnDefs,
             paging: true,
-            pageLength: 20,
+            pageLength: 10,
             pagingType: "numbers"
         });
     }).catch(err => {
@@ -586,7 +582,7 @@ async function guardarRegistro(modelo, varModulo = "") {
                     text: data.mensaje || "Registro guardado correctamente",
                     icon: 'success',
                     confirmButtonText: 'Aceptar',
-                    timer: 1000,
+                    timer: 7000,
                     timerProgressBar: true,
                 }).then(() => {
                     $(`#${modelo}Form`)[0].reset();

@@ -15,15 +15,24 @@ def before_request():
         flash('Por favor, inicia sesión para acceder a esta página.', 'warning')
         return redirect(url_for('login.login'))
 
+@staticmethod
+def create_codigo_desc(form):
+    desplazamiento = "ida" if not form.retorno.data else "idav"
+    if 6 <= form.hora_salida.data.hour < 18:
+        horario = "D"
+    else:
+        horario = "E"
+
+    codigo_desc = f"{form.empresa.data.codigo}{form.origen.data.codigo}{form.destino.data.codigo}-{form.vehiculo.data.codigo}-{desplazamiento}-{horario}".upper()
+    current_app.logger.debug("Código de descripción generado:", codigo_desc)
+    return codigo_desc
 
 @staticmethod
 def crear_factura_cliente(form):
-    
-    programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
-    current_app.logger.debug(f"Programación encontrada: {programacion}")
 
-    codigo_desc = programacion.codigo_desc if programacion else None
-    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
+    codigo_desc = create_codigo_desc(form)
+
+    current_app.logger.debug("Código de descripción generado:", codigo_desc)
 
     tarifas = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
     current_app.logger.debug(f"Tarifas para factura encontradas: {tarifas}")
@@ -35,11 +44,8 @@ def crear_factura_cliente(form):
     ).first()
     
     if factura_existente:
-        current_app.logger.debug(f"Ya existe una factura para la Guia: {programacion.guia}")
-        raise ValueError(f"Ya existe una factura para la Guia: {programacion.guia}, elimínela para modificar la programación.")
-
-    if not programacion:
-        raise ValueError("No se encontró una programación con la guía proporcionada.")
+        current_app.logger.debug(f"Ya existe una factura para la Guia: {form.guia.data}")
+        raise ValueError(f"Ya existe una factura para la Guia: {form.guia.data}, elimínela para modificar la programación.")
 
     if not tarifas:
         raise ValueError("No se encontraron tarifas con el código proporcionado.")
@@ -62,36 +68,27 @@ def crear_factura_cliente(form):
 
   
 
-    current_app.logger.info(f"Creando factura con los siguientes datos: \n"
-          f"Programación ID: {programacion.id}, "
-          f"Tarifas ID: {tarifas.id}, "
-          f"Total Desvíos: {total_desvios}, "
-          f"Total Espera: {total_espera}, "
-          f"Costo Total: {costo_total}")
+    
     
 
     nueva_factura = {
-        "programacion":  programacion.id,
+
         "tarifas_cliente": tarifas.id,
-        "costos_desvios": costo_desvios,
-        "costos_espera": costo_espera,
-        "costos_distancia": costo_distancia,
+        "costo_desvios": costo_desvios,
+        "costo_espera": costo_espera,
+        "costo_distancia": costo_distancia,
+        "costo_base": costo_base,
         "total_desvios": total_desvios,
         "total_espera": total_espera,
         "costo_total": costo_total,
         "total_distancia": total_distancia,
     }
     
-    try:
-
-        factura = facturasClientesModel(**nueva_factura)
-        db.session.add(factura)
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Error al crear la factura: {str(e)}")
-        raise ValueError(f"Error al crear la factura")
+    current_app.logger.debug("Datos de la nueva factura:", nueva_factura)
+    
+    return nueva_factura
+    
+    
 
 
 @facturacion_bp.route('/facturasClientes', methods=['GET'])
@@ -124,6 +121,7 @@ def facturasClientes_update():
             factura.total_espera = "--"
             factura.total_desvios = "--"
             factura.total_distancia = "--"
+            factura.costo_base = "--"
             factura.costo_total = form_data['costo_total']
             
             db.session.commit()
@@ -237,13 +235,17 @@ def pagos_operadores_all():
 
 @staticmethod
 def crear_pago_operador(form):
+    
+    codigo_desc = create_codigo_desc(form)
+    current_app.logger.debug("Código de descripción generado:", codigo_desc)
     programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
+    
     current_app.logger.debug(f"Programación encontrada: {programacion}")
     
     tipo_operador = programacion.operador_rel.tipo if programacion and programacion.operador_rel else None
     current_app.logger.debug(f"Tipo de operador: {tipo_operador}")
     
-    tarifas_clientes = tarifasModel.query.filter_by(codigo=programacion.codigo_desc).first()
+    tarifas_clientes = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
     tarifa_cliente_id = tarifas_clientes.id if tarifas_clientes else None
     tarifas_operador = tarifasOperadoresModel.query.filter_by(codigo=tarifa_cliente_id, tipo=tipo_operador).first()
     
@@ -262,6 +264,7 @@ def crear_pago_operador(form):
     costo_desvios = tarifas_operador.desvios if tarifas_operador.desvios else 0
     costo_espera = tarifas_operador.espera if tarifas_operador.espera else 0
     costo_base = tarifas_operador.base if tarifas_operador.base else 0
+    costo_total = costo_base + costo_desvios*form.desvios.data + costo_espera*form.tiempo_espera.data
     # costo_distancia = tarifas_clientes.tarifa_km 
 
    
@@ -276,6 +279,7 @@ def crear_pago_operador(form):
         "costo_desvios": costo_desvios,
         "costo_espera": costo_espera,
         "costo_base": costo_base,
+        "costo_total":costo_total,  # Inicialmente 0, se calculará después
     }
     
  
@@ -320,6 +324,8 @@ def pagosOperadores_delete():
 def pagosOperadores_update():
     form = pagosOperadoresForm()
     user = current_user
+    
+    current_app.logger.debug("Solicitud PUT recibida por:", user, "rol:", user.is_admin)
         
     if form.validate_on_submit():
         form_data = form.data
@@ -331,8 +337,9 @@ def pagosOperadores_update():
 
         # Actualizar los campos del pago
         try:
-            pago.total_espera = "--"
-            pago.total_desvios = "--"
+            pago.costo_espera = "--"
+            pago.costo_desvios = "--"
+            pago.costo_base = "--"
             pago.costo_total = form_data['costo_total']
 
             db.session.commit()

@@ -159,44 +159,52 @@ def programacion():
         nueva_programacion.pasajeros = form.pasajeros.data if form.pasajeros.data else []
 
 
-        current_app.logger.debug("Datos de la nueva programación:", nueva_programacion)
+        current_app.logger.debug("Datos de la nueva programación:", {nueva_programacion})
         
-        try:
-            nueva_programacion.save()
-            current_app.logger.debug("Programación guardada exitosamente:", nueva_programacion)
+        if form.status.data == 'Finalizado':
+            nueva_factura = crear_factura_cliente(form)
             
-            return jsonify(success=True, mensaje='Programación guardada correctamente.')
-
-            # Crear factura
-            # if form.status.data == 'Finalizado':
-            #     try:
-            #         crear_factura_cliente(form)
-                
-            #     except Exception as e:
-            #         current_app.logger.debug("Error al crear la factura del cliente:", e)
-            #         programacionModel.query.filter_by(guia=form.guia.data).delete()
-            #         raise ValueError(str(e))
-            #     try:
-            #         # crear_pago_operador(form)
-
-            #     except Exception as e:
-            #         current_app.logger.debug("Error al crear el pago del operador:", e)
-            #         programacionModel.query.filter_by(guia=form.guia.data).delete()
-            #         # Eliminar facturas de clientes asociadas a la programación
-            #         # Esto es necesario para evitar inconsistencias si la factura no se pudo crear
-            #         programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
-            #         facturasClientesModel.query.filter_by(programacion=programacion.id).delete()
-            #         raise ValueError(str(e))
-
-            # return jsonify(success=True, data='Formulario enviado correctamente.')
+            
+            
+            programacion = nueva_programacion.save()
+            current_app.logger.debug("Programación guardada:", programacion)
+            
+            nueva_factura['programacion'] = programacion.id
+            
         
-        except Exception as e:
-            current_app.logger.debug("Error al guardar la programación:", e)
-            return jsonify(success=False, errores=str(e), mensaje='Error al guardar la programación.')
+            try:
+                crear_factura = facturasClientesModel(**nueva_factura)
+                db.session.add(crear_factura)
+                db.session.commit()
+                current_app.logger.debug("Factura del cliente creada:", crear_factura)
+                crear_pago_operador(form)
+                return jsonify(success=True, mensaje='Programación Finalizada y Factura Generada correctamente.')
 
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
+                return jsonify(success=False, mensaje='Error al crear la factura del cliente.')
+        else:
+            try:
+                current_app.logger.debug("Guardando nueva programación:", nueva_programacion)
+                nueva_programacion.save()
+                current_app.logger.debug("Programación guardada:", nueva_programacion)
+                return jsonify(success=True, mensaje='Programación guardada correctamente.')
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"Error al guardar la programación: {str(e)}")
+                return jsonify(success=False, mensaje='Error al guardar la programación.', errores=str(e))
+        
+        
+        
     elif request.method == 'PUT' and form.validate_on_submit():
         if not current_user.is_admin:
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
+        
+        factura_existing = facturasClientesModel.query.filter_by(programacion=form.id.data).first()
+        if factura_existing:
+            current_app.logger.debug("Factura existente encontrada para la programación:", factura_existing)
+            return jsonify(success=False, errores='No se puede actualizar la programación. Elimine primero las facturas asociadas.', mensaje='Factura existente.')
 
         programacion_data = form.data
         current_app.logger.debug("Datos del formulario para actualizar:", programacion_data)
@@ -240,26 +248,28 @@ def programacion():
             
             db.session.add(programacion)
             db.session.commit()
-            
-            # if form.status.data == 'Finalizado':
-            #     try:
-            #         # crear_factura_cliente(form)
+            mensaje = 'Programación actualizada correctamente.'
+            if form.status.data == 'Finalizado':
+                nueva_factura = crear_factura_cliente(form)
+                nueva_factura['programacion'] = programacion.id
                 
-            #     except Exception as e:
-            #         current_app.logger.debug("Error al crear la factura del cliente:", e)
-            #         raise ValueError(str(e))
-            #     try:
-            #         crear_pago_operador(form)
+                try:
+                    crear_factura = facturasClientesModel(**nueva_factura)
+                    db.session.add(crear_factura)
+                    db.session.commit()
+                    mensaje = 'Programación Finalizada y Factura Generada correctamente.'
+                    crear_pago_operador(form)
+                    mensaje = 'Programación Finalizada, Factura de Cliente y Pago Operador Generados correctamente.'
+                    current_app.logger.debug("Factura del cliente creada:", crear_factura)
+                except Exception as e:
+                    db.session.rollback()
+                    current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
+                    raise ValueError('Error al crear la factura del cliente.')
 
-            #     except Exception as e:
-            #         current_app.logger.debug("Error al crear el pago del operador:", e)
-            #         raise ValueError(str(e))
+            return jsonify(success=True, mensaje=mensaje)
 
-            return jsonify(success=True, mensaje='Programación actualizada correctamente.')
-        
         except Exception as e:
             db.session.rollback()
-
             current_app.logger.debug("Error al actualizar la programación:", e)
             return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 

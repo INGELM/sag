@@ -1,3 +1,4 @@
+from flask import current_app
 from app.extensions import db
 
 programacion_pasajeros = db.Table('programacion_pasajeros',
@@ -75,8 +76,18 @@ class programacionModel(db.Model):
             return "E"
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self
+        except db.IntegrityError as e:  
+            db.session.rollback()
+            current_app.logger.error(f"Error de integridad al guardar la programación: {str(e)}")
+            raise ValueError("Error de integridad al guardar la programación. Verifique los datos ingresados.")
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error al guardar la programación: {str(e)}")
+            raise
 
     def actualizar(self, **kwargs):
         for key, value in kwargs.items():

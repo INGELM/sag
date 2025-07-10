@@ -1,13 +1,10 @@
 $(document).ready(function () {
 
     const FORM_FACTURACION_CLIENTE = $('#facturasClientesForm');
+    const FORM_PAGO_OPERADOR = $('#pagosOperadoresForm');
     window.modulo = 'facturacion';
 
     const modelo = window.location.pathname.split('/').filter(Boolean).pop();
-
-
-
-
 
     console.log("Modelo actual:", modelo);
 
@@ -16,6 +13,11 @@ $(document).ready(function () {
     FORM_FACTURACION_CLIENTE.on('submit', function (e) {
         e.preventDefault();
         guardarRegistro(modelo, 'facturacion');
+    });
+
+    FORM_PAGO_OPERADOR.on('submit', function (e) {
+        e.preventDefault();
+        guardarRegistro('pagosOperadores', 'facturacion');
     });
 
     $('#btnfactCliente li a').on('click', function (e) {

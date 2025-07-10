@@ -14,7 +14,7 @@ def create_app():
     log_path = os.path.join(app.root_path, 'app.log')
     
     file_handler = logging.FileHandler(log_path)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s - %(name)s - (' + app.name + ') - (' + app.logger.name + ') - [%(pathname)s:%(lineno)d]')
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.DEBUG)
 
