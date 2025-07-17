@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, SubmitField, SelectField, FloatField, DecimalField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from app.auxiliares.models import ciudadesModel, vehiculosModel
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, length
 
 from app.clientes.models import clientesModel
 from wtforms.fields import SelectField
@@ -18,7 +18,7 @@ def get_ciudades():
 
 class clientesForm(FlaskForm):
     id = StringField('ID', render_kw={"placeholder": "ID del cliente", "class": "form-control", "type": ""})
-    codigo = StringField('Código', validators=[DataRequired(message='El código es obligatorio.')],  render_kw={"placeholder": "CÓDIGO DEL CLIENTE", "class": "form-control", "style": "text-transform:uppercase;"})
+    codigo = StringField('Código', validators=[DataRequired(message='El código es obligatorio.'), length(max=4, message='El código debe tener máximo 4 caracteres.')],  render_kw={"placeholder": "CÓDIGO DEL CLIENTE", "class": "form-control", "style": "text-transform:uppercase;"})
     empresa = StringField('Empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"placeholder": "Empresa del cliente", "class": "form-control", "style": "text-transform:uppercase;"})
     direccion = StringField('Dirección', render_kw={"placeholder": "Dirección del cliente", "class": "form-control"})
     ciudad = QuerySelectField('Ciudad', query_factory=get_ciudades, get_label='nombre', allow_blank=True, blank_text='Seleccione una ciudad', render_kw={"placeholder": "Ciudad del cliente", "class": "form-control"})
