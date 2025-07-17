@@ -228,7 +228,7 @@ class tarifasModel(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'codigo': self.codigo,
+            'codigo': self.codigo_desc,
             'empresa': self.cliente.empresa if self.cliente else None,
             'empresa_rel': self.empresa,
             'origen': self.origen_rel.nombre if self.origen_rel else None,

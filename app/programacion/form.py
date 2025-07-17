@@ -30,7 +30,15 @@ class programacionForm(FlaskForm):
     hora_salida = TimeField('Hora de Salida', render_kw={"class": "form-control"})
     hora_retorno = TimeField('Hora de Retorno', validators=[Optional()], render_kw={"class": "form-control", "id": "hora-retorno-form"})
     empresa = QuerySelectField('Empresa', query_factory=get_empresas, allow_blank=True, blank_text="Seleccione Empresa", get_label='empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"class": "form-control ", "id": "empresa-select"})
-    pasajeros = QuerySelectMultipleField('Pasajeros', query_factory=get_pasajeros, allow_blank=True, blank_text="Seleccione Pasajeros", get_label='nombres', render_kw={"class": "form-control pasajero-select", "id": "pasajeros-select", "multiple": True})
+    pasajeros = QuerySelectMultipleField(
+        'Pasajeros',
+        query_factory=get_pasajeros,
+        allow_blank=True,
+        blank_text="Seleccione Pasajeros",
+        get_label='nombres',
+        validators=[DataRequired(message='Debe seleccionar al menos un pasajero.')],
+        render_kw={"class": "form-control pasajero-select", "id": "pasajeros-select", "multiple": True}
+    )
     operador = QuerySelectField('Operador', query_factory=get_operadores, allow_blank=True, blank_text="Seleccione Operador", get_label='nombres',render_kw={"class": "form-control operador-select", "id": "operador-select"})
     origen = QuerySelectField('Ciudad Origen', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre', validators=[DataRequired(message='La ciudad de origen es obligatoria.')], render_kw={"class": "form-control origen-select", "id": "ciudad-origen-select"})
     destino = QuerySelectField('Ciudad Destino', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre', validators=[DataRequired(message='La ciudad de destino es obligatoria.')], render_kw={"class": "form-control destino-select", "id": "ciudad-destino-select"})

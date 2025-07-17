@@ -16,3 +16,4 @@ app_org.js
 # Ignore Jupyter Notebook 
 temp/
 .log
+plantillas de carga/

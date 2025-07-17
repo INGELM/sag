@@ -25,6 +25,9 @@ def before_request():
 
 @staticmethod
 def validar_coherencias(form):
+    if form.vehiculo.data is None:
+        raise ValueError('El vehículo es obligatorio.')
+    
     desplazamiento = "ida" if not form.retorno.data else "idav"
     if 6 <= form.hora_salida.data.hour < 18:
        horario =  "D"
@@ -33,6 +36,7 @@ def validar_coherencias(form):
 
     codigo_tarifa = f"{form.empresa.data.codigo}{form.origen.data.codigo}{form.destino.data.codigo}-{form.vehiculo.data.codigo}-{desplazamiento}-{horario}".upper()
     current_app.logger.debug("Código de tarifa generado:", codigo_tarifa)
+    
     tarifa_base = tarifasModel.query.filter_by(codigo_desc=codigo_tarifa).first()
     
     if not tarifa_base:

@@ -32,7 +32,7 @@ class tarifasOperadoresForm(FlaskForm):
     codigo = QuerySelectField(
         'Código',
         query_factory=lambda: tarifasModel.query.all(),
-        get_label='codigo',
+        get_label='codigo_desc',
         allow_blank=True,
         blank_text='Seleccione un código',
         render_kw={"class": "form-control", "id": "codigo-tarifa"},
