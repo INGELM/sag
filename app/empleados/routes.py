@@ -75,8 +75,10 @@ def empleados():
             return jsonify(success=True, mensaje='Empleado eliminado exitosamente.')
 
         except Exception as e:
-            if '1452' in str(e).lower():
+            if '1452' in str(e).lower() or 'foreign key constraint fails' in str(e).lower():
                 mensaje = 'No se puede eliminar el empleado porque tiene registros relacionados.'
+            else:
+                mensaje = 'Error al eliminar el empleado.'
 
             return jsonify({
                 'success': False,

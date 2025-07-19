@@ -413,67 +413,73 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                             init: function (dt, node, config) {
                                 $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
                             },
-                            text: 'Estado > Facturado',
-                            action: function (e, dt, node, config) {
-                                const rows = dt.rows({ selected: true }).data();
-                                if (rows.length > 0) {
-                                    const ids = rows.map(row => row.id).toArray();
-                                    console.log("IDs seleccionados:", ids);
-                                    // fetch(`/facturacion/estado_facturado`, {
-                                    //     method: 'POST',
-                                    //     headers: { 'Content-Type': 'application/json' },
-                                    //     body: JSON.stringify({ ids: ids })
-                                    // })
-                                    //     .then(response => response.json())
-                                    //     .then(data => {
-                                    //         if (data.success) {
-                                    //             Swal.fire({
-                                    //                 title: 'Éxito',
-                                    //                 text: data.mensaje,
-                                    //                 icon: 'success',
-                                    //                 timer: 2000,
-                                    //                 showConfirmButton: false
-                                    //             }).then(() => {
-                                    //                 dt.ajax.reload();
-                                    //             });
-                                    //         } else {
-                                    //             Swal.fire({
-                                    //                 title: 'Error',
-                                    //                 text: data.errores || "Ocurrió un error al actualizar el estado",
-                                    //                 icon: 'error'
-                                    //             });
-                                    //         }
-                                    //     })
-                                    //     .catch(error => {
-                                    //         console.error("Error al actualizar el estado:", error);
-                                    //         Swal.fire({
-                                    //             title: 'Error',
-                                    //             text: "Ocurrió un error inesperado",
-                                    //             icon: 'error'
-                                    //         });
-                                    //     });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Aviso',
-                                        text: 'No hay filas seleccionadas.',
-                                        timer: 2000
-                                    });
+                            extend: 'collection',
+                            text: 'Acciones',
+                            // className: 'btn btn-outline-primary btn-sm mb-1 dropdown-toggle',
+                            autoClose: true,
+                            buttons: [
+                                {
+                                    text: 'Editar',
+                                    className: 'dropdown-item',
+                                    action: function (e, dt, node, config) {
+                                        if (dt.rows({ selected: true }).count() === 0) {
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: 'Aviso',
+                                                text: 'Debe seleccionar al menos un registro para editar.',
+                                                timer: 2000
+                                            });
+                                            return;
+                                        }
+                                        if (dt.rows({ selected: true }).count() > 1) {
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: 'Aviso',
+                                                text: 'Solo se puede editar un registro a la vez.',
+                                                timer: 2000
+                                            });
+                                            return;
+                                        }
+                        
+                                            const registroId = dt.rows({ selected: true }).data()[0].id;
+                                            editar(registroId, modelo);
+                                 
+                                    }
+                                },
+                                {
+                                    text: 'Eliminar',
+                                    className: 'dropdown-item',
+                                    action: function (e, dt, node, config) {
+                                        if (dt.rows({ selected: true }).count() === 0) {
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: 'Aviso',
+                                                text: 'Debe seleccionar al menos un registro para eliminar.',
+                                                timer: 2000
+                                            });
+                                            return;
+                                        }
+                                        else  {
+                                            eliminarSeleccionados(modelo);
+                                        }
+                                        
+                                        
+                                    }
                                 }
-                            }
-                        }
+                            ]
+                          }
                     ],
                     search: true
                 }
             },
             createdRow: function (row, data, dataIndex) {
-                    if (data.status && data.status.toLowerCase() === 'finalizado') {
+                    if (data.status && (data.status.toLowerCase() === 'finalizado' || data.status.toLowerCase() === 'facturado')) {
                         $(row).addClass('table-success');
                     }
-                    if (data.status && data.status.toLowerCase() === 'pendiente') {
+                    if (data.status && (data.status.toLowerCase() === 'pendiente' || data.status.toLowerCase() === 'por facturar')) {
                         $(row).addClass('table-danger');
                     }
-                    if (data.status && data.status.toLowerCase() === 'programado') {
+                    if (data.status && (data.status.toLowerCase() === 'programado' )) {
                         $(row).addClass('table-warning');
                     }
             },
@@ -721,7 +727,8 @@ async function guardarRegistro(modelo, varModulo = "") {
                         }
                     });
                     if (modelo === 'programacion' || modelo === 'facturasClientes') {
-                        cargarTabla2(modelo, modulo);
+                        // cargarTabla2(modelo, modulo);
+                        location.reload();
                     } else {
                         cargarTabla1(modelo, modulo);
                     }
@@ -778,7 +785,95 @@ function eliminar(id, modelo) {
                             title: 'Éxito',
                             text: data.mensaje,
                             icon: 'success',
-                            timer: 1000,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            const dataTable = $(`#${modelo}Table`).DataTable();
+                            if (dataTable.rows().count() === 1) {
+                                location.reload();
+                            } else {
+                                dataTable.clear().destroy();
+                                if (modelo === 'programacion' || modelo === 'facturasClientes') {
+                                    cargarTabla2(modelo, window.modulo);
+                                } else {
+                                    cargarTabla1(modelo, window.modulo);
+                                }
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: data.mensaje,
+                            text: data.errores,
+                            icon: 'error',
+                            timer: 2500,
+                            timerProgressBar: true,
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al eliminar el registro";
+                    console.error("Error al eliminar:", mensaje);
+                    Swal.fire({
+                        title: 'Falló la eliminación',
+                        text: mensaje,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
+
+function eliminarSeleccionados(modelo) {
+    const tabla = `#${modelo}Table`;
+    const dt = $(tabla).DataTable();
+    
+    if (dt.rows({ selected: true }).count() === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Aviso',
+            text: 'Debe seleccionar al menos un registro para eliminar.',
+            timer: 2000
+        });
+        return;
+    }
+
+    // Extraer los IDs correctamente
+    const registroIds = [];
+    dt.rows({ selected: true }).every(function() {
+        const data = this.data();
+        registroIds.push(data.id);
+    });
+
+    console.log("IDs de registros seleccionados para eliminar:", registroIds);
+
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás recuperar estos registros",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminarlos'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = window.modulo !== "" ? `/${window.modulo}/${modelo}` : `/${modelo}`;
+            
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: registroIds }), 
+                success: function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: data.mensaje,
+                            icon: 'success',
+                            timer: 2000,
                             timerProgressBar: true,
                             confirmButtonText: 'Aceptar'
                         }).then(() => {

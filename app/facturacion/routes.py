@@ -148,20 +148,24 @@ def facturasClientes_delete():
         raise PermissionError('No tienes permiso para realizar esta acción.')
 
     id_facturacion = request.json.get('id')
+    if not isinstance(id_facturacion, list):
+        id_facturacion = [id_facturacion]
+    
     current_app.logger.debug("ID de facturación a eliminar:", id_facturacion)
 
     if not id_facturacion:
         return jsonify(success=False, mensaje='ID de facturación no proporcionado.')
 
-    factura = facturasClientesModel.query.get(id_facturacion)
+    facturas = facturasClientesModel.query.filter(facturasClientesModel.id.in_(id_facturacion)).all()
 
-    if not factura:
+    if not facturas:
         return jsonify(success=False, mensaje='Factura no encontrada.')
 
     try:
-        db.session.delete(factura)
+        for factura in facturas:
+            db.session.delete(factura)
         db.session.commit()
-        return jsonify(success=True, mensaje='Factura eliminada correctamente.')
+        return jsonify(success=True, mensaje='Facturas eliminadas correctamente.')
 
     except Exception as e:
         db.session.rollback()
