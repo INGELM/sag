@@ -15,14 +15,16 @@ class facturasClientesModel(db.Model):
     total_espera = db.Column(db.Float, nullable=True)
     total_distancia = db.Column(db.Float, nullable=True)
     costo_total = db.Column(db.Float, nullable=True)
-    
+    status = db.Column(db.String(20), nullable=True, default='Por facturar')
+
     programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref='facturas_clientes')
     tarifas_cliente_rel = db.relationship('tarifasModel', foreign_keys=[tarifas_cliente], backref='facturas_clientes')
   
 
-    def __init__(self, programacion, tarifas_cliente, costo_desvios = 0.0, costo_espera = 0.0, costo_distancia = 0.0, costo_base = 0.0, total_desvios = 0.0, total_espera = 0.0, total_distancia = 0.0, costo_total = 0.0):
+    def __init__(self, programacion, tarifas_cliente, status, costo_desvios = 0.0, costo_espera = 0.0, costo_distancia = 0.0, costo_base = 0.0, total_desvios = 0.0, total_espera = 0.0, total_distancia = 0.0, costo_total = 0.0):
         self.programacion = programacion
         self.tarifas_cliente = tarifas_cliente
+        self.status = status
         self.costo_desvios = costo_desvios
         self.costo_espera = costo_espera
         self.costo_distancia = costo_distancia
@@ -64,6 +66,7 @@ class facturasClientesModel(db.Model):
             "total_desvios": self.total_desvios if self.total_desvios else "--",
             "costo_base": self.costo_base if self.costo_base else "--",
             "total_": self.costo_total if self.costo_total else "--",
+            "status": self.status if self.status else "--",
         }
 
 class pagosOperadoresModel(db.Model):

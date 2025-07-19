@@ -122,7 +122,8 @@ def facturasClientes_update():
             factura.total_desvios = "--"
             factura.total_distancia = "--"
             factura.costo_base = "--"
-            factura.costo_total = form_data['costo_total']
+            factura.costo_total = form_data['costo_total'] if form_data['costo_total'] else factura.costo_total
+            factura.status = form_data['status']
             
             db.session.commit()
             return jsonify(success=True, mensaje="Factura actualizada exitosamente.", icon='success')

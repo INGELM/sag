@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,  SubmitField, DecimalField
+from wtforms import StringField,  SubmitField, DecimalField, SelectField
 
 
 
@@ -8,6 +8,7 @@ class facturasClientesForm(FlaskForm):
     guia = StringField('Guía', render_kw={"placeholder": "Guía de la facturación", "class": "form-control", "readonly": True})
     cliente = StringField('Empresa', render_kw={"placeholder": "Empresa de la facturación", "class": "form-control", "readonly": True})
     costo_total = DecimalField('Costo Total', render_kw={"placeholder": "Costo total", "class": "form-control"})
+    status = SelectField('Estado', choices=[('Por facturar', 'Por facturar'), ('Facturado', 'Facturado')], default='Por facturar', render_kw={"class": "form-control"})
     submit = SubmitField('Guardar', render_kw={"class": "form-control"})
 
 

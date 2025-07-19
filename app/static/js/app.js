@@ -366,27 +366,26 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                 },
                 topEnd: {
                     buttons: [
-                    modulo !== 'facturacion' ? botonesEspeciales() : [
                         {
-                        init: function (dt, node, config) {
-                            const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
-                            $(node).attr('class', clase);
-                        },
-                        text: 'Bs',
-                        action: function (e, dt, node, config) {
-                            const current = localStorage.getItem('Bs') === 'true';
-                            localStorage.setItem('Bs', !current);
-                            $(node)
-                            .toggleClass('btn-success', !current)
-                            .toggleClass('btn-outline-secondary', current);
-                            if (tablaInstancia) {
-                            tablaInstancia.rows().invalidate().draw(false);
+                            init: function (dt, node, config) {
+                                const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
+                                $(node).attr('class', clase);
+                            },
+                            text: 'Bs',
+                            action: function (e, dt, node, config) {
+                                const current = localStorage.getItem('Bs') === 'true';
+                                localStorage.setItem('Bs', !current);
+                                $(node)
+                                    .toggleClass('btn-success', !current)
+                                    .toggleClass('btn-outline-secondary', current);
+                                if (tablaInstancia) {
+                                    tablaInstancia.rows().invalidate().draw(false);
+                                }
                             }
-                        }
                         },
                         {
                             init: function (dt, node, config) {
-                            $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+                                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
                             },
                             text: 'Seleccionar todos',
                             action: function(e, dt, node, config) {
@@ -400,35 +399,72 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                                         $(node).removeClass('btn-primary').addClass('btn-outline-primary');
                                         $(node).text('Seleccionar todos');
                                     }
-                                }
-                                else {
+                                } else {
                                     Swal.fire({
                                         icon: 'warning',
                                         title: 'Aviso',
                                         text: 'No hay filas disponibles para seleccionar.',
-                                        timer: 2000,
-                                        showConfirmButton: true
-                                        
+                                        timer: 2000
                                     });
                                 }
-                                
                             }
                         },
                         {
-                            
+                            init: function (dt, node, config) {
+                                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+                            },
+                            text: 'Estado > Facturado',
+                            action: function (e, dt, node, config) {
+                                const rows = dt.rows({ selected: true }).data();
+                                if (rows.length > 0) {
+                                    const ids = rows.map(row => row.id).toArray();
+                                    console.log("IDs seleccionados:", ids);
+                                    // fetch(`/facturacion/estado_facturado`, {
+                                    //     method: 'POST',
+                                    //     headers: { 'Content-Type': 'application/json' },
+                                    //     body: JSON.stringify({ ids: ids })
+                                    // })
+                                    //     .then(response => response.json())
+                                    //     .then(data => {
+                                    //         if (data.success) {
+                                    //             Swal.fire({
+                                    //                 title: 'Éxito',
+                                    //                 text: data.mensaje,
+                                    //                 icon: 'success',
+                                    //                 timer: 2000,
+                                    //                 showConfirmButton: false
+                                    //             }).then(() => {
+                                    //                 dt.ajax.reload();
+                                    //             });
+                                    //         } else {
+                                    //             Swal.fire({
+                                    //                 title: 'Error',
+                                    //                 text: data.errores || "Ocurrió un error al actualizar el estado",
+                                    //                 icon: 'error'
+                                    //             });
+                                    //         }
+                                    //     })
+                                    //     .catch(error => {
+                                    //         console.error("Error al actualizar el estado:", error);
+                                    //         Swal.fire({
+                                    //             title: 'Error',
+                                    //             text: "Ocurrió un error inesperado",
+                                    //             icon: 'error'
+                                    //         });
+                                    //     });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Aviso',
+                                        text: 'No hay filas seleccionadas.',
+                                        timer: 2000
+                                    });
+                                }
+                            }
                         }
-
-                    ]
                     ],
                     search: true
-                },
-                bottomEnd: {
-                    info: false,
-                    paging: true
-                },
-                bottomStart: {},
-
-                
+                }
             },
             createdRow: function (row, data, dataIndex) {
                     if (data.status && data.status.toLowerCase() === 'finalizado') {
@@ -638,7 +674,20 @@ async function guardarRegistro(modelo, varModulo = "") {
     }
 
     if (metodo === 'PUT') {
-        formData = JSON.stringify(Object.fromEntries(new URLSearchParams(formData)));
+        // Convertimos la cadena serializada en un objeto URLSearchParams
+        let params = new URLSearchParams(formData);
+
+        // Verificamos si costo_total no está presente o es undefined
+        if (params.get('costo_total') === "" || params.get('costo_total') === null || params.get('costo_total') === undefined) {
+            console.log("costo_total no está presente, eliminando...");
+            params.delete('costo_total'); // Lo eliminamos si existe (opcional, por seguridad)
+        }
+
+        // Convertimos a objeto plano y luego a JSON
+        const formDataObject = Object.fromEntries(params);
+        formData = JSON.stringify(formDataObject);
+
+        console.log("Datos del formulario:", formData, "para:", metodo, "en el modelo:", modelo);
     }
 
     const modulo = varModulo || window.modulo;
@@ -817,13 +866,13 @@ function llenarFormulario(modelo, rowData) {
                         console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
                         setTimeout(() => {
                             $campoBase[0].selectize.setValue(valorRelacionado, false);
-                        }, 300);
+                        }, 600);
                     }
 
                     else {
                         setTimeout(() => {
                             $campoBase[0].selectize.setValue(valorRelacionado, true);
-                        }, 400);
+                        }, 600);
                         console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
 
                     }
