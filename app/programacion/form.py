@@ -25,6 +25,7 @@ def get_operadores():
 class programacionForm(FlaskForm):
     id = IntegerField('ID', render_kw={"placeholder": "ID", "class": "form-control", "id": ""}, validators=[Optional()])
     retorno = BooleanField('Retorno', render_kw={"placeholder": "Retorno", "class": "form-check-input", "type": "Checkbox", "id": "retorno-form"}, default=False)
+    workflow = StringField('Workflow', render_kw={"placeholder": "Workflow", "class": "form-control"}, validators=[Optional()])
     guia = StringField('Guía', render_kw={"placeholder": "Guía", "class": "form-control"})
     fecha_salida = DateField('Fecha de Salida', validators=[DataRequired(message='La fecha de salida es obligatoria.')], render_kw={"class": "form-control", "id": "fecha_salida", "placeholder": "Fecha de Salida"})
     hora_salida = TimeField('Hora de Salida', render_kw={"class": "form-control"})

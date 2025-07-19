@@ -13,7 +13,7 @@ from app.programacion.models import programacionModel
 
 @programacion_bp.before_request
 def before_request():
-    current_app.logger.debug("Usuario autenticado:", current_user.is_authenticated)
+    current_app.logger.debug("Usuario autenticado: %s", current_user.is_authenticated)
     if not current_user.is_authenticated:
         flash('Por favor, inicie sesión para acceder a esa página.', 'warning')
         return redirect(url_for('login.login'))

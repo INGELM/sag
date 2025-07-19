@@ -9,6 +9,7 @@ programacion_pasajeros = db.Table('programacion_pasajeros',
 class programacionModel(db.Model):
     __tablename__ = "programacion"
     id = db.Column(db.Integer, primary_key=True)
+    workflow = db.Column(db.String(50), nullable=True)
     guia = db.Column(db.String(50), nullable=True)
     origen = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
     destino = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
@@ -106,6 +107,7 @@ class programacionModel(db.Model):
             'fecha_salida_rel': self.fecha_salida.isoformat() if self.fecha_salida else None,
             'empresa': self.pasajeros[0].cliente.codigo.upper() if self.pasajeros else None,
             'empresa_rel': self.pasajeros[0].cliente.id if self.pasajeros else None,
+            'workflow': self.workflow,
             'guia': self.guia,
             'pasajeros': [{'id': p.id, 'nombre': p.nombres.title(), 'telefono': p.telefono} for p in self.pasajeros] if self.pasajeros else [],
             'pasajeros_rel': [p.id for p in self.pasajeros] if self.pasajeros else [],
