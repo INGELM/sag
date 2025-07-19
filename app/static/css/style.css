@@ -5,10 +5,15 @@ body {
     margin-bottom: 3rem;
 }
 
+tr {
+  background-color: #a32222 !important;
+}
+
 th,
 td {
   text-align: center !important;
   vertical-align: middle !important;
+
 
 }
 

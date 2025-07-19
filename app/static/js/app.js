@@ -51,7 +51,13 @@ function cargarSelectize(url, empresaId, selectize) {
 
 $.extend(true, $.fn.DataTable.defaults, {
     language: {
-        url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-MX.json '
+
+        url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-MX.json ',
+        search: "",
+        searchPlaceholder: "Buscar...",
+        
+       
+        
     },
     lengthChange: false,
     ordering: false,
@@ -178,7 +184,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
         title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
        
         render: function (data_2) {
-            console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
+            // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
             if (campo === 'pasajeros' && modelo === 'programacion') {
                 if (Array.isArray(data_2)) {
                     return data_2.map(p => `${p.nombre} (${p.telefono})`).join('<br>');
@@ -327,45 +333,82 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             columnDefs: AllColumnDefs,
             paging: true,
             pageLength: 20,
+            select: 'row',
+            language: {
+                search: "",
+                info: "",
+                select: {
+                    rows: {
+                        _: "Has seleccionado %d filas",
+                        0: "Haz clic en una fila para seleccionarla",
+                        1: "1 fila seleccionada"
+                    },
+                    cells: {
+                        _: "",
+                        0: "",
+                        1: ""
+                    },
+                    columns: {
+                        _: "",
+                        0: "",
+                        1: ""
+                    }
+                }
+            },
             // orderable: true,
             // order: [[0, 'desc']], // Ordenar por la primera columna (id) de forma descendente
 
             pagingType: "numbers",
+            
             layout: {
                 topStart: {
                     buttons: modulo !== 'facturacion' ? getTablaBotones() : botonesEspeciales(),
                 },
                 topEnd: {
                     buttons: [
-                        modulo !== 'facturacion' ? botonesEspeciales() : [
-                            {
-                                init: function (dt, node, config) {
-                                    const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
-                                    $(node).attr('class', clase);
-                                },
-                                text: 'Bs',
-                                action: function (e, dt, node, config) {
-                                    const current = localStorage.getItem('Bs') === 'true';
-                                    localStorage.setItem('Bs', !current);
-                                    $(node)
-                                        .toggleClass('btn-success', !current)
-                                        .toggleClass('btn-outline-secondary', current);
-                                    if (tablaInstancia) {
-                                        tablaInstancia.rows().invalidate().draw(false);
-                                    }
-                                }
+                    modulo !== 'facturacion' ? botonesEspeciales() : [
+                        {
+                        init: function (dt, node, config) {
+                            const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
+                            $(node).attr('class', clase);
+                        },
+                        text: 'Bs',
+                        action: function (e, dt, node, config) {
+                            const current = localStorage.getItem('Bs') === 'true';
+                            localStorage.setItem('Bs', !current);
+                            $(node)
+                            .toggleClass('btn-success', !current)
+                            .toggleClass('btn-outline-secondary', current);
+                            if (tablaInstancia) {
+                            tablaInstancia.rows().invalidate().draw(false);
                             }
-                        ]
+                        }
+                        }
+                    ]
                     ],
                     search: true
                 },
                 bottomEnd: {
-                    info: true,
+                    info: false,
                     paging: true
                 },
-                bottomStart: {}
-            }
+                bottomStart: {},
+
+                
+            },
+            createdRow: function (row, data, dataIndex) {
+                    if (data.status && data.status.toLowerCase() === 'finalizado') {
+                        $(row).addClass('table-success');
+                    }
+                    if (data.status && data.status.toLowerCase() === 'pendiente') {
+                        $(row).addClass('table-danger');
+                    }
+                    if (data.status && data.status.toLowerCase() === 'programado') {
+                        $(row).addClass('table-warning');
+                    }
+            },
         };
+
 
         // Agregar footerCallback solo para facturasClientes y pagosOperadores
         if (modelo === 'facturasClientes' || modelo === 'pagosOperadores') {
