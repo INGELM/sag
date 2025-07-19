@@ -383,7 +383,41 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                             tablaInstancia.rows().invalidate().draw(false);
                             }
                         }
+                        },
+                        {
+                            init: function (dt, node, config) {
+                            $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+                            },
+                            text: 'Seleccionar todos',
+                            action: function(e, dt, node, config) {
+                                if (dt.rows({ search: 'applied' }).count() > 0) {
+                                    if ($(node).text() === 'Seleccionar todos') {
+                                        dt.rows({ search: 'applied' }).select();
+                                        $(node).removeClass('btn-outline-primary').addClass('btn-primary');
+                                        $(node).text('Deseleccionar todos');
+                                    } else {
+                                        dt.rows({ search: 'applied' }).deselect();
+                                        $(node).removeClass('btn-primary').addClass('btn-outline-primary');
+                                        $(node).text('Seleccionar todos');
+                                    }
+                                }
+                                else {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Aviso',
+                                        text: 'No hay filas disponibles para seleccionar.',
+                                        timer: 2000,
+                                        showConfirmButton: true
+                                        
+                                    });
+                                }
+                                
+                            }
+                        },
+                        {
+                            
                         }
+
                     ]
                     ],
                     search: true
