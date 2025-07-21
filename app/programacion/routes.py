@@ -94,29 +94,29 @@ def validar_coherencias(form):
         raise ValueError(
             'El operador y el vehículo son obligatorios cuando el estado es Programado.')
 
-    fecha_salida = form.fecha_salida.data
-    hoy = datetime.now().date()
-    if form.status.data in ['Programado', 'Pendiente']:
-        if fecha_salida and fecha_salida < hoy:
-            raise ValueError(
-                'La fecha de salida no puede ser menor que la fecha actual, para un viaje programado o pendiente.')
+    # fecha_salida = form.fecha_salida.data
+    # hoy = datetime.now().date()
+    # if form.status.data in ['Programado', 'Pendiente']:
+    #     if fecha_salida and fecha_salida < hoy:
+    #         raise ValueError(
+    #             'La fecha de salida no puede ser menor que la fecha actual, para un viaje programado o pendiente.')
 
-    if form.status.data == 'Finalizado':
-        if fecha_salida and fecha_salida > hoy:
-            raise ValueError(
-                'La fecha de salida no puede ser mayor que la fecha actual cuando el estado es "Finalizado".')
+    # if form.status.data == 'Finalizado':
+    #     if fecha_salida and fecha_salida > hoy:
+    #         raise ValueError(
+    #             'La fecha de salida no puede ser mayor que la fecha actual cuando el estado es "Finalizado".')
 
-    hora_salida = form.hora_salida.data
-    ahora = datetime.now()
-    if hora_salida and fecha_salida == hoy and form.status.data != 'Finalizado':
-        if hora_salida < ahora.time():
-            raise ValueError(
-                'La hora de salida no puede ser menor que la hora actual, cuando el estado no es "Finalizado".')
+    # hora_salida = form.hora_salida.data
+    # ahora = datetime.now()
+    # if hora_salida and fecha_salida == hoy and form.status.data != 'Finalizado':
+    #     if hora_salida < ahora.time():
+    #         raise ValueError(
+    #             'La hora de salida no puede ser menor que la hora actual, cuando el estado no es "Finalizado".')
 
-    if form.status.data == 'Finalizado':
-        if hora_salida and hora_salida > ahora.time() and fecha_salida == hoy:
-            raise ValueError(
-                'La hora de salida no puede ser mayor que la hora actual cuando el estado es "Finalizado".')
+    # if form.status.data == 'Finalizado':
+    #     if hora_salida and hora_salida > ahora.time() and fecha_salida == hoy:
+    #         raise ValueError(
+    #             'La hora de salida no puede ser mayor que la hora actual cuando el estado es "Finalizado".')
     
     if form.status.data == 'Finalizado' and not form.guia.data:
         raise ValueError('La guía es obligatoria para finalizar un viaje.')
@@ -267,6 +267,7 @@ def programacion():
                     current_app.logger.debug("Factura del cliente creada:", crear_factura)
                 except Exception as e:
                     db.session.rollback()
+                    print("----------------error: ------------------", e)
                     current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
                     raise ValueError('Error al crear la factura del cliente.')
 
@@ -274,7 +275,7 @@ def programacion():
 
         except Exception as e:
             db.session.rollback()
-            current_app.logger.debug("Error al actualizar la programación:", e)
+            current_app.logger.error(f"Error al actualizar la programación: {str(e)}")
             return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 
     elif request.method == 'DELETE':

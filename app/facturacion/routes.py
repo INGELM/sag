@@ -9,7 +9,6 @@ from app.facturacion.models import pagosOperadoresModel, facturasClientesModel
 from app.programacion.models import programacionModel
 
 @facturacion_bp.before_request
-@login_required
 def before_request():
     if not current_user.is_authenticated:
         flash('Por favor, inicia sesión para acceder a esta página.', 'warning')
@@ -82,6 +81,7 @@ def crear_factura_cliente(form):
         "total_espera": total_espera,
         "costo_total": costo_total,
         "total_distancia": total_distancia,
+        "status": "Por facturar",
     }
     
     current_app.logger.debug("Datos de la nueva factura:", nueva_factura)
@@ -98,6 +98,31 @@ def facturacion():
     clientes = clientesModel.query.all()
 
     return render_template('facturacion.html', User=user, form=form, clientes=clientes)
+
+@facturacion_bp.route('/facturasClientes/cambio-status', methods=['PUT'])
+@login_required
+def facturasClientes_cambio_status():
+    ids = request.json.get('ids', [])
+    nuevo_status = request.json.get('nuevo_status', 'Por facturar')
+
+    if not ids:
+        return jsonify(success=False, mensaje='No se proporcionaron IDs de facturas.')
+
+    facturas = facturasClientesModel.query.filter(facturasClientesModel.id.in_(ids)).all()
+
+    if not facturas:
+        return jsonify(success=False, mensaje='No se encontraron facturas.')
+
+    for factura in facturas:
+        factura.status = nuevo_status
+
+    try:
+        db.session.commit()
+        return jsonify(success=True, mensaje='Estado de las facturas actualizado correctamente.')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Error al actualizar el estado de las facturas:", e)
+        return jsonify(success=False, mensaje='Error al actualizar el estado de las facturas.', error=str(e))
 
 @facturacion_bp.route('/facturasClientes', methods=['PUT'])
 def facturasClientes_update():

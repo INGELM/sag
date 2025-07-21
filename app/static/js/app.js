@@ -55,6 +55,8 @@ $.extend(true, $.fn.DataTable.defaults, {
         url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-MX.json ',
         search: "",
         searchPlaceholder: "Buscar...",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros disponibles",
         
        
         
@@ -219,27 +221,22 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     }
 
 
-
-    columnas.push({
-        data: null,
-        title: "Acciones",
-        orderable: false,
-        className: 'no-export',
-        searchable: false,
-        render: function (data_4, type, row) {
-            let acciones = `
-                <i class="bx bx-edit text-primary" style="cursor: pointer;" onClick="editar(${row.id}, '${modelo}')"></i>
-                <i class="bx bx-trash text-danger" style="cursor: pointer;" onClick="eliminar(${row.id}, '${modelo}')"></i>
-            `;
-            if (modelo === 'tarifas') {
-                acciones += `<a href="/empleados/tarifasOperadores" title="Ver tarifas del operador">
+    if (modelo === 'tarifas') {
+        columnas.push({
+            data: null,
+            title: "",
+            orderable: false,
+            className: 'no-export',
+            searchable: false,
+            render: function (data_4, type, row) {
+                var acciones = `<a href="/empleados/tarifasOperadores" title="Ver tarifas del operador">
                     <i id="oper" class="bx bxs-car" style="cursor: pointer; color:${row.color_rel};"></i>
                 </a>`;
-            }
             return acciones;
-        }
-    });
-
+            
+            }
+        });
+    }
     const relColumnIndexes = keys
         .map((campo_1, idx) => campo_1.endsWith('_rel') ? idx : -1)
         .filter(idx_1 => idx_1 !== -1);
@@ -333,10 +330,16 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             columnDefs: AllColumnDefs,
             paging: true,
             pageLength: 20,
-            select: 'row',
+            select: {
+                style: 'multi',
+                blurable: true,
+                items: 'row',
+                className: 'selected'
+            },
+            
             language: {
                 search: "",
-                info: "",
+                // info: "",
                 select: {
                     rows: {
                         _: "Has seleccionado %d filas",
@@ -417,57 +420,8 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                             text: 'Acciones',
                             // className: 'btn btn-outline-primary btn-sm mb-1 dropdown-toggle',
                             autoClose: true,
-                            buttons: [
-                                {
-                                    text: 'Editar',
-                                    className: 'dropdown-item',
-                                    action: function (e, dt, node, config) {
-                                        if (dt.rows({ selected: true }).count() === 0) {
-                                            Swal.fire({
-                                                icon: 'warning',
-                                                title: 'Aviso',
-                                                text: 'Debe seleccionar al menos un registro para editar.',
-                                                timer: 2000
-                                            });
-                                            return;
-                                        }
-                                        if (dt.rows({ selected: true }).count() > 1) {
-                                            Swal.fire({
-                                                icon: 'warning',
-                                                title: 'Aviso',
-                                                text: 'Solo se puede editar un registro a la vez.',
-                                                timer: 2000
-                                            });
-                                            return;
-                                        }
-                        
-                                            const registroId = dt.rows({ selected: true }).data()[0].id;
-                                            editar(registroId, modelo);
-                                 
-                                    }
-                                },
-                                {
-                                    text: 'Eliminar',
-                                    className: 'dropdown-item',
-                                    action: function (e, dt, node, config) {
-                                        if (dt.rows({ selected: true }).count() === 0) {
-                                            Swal.fire({
-                                                icon: 'warning',
-                                                title: 'Aviso',
-                                                text: 'Debe seleccionar al menos un registro para eliminar.',
-                                                timer: 2000
-                                            });
-                                            return;
-                                        }
-                                        else  {
-                                            eliminarSeleccionados(modelo);
-                                        }
-                                        
-                                        
-                                    }
-                                }
-                            ]
-                          }
+                            buttons: modulo === 'facturacion' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]], // Solo 'Eliminar' para facturación
+                        }
                     ],
                     search: true
                 }
@@ -528,6 +482,98 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
         console.error("Error al cargar la tabla:", err);
     });
 }
+
+function botonesAcciones(){
+    return [
+        {
+            text: 'Eliminar',
+            className: 'btn btn-danger btn-sm mb-1',
+            action: function (e, dt, node, config) {
+                eliminarSeleccionados(window.modelo);
+            }
+        },
+        {
+            text: 'Editar',
+            className: 'btn btn-primary btn-sm mb-1',
+            action: function (e, dt, node, config) {
+                const selectedRows = dt.rows({ selected: true });
+                if (selectedRows.count() === 1) {
+                    const rowData = selectedRows.data().toArray()[0];
+                    editar(rowData.id, window.modelo);
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Aviso',
+                        text: 'Debe seleccionar un único registro para editar.',
+                        timer: 2000
+                    });
+                }
+            }
+        },
+        {
+            text: "Cambiar a Facturado",
+            className: 'btn btn-success btn-sm mb-1',
+            action: function (e, dt, node, config) {
+                const selectedRows = dt.rows({ selected: true });
+                const selectedIds = selectedRows.data().toArray().map(row => row.id);
+                console.log("Filas seleccionadas:", selectedIds);
+                if (selectedRows.count() === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Aviso',
+                        text: 'Debe seleccionar al menos un registro para cambiar el estado.',
+                        timer: 2000
+                    });
+                } else {
+                    console.log(`Cambiar el estado de la fila con ID: ${selectedIds.join(", ")} a "Facturado"`);
+                    const url = '/facturacion/facturasClientes/cambio-status';
+                    $.ajax({
+                        url: url,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ ids: selectedIds, nuevo_status: 'Facturado' }),
+                        success: function (data) {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Éxito',
+                                    text: data.mensaje,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    dt.rows({ selected: true }).deselect();
+                                    location.reload();
+                                    
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: data.mensaje,
+                                    text: data.errores,
+                                    icon: 'error',
+                                    timer: 2500,
+                                    timerProgressBar: true,
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al cambiar el estado";
+                            Swal.fire({
+                                title: 'Falló el cambio de estado',
+                                text: mensaje,
+                                icon: 'error',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    });  
+                }
+            }
+        }
+    ];
+}
+
+
 
 function getTablaBotones() {
     return [
@@ -961,13 +1007,13 @@ function llenarFormulario(modelo, rowData) {
                         console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
                         setTimeout(() => {
                             $campoBase[0].selectize.setValue(valorRelacionado, false);
-                        }, 600);
+                        }, 300);
                     }
 
                     else {
                         setTimeout(() => {
                             $campoBase[0].selectize.setValue(valorRelacionado, true);
-                        }, 600);
+                        }, 400);
                         console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
 
                     }
