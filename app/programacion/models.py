@@ -34,8 +34,9 @@ class programacionModel(db.Model):
     operador_rel = db.relationship('empleadosModel', foreign_keys=[operador])
     vehiculo_rel = db.relationship('vehiculosModel', foreign_keys=[vehiculo])
 
-    def __init__(self, status, guia, origen, destino, fecha_salida, hora_salida, distancia, hora_retorno=None, tiempo_espera=None, desvios=None, operador=None, vehiculo=None,  retorno=None, observaciones=None):
+    def __init__(self, status, guia, origen, destino, fecha_salida, workflow, hora_salida, distancia, hora_retorno=None, tiempo_espera=None, desvios=None, operador=None, vehiculo=None,  retorno=None, observaciones=None):
         self.guia = guia if guia is not None else None
+        self.workflow = workflow if workflow is not None else None
         self.origen = origen.id
         self.destino = destino.id
         self.fecha_salida = fecha_salida

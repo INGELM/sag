@@ -73,6 +73,7 @@ def crear_factura_cliente(form):
     nueva_factura = {
 
         "tarifas_cliente": tarifas.id,
+        "factura": "--",
         "costo_desvios": costo_desvios,
         "costo_espera": costo_espera,
         "costo_distancia": costo_distancia,
@@ -99,6 +100,8 @@ def facturacion():
 
     return render_template('facturacion.html', User=user, form=form, clientes=clientes)
 
+
+
 @facturacion_bp.route('/facturasClientes/cambio-status', methods=['PUT'])
 @login_required
 def facturasClientes_cambio_status():
@@ -124,6 +127,11 @@ def facturasClientes_cambio_status():
         current_app.logger.error("Error al actualizar el estado de las facturas:", e)
         return jsonify(success=False, mensaje='Error al actualizar el estado de las facturas.', error=str(e))
 
+@facturacion_bp.route('/facturasClientes/agregar-factura', methods=['PUT'])
+@login_required
+def facturasClientes_agregar_factura():
+    pass
+
 @facturacion_bp.route('/facturasClientes', methods=['PUT'])
 def facturasClientes_update():
     if not current_user.is_admin:
@@ -148,6 +156,7 @@ def facturasClientes_update():
             factura.total_distancia = "--"
             factura.costo_base = "--"
             factura.costo_total = form_data['costo_total'] if form_data['costo_total'] else factura.costo_total
+            factura.factura = form_data['factura'] if form_data['factura'] else factura.factura
             factura.status = form_data['status']
             
             db.session.commit()

@@ -569,6 +569,26 @@ function botonesAcciones(){
                     });  
                 }
             }
+        },
+        {
+            text: "Agregar Nº Factura",
+            className: 'btn btn-info btn-sm mb-1',
+            action: function (e, dt, node, config) {
+                const selectedRows = dt.rows({ selected: true });
+                if (selectedRows.count() === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Aviso',
+                        text: 'Debe seleccionar al menos un registro para agregar el número de factura.',
+                        timer: 2000,
+                        confirmButtonText: 'Aceptar',
+                        timerProgressBar: true
+
+                    });
+                } else {
+                    $('#agregarFacturaModal').modal('show');
+                }
+            }
         }
     ];
 }
@@ -835,17 +855,8 @@ function eliminar(id, modelo) {
                             timerProgressBar: true,
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
-                            const dataTable = $(`#${modelo}Table`).DataTable();
-                            if (dataTable.rows().count() === 1) {
-                                location.reload();
-                            } else {
-                                dataTable.clear().destroy();
-                                if (modelo === 'programacion' || modelo === 'facturasClientes') {
-                                    cargarTabla2(modelo, window.modulo);
-                                } else {
-                                    cargarTabla1(modelo, window.modulo);
-                                }
-                            }
+                           
+                            location.reload();
                         });
                     } else {
                         Swal.fire({
@@ -923,17 +934,7 @@ function eliminarSeleccionados(modelo) {
                             timerProgressBar: true,
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
-                            const dataTable = $(`#${modelo}Table`).DataTable();
-                            if (dataTable.rows().count() === 1) {
-                                location.reload();
-                            } else {
-                                dataTable.clear().destroy();
-                                if (modelo === 'programacion' || modelo === 'facturasClientes') {
-                                    cargarTabla2(modelo, window.modulo);
-                                } else {
-                                    cargarTabla1(modelo, window.modulo);
-                                }
-                            }
+                            location.reload();
                         });
                     } else {
                         Swal.fire({

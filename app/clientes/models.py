@@ -169,7 +169,9 @@ class tarifasModel(db.Model):
         self.tarifa_km = tarifa_km
 
     def generate_code(self, empresa_codigo):
-        length = tarifasModel.query.count() + 1
+        length = tarifasModel.query.filter(
+            tarifasModel.empresa == self.empresa
+        ).count() + 1
         return f"{empresa_codigo}{length:04d}".upper() if empresa_codigo else None
         
         
@@ -228,7 +230,8 @@ class tarifasModel(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'codigo': self.codigo_desc,
+            # 'codigo': self.codigo_desc,
+            'codigo': self.codigo,
             'empresa': self.cliente.empresa if self.cliente else None,
             'empresa_rel': self.empresa,
             'origen': self.origen_rel.nombre if self.origen_rel else None,

@@ -5,6 +5,7 @@ from app.extensions import db
 class facturasClientesModel(db.Model):
     __tablename__ = "facturas_clientes"
     id = db.Column(db.Integer, primary_key=True)
+    factura = db.Column(db.String(50), nullable=True)
     programacion = db.Column(db.Integer, db.ForeignKey('programacion.id'), nullable=False)
     tarifas_cliente = db.Column(db.Integer, db.ForeignKey("tarifas.id"), nullable=False)
     costo_desvios = db.Column(db.Float, nullable=True)
@@ -21,10 +22,11 @@ class facturasClientesModel(db.Model):
     tarifas_cliente_rel = db.relationship('tarifasModel', foreign_keys=[tarifas_cliente], backref='facturas_clientes')
   
 
-    def __init__(self, programacion, tarifas_cliente, status, costo_desvios = 0.0, costo_espera = 0.0, costo_distancia = 0.0, costo_base = 0.0, total_desvios = 0.0, total_espera = 0.0, total_distancia = 0.0, costo_total = 0.0):
+    def __init__(self, programacion, tarifas_cliente, status, factura, costo_desvios = 0.0, costo_espera = 0.0, costo_distancia = 0.0, costo_base = 0.0, total_desvios = 0.0, total_espera = 0.0, total_distancia = 0.0, costo_total = 0.0):
         self.programacion = programacion
         self.tarifas_cliente = tarifas_cliente
         self.status = status
+        self.factura = factura
         self.costo_desvios = costo_desvios
         self.costo_espera = costo_espera
         self.costo_distancia = costo_distancia
@@ -48,6 +50,7 @@ class facturasClientesModel(db.Model):
             "fecha": self.programacion_rel.fecha_salida.strftime('%d-%m-%Y') if self.programacion_rel else None,
             "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
             "pasajeros": [{'id': p.id, 'nombre': p.nombres.title(), 'telefono': p.telefono} for p in self.programacion_rel.pasajeros] if self.programacion_rel and self.programacion_rel.pasajeros else [],
+            "factura": self.factura,
             "guia": self.programacion_rel.guia if self.programacion_rel else None,
             "hora_salida": self.programacion_rel.hora_salida.strftime('%H:%M') if self.programacion_rel else None,
             "hora_retorno": self.programacion_rel.hora_retorno.strftime('%H:%M') if self.programacion_rel.hora_retorno else "--",

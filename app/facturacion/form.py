@@ -5,6 +5,7 @@ from wtforms import StringField,  SubmitField, DecimalField, SelectField
 
 class facturasClientesForm(FlaskForm):
     id = StringField('ID', render_kw={"placeholder": "ID de la facturación", "class": "form-control", "type": ""})
+    factura = StringField('Factura', render_kw={"placeholder": "Número de factura", "class": "form-control"})
     guia = StringField('Guía', render_kw={"placeholder": "Guía de la facturación", "class": "form-control", "readonly": True})
     cliente = StringField('Empresa', render_kw={"placeholder": "Empresa de la facturación", "class": "form-control", "readonly": True})
     costo_total = DecimalField('Costo Total', render_kw={"placeholder": "Costo total", "class": "form-control"})
