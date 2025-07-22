@@ -311,65 +311,71 @@ def all_vehiculos():
 
 @tasa_bp.route('/', methods=['GET', 'PUT'])
 def tasa():
-    if request.method == 'GET':
-        data = tasaModel.query.first()
-       
-        if data:
-            tasa = data.tasa
-            fecha = data.fecha
-            
-        response = requests.get("https://pydolarve.org/api/v2/dollar",
-            params={
-                "page": "bcv",
-                "monitor": "usd"
-            }
-        )
+    data = tasaModel.query.first()
+    form = tasaForm()
 
+
+    # URL corregida: sin espacios extra
+    api_url = "https://pydolarve.org/api/v2/dollar"
+    
+    try:
+        response = requests.get(api_url)
         if response.status_code == 200:
             data_bcv = response.json()
-            tasa_bcv = data_bcv.get('price')
-            fecha_bcv = data_bcv.get('last_update')
+            tasa_bcv = data_bcv['monitors']['bcv']['price']
+            fecha_bcv = data_bcv['monitors']['bcv']['last_update']
         else:
-            tasa_bcv = "No se pudo Obtener la tasa del BCV"
-            fecha_bcv = "No se pudo Obtener la fecha del BCV"
-            
-        if not data:
-            nueva_tasa = tasaModel(tasa=tasa_bcv)
-            try:
-                nueva_tasa.save()
-            except Exception as e:
-                current_app.logger.debug(f'Error al guardar nueva tasa: {e}')
-        
-        tasa = data.tasa if data else tasa_bcv
+            tasa_bcv = None
+            fecha_bcv = "Error al obtener datos"
+    except Exception as e:
+        current_app.logger.error(f'Error al consultar la API PyDolarVE: {e}')
+        tasa_bcv = None
+        fecha_bcv = "Error de conexión"
 
-        return render_template('tasa.html', year=datetime.now().year, form=tasaForm(), User=current_user, tasa=tasa, fecha=fecha, tasa_bcv=tasa_bcv, fecha_bcv=fecha_bcv)
+    # En caso de GET, si no hay tasa guardada, usar la del BCV como valor inicial
+    if request.method == 'GET' and tasa_bcv:
+   
+        form.tasa.data = tasa_bcv
 
-
-    elif request.method == 'PUT':
-        form = tasaForm()
-        form_data = form.data
-        
-        tasa = tasaModel.query.first()
-        
-        tasa_updated = {
-            'tasa': form_data.get('tasa'),
-            'fecha': datetime.now().date()
-        }
-        
+    # Si es PUT, se actualiza la tasa desde el formulario
+    if request.method == 'PUT':
         if form.validate_on_submit():
-            try:
-                tasa.update(**tasa_updated)
-                flash('Tasa actualizada exitosamente.', 'success')
-                return jsonify(success=True, mensaje='Tasa actualizada exitosamente.')
-            except Exception as e:
-                current_app.logger.debug(f'Error al actualizar tasa: {e}')
-                return jsonify(success=False, mensaje='Error al actualizar la tasa.', errores=str(e))
+            nueva_tasa_valor = form.tasa.data
 
-        elif form.errors:
-            first_field, first_errors = next(iter(form.errors.items()))
-            error_messages = f"{first_errors[0]}"
-            current_app.logger.debug(f'Errores en el formulario: {error_messages}')
-            return jsonify(success=False, mensaje='Atención', errores=error_messages)
+            if data:
+                data.tasa = nueva_tasa_valor
+                data.fecha = datetime.now()
+                try:
+                    data.save()  # Suponiendo que tienes un método save()
+                except Exception as e:
+                    current_app.logger.debug(f'Error al actualizar la tasa: {e}')
+                    return {"error": "No se pudo actualizar"}, 500
+            else:
+                nueva_tasa = tasaModel(tasa=nueva_tasa_valor, fecha=datetime.now())
+                try:
+                    nueva_tasa.save()
+                except Exception as e:
+                    current_app.logger.debug(f'Error al guardar nueva tasa: {e}')
+                    return {"error": "No se pudo guardar"}, 500
+
+            return {"success": True, "tasa": nueva_tasa_valor}, 200
+        else:
+            return {"errors": form.errors}, 400
+
+    # Para GET: definir valores a mostrar
+    tasa_actual = data.tasa if data else tasa_bcv
+    fecha_actual = data.fecha if data else None
+
+    return render_template(
+        'tasa.html',
+        year=datetime.now().year,
+        form=form,
+        User=current_user,
+        tasa=tasa_actual,
+        fecha=fecha_actual,
+        tasa_bcv=tasa_bcv,
+        fecha_bcv=fecha_bcv
+    )
 
 
 

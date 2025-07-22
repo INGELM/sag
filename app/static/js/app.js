@@ -291,7 +291,45 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
             columnDefs: AllColumnDefs,
             paging: true,
             pageLength: 10,
-            pagingType: "numbers"
+            pagingType: "numbers",
+            select: {
+                style: 'multi',
+                blurable: true,
+                items: 'row',
+                className: 'selected'
+            },
+            
+            language: {
+                search: "",
+                // info: "",
+                select: {
+                    rows: {
+                        _: "Has seleccionado %d filas",
+                        0: "Haz clic en una fila para seleccionarla",
+                        1: "1 fila seleccionada"
+                    },
+                    cells: {
+                        _: "",
+                        0: "",
+                        1: ""
+                    },
+                    columns: {
+                        _: "",
+                        0: "",
+                        1: ""
+                    }
+                }
+            },
+            layout: {
+           
+                topEnd: {
+                    buttons: [botonesAuxiliares()[1], botonesAuxiliares()[2]],
+                    search: {
+                        
+                        // Aquí puedes personalizar la búsqueda
+                    }
+                }
+            }
         });
     }).catch(err => {
         console.error("Error al cargar la tabla:", err);
@@ -368,61 +406,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                     buttons: modulo !== 'facturacion' ? getTablaBotones() : botonesEspeciales(),
                 },
                 topEnd: {
-                    buttons: [
-                        {
-                            init: function (dt, node, config) {
-                                const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
-                                $(node).attr('class', clase);
-                            },
-                            text: 'Bs',
-                            action: function (e, dt, node, config) {
-                                const current = localStorage.getItem('Bs') === 'true';
-                                localStorage.setItem('Bs', !current);
-                                $(node)
-                                    .toggleClass('btn-success', !current)
-                                    .toggleClass('btn-outline-secondary', current);
-                                if (tablaInstancia) {
-                                    tablaInstancia.rows().invalidate().draw(false);
-                                }
-                            }
-                        },
-                        {
-                            init: function (dt, node, config) {
-                                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
-                            },
-                            text: 'Seleccionar todos',
-                            action: function(e, dt, node, config) {
-                                if (dt.rows({ search: 'applied' }).count() > 0) {
-                                    if ($(node).text() === 'Seleccionar todos') {
-                                        dt.rows({ search: 'applied' }).select();
-                                        $(node).removeClass('btn-outline-primary').addClass('btn-primary');
-                                        $(node).text('Deseleccionar todos');
-                                    } else {
-                                        dt.rows({ search: 'applied' }).deselect();
-                                        $(node).removeClass('btn-primary').addClass('btn-outline-primary');
-                                        $(node).text('Seleccionar todos');
-                                    }
-                                } else {
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Aviso',
-                                        text: 'No hay filas disponibles para seleccionar.',
-                                        timer: 2000
-                                    });
-                                }
-                            }
-                        },
-                        {
-                            init: function (dt, node, config) {
-                                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
-                            },
-                            extend: 'collection',
-                            text: 'Acciones',
-                            // className: 'btn btn-outline-primary btn-sm mb-1 dropdown-toggle',
-                            autoClose: true,
-                            buttons: modulo === 'facturacion' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]], // Solo 'Eliminar' para facturación
-                        }
-                    ],
+                    buttons: botonesAuxiliares(),
                     search: true
                 }
             },
@@ -693,6 +677,63 @@ function botonesEspeciales() {
     ];
 }
 
+function botonesAuxiliares() {
+    return [
+            {
+                init: function (dt, node, config) {
+                    const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
+                    $(node).attr('class', clase);
+                },
+                text: 'Bs',
+                action: function (e, dt, node, config) {
+                    const current = localStorage.getItem('Bs') === 'true';
+                    localStorage.setItem('Bs', !current);
+                    $(node)
+                        .toggleClass('btn-success', !current)
+                        .toggleClass('btn-outline-secondary', current);
+                    if (tablaInstancia) {
+                        tablaInstancia.rows().invalidate().draw(false);
+                    }
+                }
+            },
+            {
+                init: function (dt, node, config) {
+                    $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+                },
+                text: 'Seleccionar todos',
+                action: function(e, dt, node, config) {
+                    if (dt.rows({ search: 'applied' }).count() > 0) {
+                        if ($(node).text() === 'Seleccionar todos') {
+                            dt.rows({ search: 'applied' }).select();
+                            $(node).removeClass('btn-outline-primary').addClass('btn-primary');
+                            $(node).text('Deseleccionar todos');
+                        } else {
+                            dt.rows({ search: 'applied' }).deselect();
+                            $(node).removeClass('btn-primary').addClass('btn-outline-primary');
+                            $(node).text('Seleccionar todos');
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Aviso',
+                            text: 'No hay filas disponibles para seleccionar.',
+                            timer: 2000
+                        });
+                    }
+                }
+            },
+            {
+                init: function (dt, node, config) {
+                    $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+                },
+                extend: 'collection',
+                text: 'Acciones',
+                // className: 'btn btn-outline-primary btn-sm mb-1 dropdown-toggle',
+                autoClose: true,
+                buttons: modulo === 'facturacion' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]], // Solo 'Eliminar' para facturación
+            }
+            ]
+        }
 function aplicarFiltro(dt, node, filtro, textoTabla) {
     dt.ajax.url(`/programacion/get_data?filtro=${filtro}`).load();
     $("#nombre-tabla").text(textoTabla);
@@ -780,7 +821,7 @@ async function guardarRegistro(modelo, varModulo = "") {
                     text: data.mensaje || "Registro guardado correctamente",
                     icon: 'success',
                     confirmButtonText: 'Aceptar',
-                    timer: 7000,
+                    timer: 3000,
                     timerProgressBar: true,
                 }).then(() => {
                     $(`#${modelo}Form`)[0].reset();
@@ -792,12 +833,7 @@ async function guardarRegistro(modelo, varModulo = "") {
                             // this.selectize.clearOptions();
                         }
                     });
-                    if (modelo === 'programacion' || modelo === 'facturasClientes') {
-                        // cargarTabla2(modelo, modulo);
-                        location.reload();
-                    } else {
-                        cargarTabla1(modelo, modulo);
-                    }
+                    location.reload();
                     if (metodo === 'PUT') {
                         $(".formulario").addClass("visually-hidden");
                         window.registroIdEditar = null;

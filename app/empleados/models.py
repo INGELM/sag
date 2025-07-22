@@ -102,7 +102,7 @@ class empleadosModel(db.Model, UserMixin):
             'email': self.email,
             'telefono': self.telefono,
             'rol': self.rol,
-            'tipo': self.tipo,
+            'tipo': self.tipo
         }
 
 class tarifasOperadoresModel(db.Model):
