@@ -49,6 +49,7 @@ class facturasClientesModel(db.Model):
             "id": self.id,
             "fecha": self.programacion_rel.fecha_salida.strftime('%d-%m-%Y') if self.programacion_rel else None,
             "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
+            "#_Trabajador": self.programacion_rel.pasajeros[0].numero if self.programacion_rel and self.programacion_rel.pasajeros else None,
             "pasajeros": [{'id': p.id, 'nombre': p.nombres.title(), 'telefono': p.telefono} for p in self.programacion_rel.pasajeros] if self.programacion_rel and self.programacion_rel.pasajeros else [],
             "factura": self.factura,
             "guia": self.programacion_rel.guia if self.programacion_rel else None,

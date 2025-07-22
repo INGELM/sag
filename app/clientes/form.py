@@ -28,6 +28,7 @@ class clientesForm(FlaskForm):
 
 class pasajerosForm(FlaskForm):
     id = StringField('ID', render_kw={"class": "form-control", "type": ""})
+    numero = StringField('Número de Trabajador', render_kw={"placeholder": "Número del pasajero", "class": "form-control", "style": "text-transform:uppercase;"})
     nombres = StringField('Nombre', validators=[DataRequired(message='El nombre es obligatorio.')], render_kw={"placeholder": "Nombre del pasajero", "class": "form-control"})
     empresa = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del pasajero", "class": "form-control"})
     ciudad = QuerySelectField('Ciudad', query_factory=lambda: ciudadesModel.query.all(), get_label='nombre', allow_blank=True, blank_text='Seleccione una ciudad', render_kw={"placeholder": "Ciudad del pasajero", "class": "form-control"})

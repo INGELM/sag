@@ -77,6 +77,7 @@ class pasajerosModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     empresa = db.Column(db.Integer, db.ForeignKey(
         'clientes.id'), nullable=False)
+    numero = db.Column(db.String(20), unique=True, nullable=False)
     nombres = db.Column(db.String(100), nullable=False)
     ciudad = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=True)
     direccion = db.Column(db.String(200), nullable=True)
@@ -86,8 +87,9 @@ class pasajerosModel(db.Model):
     cliente = db.relationship('clientesModel', back_populates='pasajeros')
     ciudad_rel = db.relationship('ciudadesModel', back_populates='pasajeros')
 
-    def __init__(self, empresa, nombres, email=None, telefono=None, ciudad=None, direccion=None):
+    def __init__(self, empresa, nombres, numero,email=None, telefono=None, ciudad=None, direccion=None):
         self.empresa = empresa.id if hasattr(empresa, 'id') else empresa
+        self.numero = numero.upper() if numero else None
         self.nombres = nombres.title() if nombres else None
         self.email = email.lower() if email else None
         self.telefono = telefono if telefono else None
@@ -114,6 +116,7 @@ class pasajerosModel(db.Model):
             'id': self.id,
             'empresa': self.cliente.empresa if self.cliente else None,
             'empresa_rel': self.empresa,
+            'numero': self.numero,
             'nombres': self.nombres,
             'ciudad': self.ciudad_rel.nombre if self.ciudad_rel else None,
             'ciudad_rel': self.ciudad,

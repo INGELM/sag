@@ -337,6 +337,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
 }
 
 function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = []) {
+    console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
         // Configuración base de DataTable
 
@@ -730,7 +731,7 @@ function botonesAuxiliares() {
                 text: 'Acciones',
                 // className: 'btn btn-outline-primary btn-sm mb-1 dropdown-toggle',
                 autoClose: true,
-                buttons: modulo === 'facturacion' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]], // Solo 'Eliminar' para facturación
+                buttons: modelo === 'facturasClientes' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]],
             }
             ]
         }
