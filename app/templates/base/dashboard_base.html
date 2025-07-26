@@ -31,7 +31,10 @@
             {{ nav_link('programacion.programacion', 'Programación', 'bx bx-calendar-alt') }}
 
             {{ dropdown_menu('facturacion.facturacion', 'Facturación', [
-              {'href': url_for('facturacion.facturacion'), 'text': 'Facturas Clientes', 'endpoint': 'facturacion.facturacion', 'icon': 'bx bx-arrow-in-down-left-circle'},
+              {'href': url_for('facturacion.facturacion'), 'text': ' Clientes', 'endpoint': 'facturacion.facturacion', 'icon': 'bx bx-arrow-in-down-left-circle'},
+
+              {'href': url_for('facturacion.cobro_detalle'), 'text': 'Cobros Detalle', 'endpoint': 'facturacion.cobro_detalle', 'icon': 'bx bx-article', 'id':'cobro_detalle'},
+
               {'href': url_for('facturacion.pagos_operadores'), 'text': 'Pagos Operadores', 'endpoint': 'facturacion.pagos_operadores', 'icon': 'bx bx-arrow-out-down-right-circle'}
 
             ], menu_icon='bx bx-receipt') }}

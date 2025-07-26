@@ -49,7 +49,7 @@ class facturasClientesModel(db.Model):
             "id": self.id,
             "fecha": self.programacion_rel.fecha_salida.strftime('%d-%m-%Y') if self.programacion_rel else None,
             "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
-            "#_Trabajador": self.programacion_rel.pasajeros[0].numero if self.programacion_rel and self.programacion_rel.pasajeros else None,
+            # "#_Trabajador": self.programacion_rel.pasajeros[0].numero if self.programacion_rel and self.programacion_rel.pasajeros else None,
             "pasajeros": [{'id': p.id, 'nombre': p.nombres.title(), 'telefono': p.telefono} for p in self.programacion_rel.pasajeros] if self.programacion_rel and self.programacion_rel.pasajeros else [],
             "factura": self.factura,
             "guia": self.programacion_rel.guia if self.programacion_rel else None,
@@ -72,6 +72,39 @@ class facturasClientesModel(db.Model):
             "total_": self.costo_total if self.costo_total else "--",
             "status": self.status if self.status else "--",
         }
+
+    def serialize_detalle(self, x):
+
+        return {
+            "id": self.id,
+            "fecha": self.programacion_rel.fecha_salida.strftime('%d-%m-%Y') if self.programacion_rel else None,
+            "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
+            # "#_Trabajador": self.programacion_rel.pasajeros[0].numero if self.programacion_rel and self.programacion_rel.pasajeros else None,
+            # "pasajeros": [{'id': p.id, 'nombre': p.nombres.title(), 'telefono': p.telefono} for p in self.programacion_rel.pasajeros] if self.programacion_rel and self.programacion_rel.pasajeros else [],
+            '#_Pasajero': self.programacion_rel.pasajeros[x].numero if self.programacion_rel and self.programacion_rel.pasajeros else None,
+            'pasajero': self.programacion_rel.pasajeros[x].nombres.title() if self.programacion_rel and self.programacion_rel.pasajeros else None,
+            "factura": self.factura,
+            "guia": self.programacion_rel.guia if self.programacion_rel else None,
+            "hora_salida": self.programacion_rel.hora_salida.strftime('%H:%M') if self.programacion_rel else None,
+            "hora_retorno": self.programacion_rel.hora_retorno.strftime('%H:%M') if self.programacion_rel.hora_retorno else "--",
+            "horario": self.programacion_rel.turno if self.programacion_rel else None,
+            "desplazamiento": self.programacion_rel.desplazamiento if self.programacion_rel else None,
+            "origen": self.programacion_rel.origen_rel.nombre if self.programacion_rel else None,
+            "destino": self.programacion_rel.destino_rel.nombre if self.programacion_rel else None,
+            # "distancia": self.programacion_rel.distancia if self.programacion_rel.distancia else "--",
+            # # "Costo km": self.tarifas_cliente_rel.tarifa_km if self.tarifas_cliente_rel.tarifa_km else "--",
+            # "total_distancia": self.total_distancia if self.total_distancia else "--",
+            # "tiempo_espera": self.programacion_rel.tiempo_espera if self.programacion_rel.tiempo_espera else "--",
+            # # "Costo espera": self.tarifas_cliente_rel.espera if self.tarifas_cliente_rel.espera else "--",
+            # "total_espera": self.total_espera if self.total_espera else "--",
+            # "desvíos": self.programacion_rel.desvios if self.programacion_rel.desvios else "--",
+            # # "Costo Desvíos": self.tarifas_cliente_rel.desvios if self.tarifas_cliente_rel.desvios else "--",
+            # "total_desvios": self.total_desvios if self.total_desvios else "--",
+            # "costo_base": self.costo_base if self.costo_base else "--",
+            # "total_": self.costo_total if self.costo_total else "--",
+            "status": self.status if self.status else "--",
+        }
+
 
 class pagosOperadoresModel(db.Model):
     __tablename__ = "facturas_operadores"

@@ -8,7 +8,30 @@ $(document).ready(function () {
 
     console.log("Modelo actual:", modelo);
 
-    cargarTabla2(modelo, 'facturacion');
+    if (modelo === 'cobro_detalle') {
+        $.ajax({
+            type: "GET",
+            url: "/facturacion/get/cobro_detalle",
+            data: {},
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    console.log("Datos de cobro detalle:", response.data);
+                    const keys = Object.keys(response.data[0]);
+                    // console.log("Keys:", keys);
+                    var columnas = keys.map(campo => ({
+                        data: campo,
+                        title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
+                    }));
+                    console.log("Columnas:", columnas);
+                    crearTabla("/facturacion/get/cobro_detalle", "#facturasCobrosDetalle", columnas);
+                }
+            },
+       });
+    }
+    else {
+        cargarTabla2(modelo, 'facturacion');
+    }
 
     FORM_FACTURACION_CLIENTE.on('submit', function (e) {
         e.preventDefault();
@@ -32,6 +55,8 @@ $(document).ready(function () {
 
     });
 
+  
 
 
+   
 });

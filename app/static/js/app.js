@@ -468,6 +468,60 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
     });
 }
 
+function botonBs() {
+    return [
+            {
+                init: function (dt, node, config) {
+                    const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
+                    $(node).attr('class', clase);
+                },
+                text: 'Bs',
+                action: function (e, dt, node, config) {
+                    const current = localStorage.getItem('Bs') === 'true';
+                    localStorage.setItem('Bs', !current);
+                    $(node)
+                        .toggleClass('btn-success', !current)
+                        .toggleClass('btn-outline-secondary', current);
+                    if (tablaInstancia) {
+                        tablaInstancia.rows().invalidate().draw(false);
+                    }
+                }
+            }
+        ];
+}
+
+function crearTabla(url, tablaId, columnas) {
+console.log("Creando tabla en:", tablaId, "y URL:", url);
+
+if ($(tablaId).hasClass('dataTable')) {
+    $(tablaId).DataTable().clear().destroy();
+}
+
+
+
+    $(tablaId).DataTable({
+        ajax: {
+            url: url,
+            dataSrc: 'data'
+        },
+        columns: columnas,
+        responsive: true,
+        paging: true,
+        searching: true,
+        layout: {
+            topStart: {
+                buttons: botonesEspeciales() 
+            },
+            topEnd: {
+                buttons: botonBs(),
+                search: true
+            }
+
+    
+        }
+    });
+}
+
 function botonesAcciones(){
     return [
         {
@@ -619,6 +673,12 @@ function getTablaBotones() {
             }
         }
     ];
+
+
+
+
+
+
 }
 
 function botonesEspeciales() {

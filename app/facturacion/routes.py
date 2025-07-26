@@ -7,7 +7,6 @@ from flask_login import login_required, current_user
 from app.facturacion.form import facturasClientesForm, pagosOperadoresForm
 from app.facturacion.models import pagosOperadoresModel, facturasClientesModel
 from app.programacion.models import programacionModel
-
 @facturacion_bp.before_request
 def before_request():
     if not current_user.is_authenticated:
@@ -217,6 +216,8 @@ def facturas_clientes_all():
     # if not facturas:
     #     return jsonify(success=False, mensaje="No se encontraron facturas.", icon='warning', data=[])
     
+    
+    
     response_data = {
         'success': True,
         'mensaje': 'Programaciones obtenidas exitosamente.',
@@ -242,11 +243,11 @@ def facturas_clientes():
         ).all()
     else:
         facturas = facturasClientesModel.query.all()
-    
+ 
     response_data = {
         'success': True,
         'mensaje': 'Facturas obtenidas exitosamente.',
-        'data': [factura.serialize() for factura in facturas]
+        'data': [factura.serialize(x) for x, factura in enumerate(facturas)]
     }
 
     current_app.logger.debug("Datos de respuesta:", response_data['data'])
@@ -388,3 +389,31 @@ def pagosOperadores_update():
             return jsonify(success=False, mensaje=f"Error al actualizar el pago: {str(e)}", icon='danger')
 
     return render_template('pagosOperadores.html', User=user, form=form)
+
+@facturacion_bp.route('/cobro_detalle', methods=['GET'])
+def cobro_detalle():
+    user = current_user
+    current_app.logger.debug("Accediendo a la vista de cobro detalle por:", user, "rol:", user.is_admin)
+    
+    return render_template('cobro-detalle.html', User=user)
+
+@facturacion_bp.route("/get/cobro_detalle", methods=['GET'])
+def get_cobro_detalle():
+    user = current_user
+    # programaciones = programacionModel.query.all()
+    facturas = facturasClientesModel.query.all()
+    
+    data = []
+    for factura in facturas:
+        for x, pasajero in enumerate(factura.programacion_rel.pasajeros):
+            data.append(factura.serialize_detalle(x))
+
+    response_data = {
+        'success': True,
+        'mensaje': 'Detalles de cobro obtenidos exitosamente.',
+        'data': data
+    }
+
+    return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
+
+     

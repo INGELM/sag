@@ -1,0 +1,68 @@
+{% extends 'base/dashboard_base.html' %}
+{% from 'macros.html' import render_field %}
+
+{% block titulo %}
+  Facturación
+{% endblock %}
+
+{% block nav_menu %}
+  {% include 'nav-menu-facturacion.html' %}
+{% endblock %}
+
+{% block dashboard %}
+  <div class="row d-flex p-1">
+   
+    <div class="col-lg">
+      <div class="justify-content-center">
+        <div class="card">
+          <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <h3 class="text-primary fw-bold" id="">Detalle Cobros a Clientes</h3>
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+              <!-- Grupo Desde -->
+              <div class="d-flex align-items-center gap-2">
+                <label for="f-desde" class="fw-bold">Desde:</label>
+                <input type="date" class="form-control rounded-1" id="f-desde" />
+              </div>
+
+
+              <!-- Grupo Hasta -->
+              <div class="d-flex align-items-center gap-2">
+                <label for="f-hasta" class="fw-bold">Hasta:</label>
+                <input type="date" class="form-control rounded-1" id="f-hasta" />
+              </div>
+
+              <!-- Botones -->
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-sm" id="f-filtrar">Filtrar</button>
+                <button type="button" class="btn btn-info btn-sm" id="f-limpiar">Limpiar</button>
+              </div>
+            </div>
+
+          </div>
+          <div class="card-body">
+            <table class="table" id="facturasCobrosDetalle">
+              <thead>
+                <tr>
+                  <th></th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+              
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block JS %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('facturacion.static', filename='js/facturacion.js') }}"></script>
+{% endblock %}

@@ -44,10 +44,11 @@
     <ul class="dropdown-menu" aria-labelledby="{{ menu_id }}">
       {% for item in items %}
         <li>
-          <a class="dropdown-item d-flex justify-content-start align-items-center {{ 'active' if request.endpoint == item.endpoint }}" href="{{ item.href }}">
+          <a class="dropdown-item d-flex justify-content-start align-items-center {{ 'active' if request.endpoint == item.endpoint }}" href="{{ item.href }}" id="{{ item.id }}">
             {% if item.icon %}
               <i class="{{ item.icon }} me-2"></i>
             {% endif %}
+          
             <span class="d-flex align-items-center">{{ item.text }}</span>
           </a>
         </li>
