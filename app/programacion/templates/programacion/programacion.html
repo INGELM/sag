@@ -105,8 +105,24 @@
               <div class="row">
                 <div class="col-xl-6">
                   <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.direccion_origen.label }}</label>
+                    {{ form.direccion_origen }}
+                  </div>
+                </div>
+
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
                     <label class="form-label text-start w-100 text-secondary">{{ form.origen.label }}</label>
                     {{ form.origen }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-6">
+                  <div class="form-control form-group mb-3">
+                    <label class="form-label text-start w-100 text-secondary">{{ form.direccion_destino.label }}</label>
+                    {{ form.direccion_destino }}
                   </div>
                 </div>
 

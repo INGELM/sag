@@ -11,7 +11,9 @@ class programacionModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     workflow = db.Column(db.String(50), nullable=True)
     guia = db.Column(db.String(50), nullable=True)
+    direccion_origen = db.Column(db.String(255), nullable=True)
     origen = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
+    direccion_destino = db.Column(db.String(255), nullable=True)
     destino = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
     fecha_salida = db.Column(db.Date, nullable=False)
     hora_salida = db.Column(db.Time, nullable=False)
@@ -34,11 +36,11 @@ class programacionModel(db.Model):
     operador_rel = db.relationship('empleadosModel', foreign_keys=[operador])
     vehiculo_rel = db.relationship('vehiculosModel', foreign_keys=[vehiculo])
 
-    def __init__(self, status, guia, origen, destino, fecha_salida, workflow, hora_salida, distancia, hora_retorno=None, tiempo_espera=None, desvios=None, operador=None, vehiculo=None,  retorno=None, observaciones=None):
+    def __init__(self, status, guia, direccion_origen, direccion_destino, fecha_salida, workflow, hora_salida, distancia, hora_retorno=None, tiempo_espera=None, desvios=None, operador=None, vehiculo=None,  retorno=None, observaciones=None):
         self.guia = guia if guia is not None else None
         self.workflow = workflow if workflow is not None else None
-        self.origen = origen.id
-        self.destino = destino.id
+        self.direccion_origen = direccion_origen if direccion_origen is not None else None
+        self.direccion_destino = direccion_destino if direccion_destino is not None else None
         self.fecha_salida = fecha_salida
         self.hora_salida = hora_salida
         self.distancia = distancia
@@ -114,7 +116,7 @@ class programacionModel(db.Model):
             'pasajeros_rel': [p.id for p in self.pasajeros] if self.pasajeros else [],
             'hora_salida': self.hora_salida.strftime('%H:%M') if self.hora_salida else None,
             'hora_retorno': self.hora_retorno.strftime('%H:%M') if self.hora_retorno else None,
-            'origen': self.origen_rel.nombre if self.origen_rel else None,
+            'origen': self.origen_rel.nombre,
             'origen_rel': self.origen,
             'destino': self.destino_rel.nombre if self.destino_rel else None,
             'destino_rel': self.destino,

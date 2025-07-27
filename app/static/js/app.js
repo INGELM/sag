@@ -716,6 +716,31 @@ function getTablaBotones() {
                 aplicarFiltro(dt, node, '', 'VIAJES');
             }
         },
+        {            init: function (dt, node, config) {    
+                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+            },
+            text: 'copy',
+            extend: 'copyHtml5',
+            titleAttr: 'Copiar',
+            exportOptions: {
+                columns: ':visible:not(.no-export)',
+                format: {
+                    body: function (data) {
+                        if (typeof data === 'string') {
+                            return data.replace(/<[^>]+>/g, '');
+                        }
+                        if (Array.isArray(data)) {
+                            return data.join(', ');
+                        }
+                        if (typeof data === 'object' && data !== null) {
+                            return Object.values(data).join(', ');
+                        }
+                        return data;
+                    }
+                }
+            },
+            
+        },
         {
             init: function (dt, node, config) {
                 $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');

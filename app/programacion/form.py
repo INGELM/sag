@@ -41,7 +41,9 @@ class programacionForm(FlaskForm):
         render_kw={"class": "form-control pasajero-select", "id": "pasajeros-select", "multiple": True}
     )
     operador = QuerySelectField('Operador', query_factory=get_operadores, allow_blank=True, blank_text="Seleccione Operador", get_label='nombres',render_kw={"class": "form-control operador-select", "id": "operador-select"})
+    direccion_origen = StringField('Dirección Origen', render_kw={"placeholder": "Dirección Origen", "class": "form-control"}, validators=[Optional()])
     origen = QuerySelectField('Ciudad Origen', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre', validators=[DataRequired(message='La ciudad de origen es obligatoria.')], render_kw={"class": "form-control origen-select", "id": "ciudad-origen-select"})
+    direccion_destino = StringField('Dirección Destino', render_kw={"placeholder": "Dirección Destino", "class": "form-control"}, validators=[Optional()])
     destino = QuerySelectField('Ciudad Destino', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre', validators=[DataRequired(message='La ciudad de destino es obligatoria.')], render_kw={"class": "form-control destino-select", "id": "ciudad-destino-select"})
     vehiculo = QuerySelectField('Vehículo', query_factory=get_vehiculos, allow_blank=True, blank_text="Seleccione Vehículo", get_label='tipo', render_kw={"class": "form-control vehiculo-select"})
     distancia = FloatField('Distancia', render_kw={"placeholder": "Distancia", "class": "form-control"}, validators=[Optional()], default=0.0)
