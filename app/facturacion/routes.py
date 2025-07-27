@@ -129,7 +129,36 @@ def facturasClientes_cambio_status():
 @facturacion_bp.route('/facturasClientes/agregar-factura', methods=['PUT'])
 @login_required
 def facturasClientes_agregar_factura():
-    pass
+    numero_factura = request.json.get('factura')
+    id_facturas = request.json.get('ids', [])
+    
+    current_app.logger.debug("Número de factura recibido:", numero_factura)
+    current_app.logger.debug("ID de facturas recibido:", id_facturas)
+    
+    if not numero_factura or not id_facturas:
+        return jsonify(success=False, mensaje='Número de factura o ID no proporcionado.')
+    
+    if not isinstance(id_facturas, list):
+        id_facturas = [id_facturas]
+        
+    for id_factura in id_facturas:
+        factura = facturasClientesModel.query.filter_by(id=id_factura).first()
+        
+        if not factura:
+            return jsonify(success=False, mensaje=f'Factura con ID {id_factura} no encontrada.')
+        
+        # if factura.factura and factura.factura != "--":
+        #     return jsonify(success=False, mensaje=f'La factura con ID {id_factura} ya tiene un número de factura asignado.')
+        
+        try:
+            factura.factura = numero_factura
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error al agregar la factura {numero_factura} a la factura con ID {id_factura}: {str(e)}")
+            return jsonify(success=False, mensaje=f'Error al agregar la factura: {str(e)}')
+    
+    return jsonify(success=True, mensaje='Numero(s) de Factura(s) agregada(s) correctamente.')
 
 @facturacion_bp.route('/facturasClientes', methods=['PUT'])
 def facturasClientes_update():

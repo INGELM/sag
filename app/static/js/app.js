@@ -1,3 +1,72 @@
+$(document).ready(function () {
+    $('#agregarFacturaModal').on('click', function (e) {
+        e.stopPropagation(); // Evita que el clic se propague y afecte la selección
+    });
+
+    $('#guardarNoFacturaBtn').click(function (e) {
+        e.preventDefault();
+        const form = $('#agregarFacturaForm');
+        const dt = $('#facturasClientesTable').DataTable();
+        const selectedRows = dt.rows({ selected: true });
+        const selectedIds = selectedRows.data().toArray().map(row => row.id);
+        console.log("IDs seleccionados:", selectedIds);
+        console.log("Datos del formulario:", form.serializeArray());
+        console.log("Numero de factura", $('#numero-factura').val());
+
+        const data = {
+            factura: $('#numero-factura').val(),
+            ids: selectedIds
+        };
+
+        console.log("Datos a enviar:", data);
+        
+        $.ajax({
+            url: '/facturacion/facturasClientes/agregar-factura',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: response.mensaje,
+                        icon: 'success',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        $('#agregarFacturaModal').modal('hide');
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: response.mensaje,
+                        icon: 'error',
+                        // confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al agregar el número de factura";
+                Swal.fire({
+                    title: 'Falló la operación',
+                    text: mensaje,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });
+        
+        
+    });
+});
+
+
+
+
 const selectizeConfig = {
     create: false,
     allowEmptyOption: false,
@@ -631,6 +700,8 @@ function botonesAcciones(){
         }
     ];
 }
+
+
 
 
 

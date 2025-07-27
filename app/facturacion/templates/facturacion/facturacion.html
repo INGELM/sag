@@ -122,11 +122,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="agregarFacturaForm">
+        <form id="agregarFacturaForm" novalidate>
           <div class="mb-3">
             <div class="form-floating">
-              <input type="text" class="form-control" id="factura" name="factura" placeholder="Ingrese el número de factura" required>
-              <label for="factura" class="form-label">Número de Factura</label>
+              <input type="text" class="form-control" id="numero-factura" name="factura" placeholder="Ingrese el número de factura" >
+              <label for="numero-factura" class="form-label">Número de Factura</label>
             </div>
             
 
@@ -136,7 +136,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="guardarFacturaBtn">Guardar</button>
+        <button type="button" class="btn btn-primary" id="guardarNoFacturaBtn">Guardar</button>
       </div>
     </div>
   </div>
