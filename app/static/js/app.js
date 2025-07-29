@@ -1159,12 +1159,14 @@ function llenarFormulario(modelo, rowData) {
             console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
         }
 
-        if ($campo.length && $campo[0].selectize && key.includes('direccion_origen')) {
+        if ($campo.length && $campo[0].selectize && key.includes('direccion_origen') && rowData[key]) {
             
-            $campo[0].selectize.addOption({ id: rowData[key], text: rowData[key] });
-            $campo[0].selectize.refreshOptions(false);
-            $campo[0].selectize.setValue(rowData[key], true);
-            console.log(`Selectize 1 actualizado para: ${key} con valor: ${rowData[key]}`);
+            arrayDataKey = rowData[key].map(item => item.trim());
+            // console.log("arrayDataKey:", arrayDataKey);
+            $campo[0].selectize.setValue(arrayDataKey, true);
+            console.log(`Selectize actualizado para: ${key} con valor: ${arrayDataKey}`);
+
+
         }
 
     

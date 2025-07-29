@@ -1,5 +1,6 @@
 from flask import current_app
 from app.extensions import db
+import json
 
 programacion_pasajeros = db.Table('programacion_pasajeros',
     db.Column('programacion', db.Integer, db.ForeignKey('programacion.id')),
@@ -118,7 +119,7 @@ class programacionModel(db.Model):
             'pasajeros_rel': [p.id for p in self.pasajeros] if self.pasajeros else [],
             'hora_salida': self.hora_salida.strftime('%H:%M') if self.hora_salida else None,
             'hora_retorno': self.hora_retorno.strftime('%H:%M') if self.hora_retorno else None,
-            'direccion_origen': self.direccion_origen,
+            'direccion_origen': json.loads(self.direccion_origen) if self.direccion_origen else None,
             'origen': self.origen_rel.nombre,
             'origen_rel': self.origen,
             'destino': self.destino_rel.nombre if self.destino_rel else None,

@@ -159,6 +159,8 @@ def programacion():
         # Eliminar campos que no son necesarios para el procesamiento
         for field in ['csrf_token', 'submit', 'id', 'empresa', 'pasajeros']:
             programacion_data.pop(field, None)
+        
+        programacion_data['direccion_origen'] = json.dumps(form.direccion_origen.data) if form.direccion_origen.data else None
 
         nueva_programacion = programacionModel(**programacion_data)
         
@@ -242,6 +244,7 @@ def programacion():
             if hasattr(value, 'id'):
                 programacion_data[key] = value.id
                 
+        programacion_data['direccion_origen'] = json.dumps(form.direccion_origen.data) if form.direccion_origen.data else None
         
         try:
             db.session.query(programacionModel).filter_by(id=id_programacion).update(programacion_data)
@@ -292,13 +295,13 @@ def programacion():
         if not id_programacion:
             return jsonify(success=False, mensaje='ID de programación no proporcionado.')
 
-        programacion = programacionModel.query.get(id_programacion)
-
+        programacion = programacionModel.query.filter(programacionModel.id.in_(id_programacion)).all()
         if not programacion:
             return jsonify(success=False, mensaje='Programación no encontrada.')
 
         try:
-            db.session.delete(programacion)
+            for item in programacion:
+                db.session.delete(item)
             db.session.commit()
             return jsonify(success=True, mensaje='Programación eliminada correctamente.')
 
