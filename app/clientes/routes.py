@@ -24,7 +24,7 @@ def clientes():
 
     form = clientesForm()
     
-    cliente_data = request.get_json() if request.method in ['PUT', 'DELETE'] else form.data
+    cliente_data =  {**form.data}
     current_app.logger.info(f'Datos recibidos del formulario: {cliente_data}')
 
     # if 'ciudad' in cliente_data and cliente_data['ciudad']:
@@ -47,7 +47,11 @@ def clientes():
         for field in ['csrf_token', 'validar_contrasena', 'submit', 'id']:
             current_app.logger.debug(f'Campos eliminados: {field}')
             cliente_data.pop(field, None)
-           
+        
+         # Convertir campos tipo <empleadosModel ...> a su id
+        for key, value in cliente_data.items():
+            if hasattr(value, 'id'):
+                cliente_data[key] = value.id
 
         try:
             cliente.update(**cliente_data)

@@ -68,7 +68,8 @@ $(document).ready(function () {
 
 
 const selectizeConfig = {
-    create: false,
+    create: true,
+    Plugins: ['remove_button'],
     allowEmptyOption: false,
     placeholder: 'Seleccione',
     valueField: 'id',
@@ -258,7 +259,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
             // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
             if (campo === 'pasajeros' && modelo === 'programacion') {
                 if (Array.isArray(data_2)) {
-                    return data_2.map(p => `${p.nombre} (${p.telefono})`).join('<br>');
+                    return data_2.map(p => `${p.nombre} [${p.telefono}]`).join('<br>');
                 }
                 return data_2;
             }
@@ -716,31 +717,7 @@ function getTablaBotones() {
                 aplicarFiltro(dt, node, '', 'VIAJES');
             }
         },
-        {            init: function (dt, node, config) {    
-                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
-            },
-            text: 'copy',
-            extend: 'copyHtml5',
-            titleAttr: 'Copiar',
-            exportOptions: {
-                columns: ':visible:not(.no-export)',
-                format: {
-                    body: function (data) {
-                        if (typeof data === 'string') {
-                            return data.replace(/<[^>]+>/g, '');
-                        }
-                        if (Array.isArray(data)) {
-                            return data.join(', ');
-                        }
-                        if (typeof data === 'object' && data !== null) {
-                            return Object.values(data).join(', ');
-                        }
-                        return data;
-                    }
-                }
-            },
-            
-        },
+        
         {
             init: function (dt, node, config) {
                 $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
@@ -922,103 +899,99 @@ async function guardarRegistro(modelo, varModulo = "") {
     const FORMULARIO = $(`#${modelo}Form`);
     const metodo = FORMULARIO.attr('method');
 
-    let formData = metodo === 'POST' ? new FormData(FORMULARIO[0]) : FORMULARIO.serialize();
+    let formData;
+    let isFormData = false;
 
-    if (modelo === 'programacion' && metodo === 'POST') {
-        const operador = formData.get('operador');
-        const status = formData.get('status');
-        if (operador !== "__None" && status === 'Pendiente') {
-            await Swal.fire({
-                icon: 'warning',
-                title: 'Aviso',
-                text: 'Ha asignado un operador, pero el estado es "Pendiente". ¿Desea cambiar a "Programado"?',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, cambiar a Programado',
-                cancelButtonText: 'No, mantener Pendiente'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    formData.set('status', 'Programado');
-                }
-            });
+    if (metodo === 'POST') {
+        formData = new FormData(FORMULARIO[0]);
+        isFormData = true;
+    } else if (metodo === 'PUT') {
+        // Usar FormData también en PUT para manejar arrays correctamente
+        formData = new FormData(FORMULARIO[0]);
+        isFormData = true;
+
+        // Opcional: eliminar campos vacíos o costo_total si no se usa
+        if (!formData.get('costo_total')) {
+            formData.delete('costo_total');
         }
+    } else {
+        formData = FORMULARIO.serialize();
     }
 
-    if (metodo === 'PUT') {
-        // Convertimos la cadena serializada en un objeto URLSearchParams
-        let params = new URLSearchParams(formData);
-
-        // Verificamos si costo_total no está presente o es undefined
-        if (params.get('costo_total') === "" || params.get('costo_total') === null || params.get('costo_total') === undefined) {
-            console.log("costo_total no está presente, eliminando...");
-            params.delete('costo_total'); // Lo eliminamos si existe (opcional, por seguridad)
-        }
-
-        // Convertimos a objeto plano y luego a JSON
-        const formDataObject = Object.fromEntries(params);
-        formData = JSON.stringify(formDataObject);
-
-        console.log("Datos del formulario:", formData, "para:", metodo, "en el modelo:", modelo);
-    }
-
+    // Si usamos FormData, no se puede enviar como JSON directamente
+    // Pero si el backend espera JSON, necesitamos convertirlo correctamente
     const modulo = varModulo || window.modulo;
     const url = modulo !== "" ? `/${modulo}/${modelo}` : `/${modelo}`;
 
-    fetch(url, {
+    const fetchOptions = {
         method: metodo,
-        headers: {
-            ...(!(formData instanceof FormData) && { 'Content-Type': 'application/json' })
-        },
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: 'Éxito',
-                    text: data.mensaje || "Registro guardado correctamente",
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                    timer: 3000,
-                    timerProgressBar: true,
-                }).then(() => {
-                    $(`#${modelo}Form`)[0].reset();
-                    $(`#${modelo}Form .selectized`).each(function () {
-                        if (this.selectize) {
-                            this.selectize.clear();
-                            // this.selectize(selectizeConfig)
+        headers: {},
+    };
 
-                            // this.selectize.clearOptions();
-                        }
-                    });
-                    location.reload();
-                    if (metodo === 'PUT') {
-                        $(".formulario").addClass("visually-hidden");
-                        window.registroIdEditar = null;
-                        $(".tituloForm").text(`Registrar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
-                        $(".botonForm").text('Registrar');
-                        $(`#${modelo}Form`).attr('method', 'POST');
+    if (isFormData) {
+        // Enviar como multipart/form-data
+        fetchOptions.body = formData;
+        // No agregues 'Content-Type' aquí, el navegador lo hace automáticamente con boundary
+    } else {
+        // Enviar como JSON
+        fetchOptions.headers['Content-Type'] = 'application/json';
+        const params = new URLSearchParams(formData);
+        const formDataObject = Object.fromEntries(params);
+        // Manejar campos múltiples manualmente
+        for (let [key, value] of params) {
+            if (key.endsWith('[]')) {
+                const cleanKey = key.slice(0, -2);
+                const values = params.getAll(key);
+                formDataObject[cleanKey] = values;
+            }
+        }
+        fetchOptions.body = JSON.stringify(formDataObject);
+    }
+
+    try {
+        const response = await fetch(url, fetchOptions);
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                title: 'Éxito',
+                text: data.mensaje || "Registro guardado correctamente",
+                icon: 'success',
+                timer: 3000,
+                timerProgressBar: true,
+            }).then(() => {
+                $(`#${modelo}Form`)[0].reset();
+                $(`#${modelo}Form .selectized`).each(function () {
+                    if (this.selectize) {
+                        this.selectize.clear();
                     }
                 });
-            } else {
-                Swal.fire({
-                    title: data.mensaje || "Ocurrió un error al guardar el registro",
-                    text: data.errores || "Ocurrió un error al guardar el registro",
-                    icon: 'error',
-                    timer: 10000,
-                    timerProgressBar: true,
-                    confirmButtonText: 'Aceptar',
-                });
-            }
-        })
-        .catch(error => {
-            console.warn('Error:', error);
-            Swal.fire({
-                title: 'Error',
-                text: "Ocurrió un error inesperado al guardar el registro",
-                icon: 'error',
-                confirmButtonText: 'Aceptar',
+                location.reload();
+                if (metodo === 'PUT') {
+                    $(".formulario").addClass("visually-hidden");
+                    window.registroIdEditar = null;
+                    $(".tituloForm").text(`Registrar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
+                    $(".botonForm").text('Registrar');
+                    $(`#${modelo}Form`).attr('method', 'POST');
+                }
             });
+        } else {
+            Swal.fire({
+                title: data.mensaje || "Error al guardar",
+                text: data.errores || "Ocurrió un error",
+                icon: 'error',
+                timer: 10000,
+                timerProgressBar: true,
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error',
+            text: "Ocurrió un error inesperado",
+            icon: 'error',
         });
+    }
 }
 
 function eliminar(id, modelo) {
@@ -1181,10 +1154,26 @@ function editar(id, modelo) {
 function llenarFormulario(modelo, rowData) {
     Object.keys(rowData).forEach(key => {
         const $campo = $(`#${modelo}Form [name="${key}"]`);
-        if ($campo.length) {
+        if ($campo.length && !$campo[0].selectize) {
             $campo.val(rowData[key]);
             console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
         }
+
+        if ($campo.length && $campo[0].selectize && key.includes('direccion_origen')) {
+            
+            $campo[0].selectize.addOption({ id: rowData[key], text: rowData[key] });
+            $campo[0].selectize.refreshOptions(false);
+            $campo[0].selectize.setValue(rowData[key], true);
+            console.log(`Selectize 1 actualizado para: ${key} con valor: ${rowData[key]}`);
+        }
+
+    
+
+
+   
+
+
+
         if (key.includes('_rel')) {
             const baseKey = key.replace('_rel', '');
             const valorRelacionado = rowData[key];
@@ -1208,7 +1197,7 @@ function llenarFormulario(modelo, rowData) {
                         setTimeout(() => {
                             $campoBase[0].selectize.setValue(valorRelacionado, true);
                         }, 400);
-                        console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
+                        // console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
 
                     }
 
@@ -1217,6 +1206,8 @@ function llenarFormulario(modelo, rowData) {
 
             }
         }
+
+    
     });
 
 }

@@ -13,7 +13,7 @@ from app.programacion.models import programacionModel
 
 @programacion_bp.before_request
 def before_request():
-    current_app.logger.debug("Usuario autenticado: %s", current_user.is_authenticated)
+    # current_app.logger.debug("Usuario autenticado: %s", current_user.is_authenticated)
     if not current_user.is_authenticated:
         flash('Por favor, inicie sesión para acceder a esa página.', 'warning')
         return redirect(url_for('login.login'))
@@ -35,7 +35,7 @@ def validar_coherencias(form):
        horario =  "E"
 
     codigo_tarifa = f"{form.empresa.data.codigo}{form.origen.data.codigo}{form.destino.data.codigo}-{form.vehiculo.data.codigo}-{desplazamiento}-{horario}".upper()
-    current_app.logger.debug("Código de tarifa generado:", codigo_tarifa)
+    # current_app.logger.debug("Código de tarifa generado:", codigo_tarifa)
     
     tarifa_base = tarifasModel.query.filter_by(codigo_desc=codigo_tarifa).first()
     
@@ -54,7 +54,7 @@ def validar_coherencias(form):
 
     # Validar que el operador tenga tarifas definidas
     if form.operador.data:
-        current_app.logger.debug("Operador seleccionado:", form.operador.data, "Tipo:", form.operador.data.tipo)
+        # current_app.logger.debug("Operador seleccionado:", form.operador.data, "Tipo:", form.operador.data.tipo)
 
         tipo_operador = form.operador.data.tipo
 
@@ -131,7 +131,7 @@ def get_data():
     else:
         data = programacionModel.query.filter_by(status=filtro).all()
     data_serializada = [d.serialize() for d in data]
-    current_app.logger.debug("Datos serializados:", data_serializada)
+    # current_app.logger.debug("Datos serializados:", data_serializada)
     return jsonify(data=data_serializada)
 
 @programacion_bp.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -139,19 +139,21 @@ def get_data():
 def programacion():
     form = programacionForm()
     dataForm = form.data
-    current_app.logger.debug("datos del formulario:", dataForm)
+    programacion_data = {**form.data}
+    print("Datos de la programación:---------------------------", programacion_data)
     if request.method == 'GET':
         return render_template('/programacion.html', User=current_user, form=form)
 
     elif request.method == 'POST' and form.validate_on_submit():
         
-        programacion_data = {**form.data}
+        
+        print("Datos del formulario:", programacion_data)
 
         try:
             # Validar coherencias antes de guardar
             validar_coherencias(form)
         except ValueError as e:
-            current_app.logger.debug("Error de validación:", str(e))
+            # current_app.logger.debug("Error de validación:", str(e))
             return jsonify(success=False, mensaje='Error de validación.', errores=str(e))
 
         # Eliminar campos que no son necesarios para el procesamiento
@@ -163,7 +165,7 @@ def programacion():
         nueva_programacion.pasajeros = form.pasajeros.data if form.pasajeros.data else []
 
 
-        current_app.logger.debug("Datos de la nueva programación:", {nueva_programacion})
+        # current_app.logger.debug("Datos de la nueva programación:", {nueva_programacion})
         
         if form.status.data == 'Finalizado':
             nueva_factura = crear_factura_cliente(form)
@@ -171,7 +173,7 @@ def programacion():
             
             
             programacion = nueva_programacion.save()
-            current_app.logger.debug("Programación guardada:", programacion)
+            # current_app.logger.debug("Programación guardada:", programacion)
             
             nueva_factura['programacion'] = programacion.id
             
@@ -180,23 +182,23 @@ def programacion():
                 crear_factura = facturasClientesModel(**nueva_factura)
                 db.session.add(crear_factura)
                 db.session.commit()
-                current_app.logger.debug("Factura del cliente creada:", crear_factura)
+                # current_app.logger.debug("Factura del cliente creada:", crear_factura)
                 crear_pago_operador(form)
                 return jsonify(success=True, mensaje='Programación Finalizada y Factura Generada correctamente.')
 
             except Exception as e:
                 db.session.rollback()
-                current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
+                # current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
                 return jsonify(success=False, mensaje='Error al crear la factura del cliente.')
         else:
             try:
-                current_app.logger.debug("Guardando nueva programación:", nueva_programacion)
+                # current_app.logger.debug("Guardando nueva programación:", nueva_programacion)
                 nueva_programacion.save()
-                current_app.logger.debug("Programación guardada:", nueva_programacion)
+                # current_app.logger.debug("Programación guardada:", nueva_programacion)
                 return jsonify(success=True, mensaje='Programación guardada correctamente.')
             except Exception as e:
                 db.session.rollback()
-                current_app.logger.error(f"Error al guardar la programación: {str(e)}")
+                # current_app.logger.error(f"Error al guardar la programación: {str(e)}")
                 return jsonify(success=False, mensaje='Error al guardar la programación.', errores=str(e))
         
         
@@ -207,11 +209,11 @@ def programacion():
         
         factura_existing = facturasClientesModel.query.filter_by(programacion=form.id.data).first()
         if factura_existing:
-            current_app.logger.debug("Factura existente encontrada para la programación:", factura_existing)
+            # current_app.logger.debug("Factura existente encontrada para la programación:", factura_existing)
             return jsonify(success=False, errores='No se puede actualizar la programación. Elimine primero las facturas asociadas.', mensaje='Factura existente.')
 
-        programacion_data = form.data
-        current_app.logger.debug("Datos del formulario para actualizar:", programacion_data)
+        # programacion_data = {**form.data}
+        print("Datos del formulario para actualizar:", programacion_data)
 
         
         id_programacion = programacion_data.get('id')
@@ -223,7 +225,7 @@ def programacion():
             # Validar coherencias antes de actualizar
             validar_coherencias(form)
         except ValueError as e:
-            current_app.logger.debug("Error de validación:", e)
+            # current_app.logger.debug("Error de validación:", e)
             return jsonify(success=False, mensaje='Error de validación.', errores=str(e))
         
         programacion = programacionModel.query.get(id_programacion)
@@ -248,6 +250,7 @@ def programacion():
             db.session.commit()
             # Asignar los nuevos pasajeros si existen
             if form.pasajeros.data:
+
                 programacion.pasajeros = form.pasajeros.data
             
             db.session.add(programacion)
@@ -264,27 +267,27 @@ def programacion():
                     mensaje = 'Programación Finalizada y Factura Generada correctamente.'
                     crear_pago_operador(form)
                     mensaje = 'Programación Finalizada, Factura de Cliente y Pago Operador Generados correctamente.'
-                    current_app.logger.debug("Factura del cliente creada:", crear_factura)
+                    # current_app.logger.debug("Factura del cliente creada:", crear_factura)
                 except Exception as e:
                     db.session.rollback()
                     print("----------------error: ------------------", e)
-                    current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
+                    # current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
                     raise ValueError('Error al crear la factura del cliente.')
 
             return jsonify(success=True, mensaje=mensaje)
 
         except Exception as e:
             db.session.rollback()
-            current_app.logger.error(f"Error al actualizar la programación: {str(e)}")
+            # current_app.logger.error(f"Error al actualizar la programación: {str(e)}")
             return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 
     elif request.method == 'DELETE':
         if not current_user.is_admin:
-            current_app.logger.debug("Solicitud DELETE recibida.")
+            # current_app.logger.debug("Solicitud DELETE recibida.")
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.')
 
         id_programacion = request.json.get('id')
-        current_app.logger.debug("ID de programación a eliminar:", id_programacion)
+        # current_app.logger.debug("ID de programación a eliminar:", id_programacion)
 
         if not id_programacion:
             return jsonify(success=False, mensaje='ID de programación no proporcionado.')
@@ -301,11 +304,11 @@ def programacion():
 
         except Exception as e:
             db.session.rollback()
-            current_app.logger.debug("Error al eliminar la programación:", e)
+            # current_app.logger.debug("Error al eliminar la programación:", e)
             return jsonify(success=False, mensaje='No se puede eliminar la programación. Elimine primero las facturas asociadas.', error=str(e))
 
     elif form.errors:
-        current_app.logger.debug("Errores de validación:", form.errors)
+        # current_app.logger.debug("Errores de validación:", form.errors)
         primer_error = next(iter(form.errors.values()))[0] if form.errors else 'Error desconocido.'
         return jsonify(success=False, mensaje='Error en el formulario.', errores=primer_error)
 

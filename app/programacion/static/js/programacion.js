@@ -12,6 +12,8 @@ $(document).ready(function () {
     const CIUDAD_ORIGEN = $('#programacionForm .origen-select');
     const CIUDAD_DESTINO = $('#programacionForm .destino-select');
     const VEHICULO_SELECT = $('#programacionForm .vehiculo-select');
+    const DIRECCION_ORIGEN = $('#direccion-origen')
+    const DIRECCION_DESTINO = $('#direccion-destino')
 
     window.tablaId = `#${lastSegment}Table`;
 
@@ -37,6 +39,31 @@ $(document).ready(function () {
     CIUDAD_ORIGEN.selectize(selectizeConfig);
     CIUDAD_DESTINO.selectize(selectizeConfig);
     VEHICULO_SELECT.selectize(selectizeConfig);
+
+    const config_direccion = {
+        create: true,
+        sortField: 'text',
+        plugins: ['remove_button'],
+        render: {
+            option_create: function (data, escape) {
+                return `<div class="create">Crear dirección <strong>${escape(data.input)}</strong>&hellip;</div>`;
+            }
+        }
+    };
+
+    DIRECCION_ORIGEN.selectize(config_direccion);
+
+    DIRECCION_DESTINO.selectize(config_direccion);
+        
+ 
+
+    PASAJEROS_SELECT.on('change', function () {
+        var pasajerosSeleccionados = $(this).val();
+        console.log("Pasajeros seleccionados:", pasajerosSeleccionados);
+        if (pasajerosSeleccionados && pasajerosSeleccionados.length > 0) {
+            
+        }
+    });
 
     // const EMPRESA_SELECTIZE = EMPRESA_SELECT[0].selectize;
     // EMPRESA_SELECTIZE.clearOptions();

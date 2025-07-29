@@ -20,12 +20,13 @@ def before_request():
 @login_required
 def empleados():
     form = empleadosForm()
+    empleado_data = {**form.data}
 
     if request.method == 'PUT' and form.validate_on_submit():
         if not current_user.is_admin:
             # current_app.logger.debug("Solicitud PUT recibida.")
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
-        empleado_data = request.get_json()
+        # empleado_data = request.get_json()
         current_app.logger.debug(f'Recibido datos de empleado para actualizar: {empleado_data}')
         if not empleado_data or 'id' not in empleado_data:
             return jsonify(success=False, mensaje='Datos de empleado inválidos.')
@@ -42,6 +43,11 @@ def empleados():
         if not form.contrasena.data:
             # Mantener la contraseña actual si no se proporciona una nueva
             empleado_data['contrasena'] = empleado.contrasena
+            
+         # Convertir campos tipo <empleadosModel ...> a su id
+        for key, value in empleado_data.items():
+            if hasattr(value, 'id'):
+                empleado_data[key] = value.id
 
         try:
             empleado.update(**empleado_data)

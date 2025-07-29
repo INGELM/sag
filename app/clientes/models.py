@@ -3,6 +3,8 @@ from app.empleados.models import tarifasOperadoresModel
 from app.extensions import db
 
 
+
+
 class clientesModel(db.Model):
     __tablename__ = 'clientes'
     id = db.Column(db.Integer, primary_key=True)
