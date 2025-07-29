@@ -474,7 +474,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             
             layout: {
                 topStart: {
-                    buttons: modulo !== 'facturacion' ? getTablaBotones() : botonesEspeciales(),
+                    buttons: modulo === 'programacion' ? getTablaBotones() : [getTablaBotones(), ...botonesEspeciales()],
                 },
                 topEnd: {
                     buttons: botonesAuxiliares(),
@@ -603,7 +603,7 @@ function botonesAcciones(){
         },
         {
             text: 'Editar',
-            className: 'btn btn-primary btn-sm mb-1',
+            className: 'btn  btn-sm mb-1',
             action: function (e, dt, node, config) {
                 const selectedRows = dt.rows({ selected: true });
                 if (selectedRows.count() === 1) {
@@ -758,7 +758,7 @@ function botonesEspeciales() {
     return [
         {
             init: function (dt, node, config) {
-                $(node).attr('class', 'btn btn-primary btn-sm mb-1');
+                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
             },
             extend: 'excelHtml5',
             text: 'Excel',
@@ -783,7 +783,7 @@ function botonesEspeciales() {
         },
         {
             init: function (dt, node, config) {
-                $(node).attr('class', 'btn btn-primary btn-sm mb-1');
+                $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
             },
             extend: 'print',
             text: 'Imprimir',
