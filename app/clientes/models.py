@@ -73,6 +73,16 @@ class clientesModel(db.Model):
             'telefono': self.telefono
         }
 
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'codigo': self.codigo,
+            'empresa': self.empresa,
+            'direccion': self.direccion,
+            'ciudad': self.ciudad,
+            'email': self.email,
+            'telefono': self.telefono
+        }
 
 class pasajerosModel(db.Model):
     __tablename__ = 'pasajeros'
@@ -127,6 +137,17 @@ class pasajerosModel(db.Model):
             'telefono': self.telefono
         }
 
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'empresa': self.empresa,
+            'numero': self.numero,
+            'nombres': self.nombres,
+            'ciudad': self.ciudad,
+            'direccion': self.direccion,
+            'email': self.email,
+            'telefono': self.telefono
+        }
 
 class tarifasModel(db.Model):
     __tablename__ = 'tarifas'
@@ -253,6 +274,22 @@ class tarifasModel(db.Model):
             'tarifa_km': self.tarifa_km,
             'color_rel': self.color_code()
         }
+    
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'codigo': self.codigo,
+            'empresa': self.empresa,
+            'origen': self.origen,
+            'destino': self.destino,
+            'vehiculo': self.vehiculo,
+            'desplazamiento': self.desplazamiento,
+            'horario': self.horario,
+            'espera': self.espera,
+            'desvios': self.desvios,
+            'base': self.base,
+            'tarifa_km': self.tarifa_km
+        }
 
 
 class recargoVehiculosModel(db.Model):
@@ -298,5 +335,13 @@ class recargoVehiculosModel(db.Model):
             'vehiculo_rel': self.vehiculo,
             'cliente': self.cliente_rel.empresa if self.cliente_rel else None,
             'cliente_rel': self.cliente,
+            'recargo': self.recargo
+        }
+    
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'vehiculo': self.vehiculo,
+            'cliente': self.cliente,
             'recargo': self.recargo
         }

@@ -127,6 +127,26 @@ def clientes():
 
     return render_template('clientes.html', year=datetime.now().year, form=clientesForm(), User=current_user)
 
+@clientes_bp.route('/clientes/get_data/<int:id>', methods=['GET'])
+def get_cliente_data(id):
+    current_app.logger.debug(f'Recibiendo solicitud para obtener datos del cliente con ID: {id}')
+    try:
+        cliente = clientesModel.query.get(id)
+        
+        if not cliente:
+            return jsonify(success=False, mensaje='Cliente no encontrado.')
+
+        response = cliente.serialize_form()
+        current_app.logger.debug(f'Datos del cliente obtenidos: {response}')
+
+        return jsonify(success=True, data=response, mensaje='Datos del cliente obtenidos exitosamente.')
+
+    except Exception as e:
+        current_app.logger.debug(f'Error al obtener datos del cliente: {e}')
+        return jsonify(success=False, mensaje='Error al obtener datos del cliente.', errores=str(e))
+    
+    
+
 @clientes_bp.route('clientes/all', defaults={'id': None}, methods=['GET'])
 @clientes_bp.route('clientes/get/<int:id>', methods=['GET'])
 # @login_required
@@ -270,6 +290,25 @@ def pasajeros():
         return jsonify(success=False, mensaje='Error al registrar el cliente.', errores=error_messages)
 
     return render_template('pasajeros.html', year=datetime.now().year, form=pasajerosForm(), User=current_user)
+
+@clientes_bp.route('/pasajeros/get_data/<int:id>', methods=['GET'])
+def get_pasajero_data(id):
+    current_app.logger.debug(f'Recibiendo solicitud para obtener datos del pasajero con ID: {id}')
+    try:
+        pasajero = pasajerosModel.query.get(id)
+        
+        if not pasajero:
+            return jsonify(success=False, mensaje='Pasajero no encontrado.')
+
+        response = pasajero.serialize_form()
+        current_app.logger.debug(f'Datos del pasajero obtenidos: {response}')
+
+        return jsonify(success=True, data=response, mensaje='Datos del pasajero obtenidos exitosamente.')
+
+    except Exception as e:
+        current_app.logger.debug(f'Error al obtener datos del pasajero: {e}')
+        return jsonify(success=False, mensaje='Error al obtener datos del pasajero.', errores=str(e))
+
 
 @clientes_bp.route('pasajeros/all', defaults={'id': None}, methods=['GET'])
 @clientes_bp.route('pasajeros/get/<int:id>', methods=['GET'])
@@ -429,6 +468,26 @@ def tarifas():
         return jsonify(success=False, mensaje='Error al registrar la tarifa.', errores=errores)
 
     return render_template('tarifas.html', year=datetime.now().year, form=tarifasForm(), User=current_user)
+
+@clientes_bp.route('/tarifas/get_data/<int:id>', methods=['GET'])
+def get_tarifa_data(id):
+    current_app.logger.debug(f'Recibiendo solicitud para obtener datos de la tarifa con ID: {id}')
+    try:
+        tarifa = tarifasModel.query.get(id)
+        
+        if not tarifa:
+            return jsonify(success=False, mensaje='Tarifa no encontrada.')
+
+        response = tarifa.serialize_form()
+        current_app.logger.debug(f'Datos de la tarifa obtenidos: {response}')
+
+        return jsonify(success=True, data=response, mensaje='Datos de la tarifa obtenidos exitosamente.')
+
+    except Exception as e:
+        current_app.logger.debug(f'Error al obtener datos de la tarifa: {e}')
+        return jsonify(success=False, mensaje='Error al obtener datos de la tarifa.', errores=str(e))
+
+
 
 @clientes_bp.route('tarifas/all',  methods=['GET'])
 @clientes_bp.route('/get/tarifas', methods=['GET'])

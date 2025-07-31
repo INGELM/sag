@@ -135,4 +135,30 @@ class programacionModel(db.Model):
             'tiempo_espera': self.tiempo_espera,
             'desvios': self.desvios,
             'status': self.status,
+            'observaciones': self.observaciones
+        }
+    
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'fecha_salida': self.fecha_salida.strftime('%Y-%m-%d') if self.fecha_salida else None,
+            'empresa': self.pasajeros[0].empresa if self.pasajeros else None,
+            'pasajeros': [p.id for p in self.pasajeros] if self.pasajeros else [],
+            'workflow': self.workflow,
+            'guia': self.guia,
+            'direccion_origen': self.direccion_origen,
+            'direccion_destino': self.direccion_destino,
+            'origen': self.origen,
+            'destino': self.destino,
+            'hora_salida': self.hora_salida.strftime('%H:%M') if self.hora_salida else None,
+            'hora_retorno': self.hora_retorno.strftime('%H:%M') if self.hora_retorno else None,
+            'distancia': str(self.distancia) if self.distancia is not None else '',
+            'operador': self.operador,
+            'vehiculo': self.vehiculo,
+            'horario': "Diurno" if self.turno == "D" else "Especial",
+            'desplazamiento': "Ida y Vuelta" if self.desplazamiento == "idav" else "Ida",
+            'tiempo_espera': self.tiempo_espera if self.tiempo_espera is not None else '',
+            'desvios': self.desvios if self.desvios is not None else '',
+            'status': self.status if self.status is not None else '',
+            'observaciones': self.observaciones if self.observaciones is not None else ''
         }

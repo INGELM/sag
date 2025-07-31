@@ -607,7 +607,8 @@ function botonesAcciones(){
                 const selectedRows = dt.rows({ selected: true });
                 if (selectedRows.count() === 1) {
                     const rowData = selectedRows.data().toArray()[0];
-                    editar(rowData.id, window.modelo);
+                    // const url = window.modulo !== "" ? `/${window.modulo}/${window.modelo}` : `/${window.modelo}`;
+                    editar(rowData.id);
                 } else {
                     Swal.fire({
                         icon: 'warning',
@@ -1126,52 +1127,40 @@ function eliminarSeleccionados(modelo) {
     });
 }
 
-function editar(id, modelo) {
-    window.registroIdEditar = id;
-    const tabla = `#${modelo}Table`;
-    const table = $(tabla).DataTable();
-    const rowData = table.rows().data().toArray().find(row => row.id === id);
-    if (!rowData) {
-        Swal.fire({
-            title: 'Error',
-            text: 'No se encontraron los datos del registro.',
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
+function editar(id) {
+ 
 
-    llenarFormulario(modelo, rowData);
+    llenarFormulario(id);
 
 
     $(".formulario").removeClass("visually-hidden");
     $(".tituloForm").text(`Editar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
     $(".botonForm").text('Actualizar');
-    $(`#${modelo}Form`).attr('method', 'PUT');
+    $(`#${window.modelo}Form`).attr('method', 'PUT');
 }
 
-function llenarFormulario(modelo, rowData) {
-    Object.keys(rowData).forEach(key => {
-        const $campo = $(`#${modelo}Form [name="${key}"]`);
-        if ($campo.length && !$campo[0].selectize) {
-            $campo.val(rowData[key]);
-            console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
-        }
+// function llenarFormulario(modelo, rowData) {
+//     Object.keys(rowData).forEach(key => {
+//         const $campo = $(`#${modelo}Form [name="${key}"]`);
+//         if ($campo.length && !$campo[0].selectize) {
+//             $campo.val(rowData[key]);
+//             console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
+//         }
 
-        if ($campo.length && $campo[0].selectize && key.includes('direccion_origen') && rowData[key]) {
+//         if ($campo.length && $campo[0].selectize && key.includes('direccion_origen') && rowData[key]) {
             
-            arrayDataKey = rowData[key].map(item => item.trim());
-            // console.log("arrayDataKey:", arrayDataKey);
+//             arrayDataKey = rowData[key].map(item => item.trim());
+//             // console.log("arrayDataKey:", arrayDataKey);
             
 
 
-            setTimeout(() => {
-                $campo[0].selectize.setValue(arrayDataKey, true);
-                console.log(`Selectize timeout actualizado para: ${key} con valor: ${arrayDataKey}`);
-            }, 500);
+//             setTimeout(() => {
+//                 $campo[0].selectize.setValue(arrayDataKey, true);
+//                 console.log(`Selectize timeout actualizado para: ${key} con valor: ${arrayDataKey}`);
+//             }, 500);
 
 
-        }
+//         }
 
     
 
@@ -1180,50 +1169,110 @@ function llenarFormulario(modelo, rowData) {
 
 
 
-        if (key.includes('_rel')) {
-            const baseKey = key.replace('_rel', '');
-            const valorRelacionado = rowData[key];
-            const $campoBase = $(`#${modelo}Form [name="${baseKey}"]`);
+//         if (key.includes('_rel')) {
+//             const baseKey = key.replace('_rel', '');
+//             const valorRelacionado = rowData[key];
+//             const $campoBase = $(`#${modelo}Form [name="${baseKey}"]`);
 
-            if ($campoBase.length) {
-                $campoBase.val(valorRelacionado);
+//             if ($campoBase.length) {
+//                 $campoBase.val(valorRelacionado);
 
-                // console.log(`Llenando campo relacionado: ${baseKey} con valor: ${valorRelacionado}`);
-                if ($campoBase[0] && $campoBase[0].selectize) {
+//                 // console.log(`Llenando campo relacionado: ${baseKey} con valor: ${valorRelacionado}`);
+//                 if ($campoBase[0] && $campoBase[0].selectize) {
 
-                    if (baseKey === 'empresa' || baseKey === 'origen') {
-                        $campoBase[0].selectize.setValue(valorRelacionado, false);
-                        console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
-                        setTimeout(() => {
-                            $campoBase[0].selectize.setValue(valorRelacionado, false);
-                        }, 300);
-                    }
+//                     if (baseKey === 'empresa' || baseKey === 'origen') {
+//                         $campoBase[0].selectize.setValue(valorRelacionado, false);
+//                         console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
+//                         setTimeout(() => {
+//                             $campoBase[0].selectize.setValue(valorRelacionado, false);
+//                         }, 300);
+//                     }
 
-                    else {
-                        setTimeout(() => {
+//                     else {
+//                         setTimeout(() => {
 
-                            $campoBase[0].selectize.setValue(valorRelacionado, true);
+//                             $campoBase[0].selectize.setValue(valorRelacionado, true);
 
-                            if (baseKey === 'pasajeros') {
-                                const pasajerosSelectize = $campoBase[0].selectize;
-                                pasajerosSelectize.trigger('change', {
-                                    // silent: true // Evita disparar eventos adicionales
-                                });
-                            }
+//                             if (baseKey === 'pasajeros') {
+//                                 const pasajerosSelectize = $campoBase[0].selectize;
+//                                 pasajerosSelectize.trigger('change', {
+//                                     // silent: true // Evita disparar eventos adicionales
+//                                 });
+//                             }
 
-                        }, 400);
-                        console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
+//                         }, 400);
+//                         console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
 
-                    }
+//                     }
 
-                    // console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
-                }
+//                     // console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
+//                 }
 
-            }
-        }
+//             }
+//         }
 
     
-    });
+//     });
 
+// }
+
+function llenarFormulario(id) {
+    // const id = rowData.id;
+
+    const URL = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/get_data/${id}` : `/${window.modelo}/get_data/${id}`;
+
+    console.log(`Llenando formulario para el modelo: ${modelo}, ID: ${id}, URL: ${URL}`);
+
+    $.ajax({
+        type: "GET",
+        url: URL,
+        data: {},
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                console.log("Datos obtenidos:", response.data);
+                const data = response.data;
+                Object.keys(data).forEach(key => {
+                    const $campo = $(`#${modelo}Form [name="${key}"]`);
+                    console.log(`Procesando campo: ${key}, valor: ${data[key]}`);
+                    if ($campo.length) {
+                        if ($campo[0].selectize) {
+                            if (key === "pasajeros") {
+                                $campo[0].selectize.setValue(data[key], true);
+                                $campo[0].selectize.trigger('change');
+                            }
+                            else {
+                                $campo[0].selectize.setValue(data[key], true);
+                            }
+
+                            if (key.includes('direccion_origen')) {
+                                // const arrayDataKey = rowData[key].map(item => item.trim());
+                                // console.log("arrayDataKey:", arrayDataKey); 
+                                setTimeout(() => {
+                                    $campo[0].selectize.setValue(data[key], true);
+                                    console.log(`Selectize timeout actualizado para: ${key} con valor: ${data[key]}`);
+                                }, 500);
+                            }
+                        }
+                        else {
+                            $campo.val(data[key]);
+                            console.log(`Llenando campo: ${key} con valor: ${data[key]}`);
+                        }
+                    }
+                    
+                });
+            } else {
+                console.error(response.mensaje);
+            }
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.error("Error al obtener los datos:", textStatus, errorThrown);
+        Swal.fire({
+            title: 'Error',
+            text: "Ocurrió un error al cargar los datos del registro",
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+    });
 }
 

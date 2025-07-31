@@ -107,6 +107,17 @@ class empleadosModel(db.Model, UserMixin):
             'rol': self.rol,
             'tipo': self.tipo
         }
+    
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'nombres': self.nombres,
+            'usuario': self.usuario,
+            'email': self.email,
+            'telefono': self.telefono,
+            'rol': self.rol,
+            'tipo': self.tipo
+        }
 
 class tarifasOperadoresModel(db.Model):
     __tablename__ = 'tarifas_operadores'
@@ -173,6 +184,17 @@ class tarifasOperadoresModel(db.Model):
             # 'codigo': self.codigo_rel.codigo_desc if self.codigo_rel else None,
             'codigo': self.codigo_rel.codigo if self.codigo_rel else None,
             'codigo_rel': self.codigo,
+            'tipo': self.tipo,
+            'desvios': self.desvios,
+            'espera': self.espera,
+            'base': self.base
+        }
+    
+    def serialize_form(self):
+        return {
+            'id': self.id,
+            'empresa_rel': self.codigo_rel.cliente.id if self.codigo_rel else None,
+            'codigo': self.codigo_rel.codigo if self.codigo_rel else None,
             'tipo': self.tipo,
             'desvios': self.desvios,
             'espera': self.espera,

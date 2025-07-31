@@ -104,6 +104,17 @@ class facturasClientesModel(db.Model):
             # "total_": self.costo_total if self.costo_total else "--",
             "status": self.status if self.status else "--",
         }
+    
+    def serialize_form(self):
+        return {
+            "id": self.id,
+            "factura": self.factura if self.factura else None,
+            "guia": self.programacion_rel.guia if self.programacion_rel else None,
+            "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
+            "programacion": self.programacion_rel.serialize() if self.programacion_rel else None,
+            "costo_total": self.costo_total,
+            "status": self.status if self.status else "--"
+        }
 
 
 class pagosOperadoresModel(db.Model):
@@ -160,4 +171,12 @@ class pagosOperadoresModel(db.Model):
             "total_desvios": "--" if self.costo_desvios * self.programacion_rel.desvios == 0 else self.costo_desvios * self.programacion_rel.desvios,
             "costo_base": self.costo_base if self.costo_base else "--",
             "total_": self.costo_total if self.costo_total else "--",
+        }
+    
+    def serialize_form(self):
+        return {
+            "id": self.id,
+            "guia": self.programacion_rel.guia if self.programacion_rel else None,
+            "cliente": self.programacion_rel.pasajeros[0].cliente.codigo.upper() if self.programacion_rel else None,
+            "costo_total": self.costo_total,
         }

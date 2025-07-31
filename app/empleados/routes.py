@@ -114,6 +114,22 @@ def empleados():
 
     return render_template('empleados.html', year=datetime.now().year, form=empleadosForm(), User=current_user)
 
+@empleados_bp.route('/empleados/get_data/<int:id>', methods=['GET'])
+@login_required
+def get_empleado_data(id):
+    try:
+        empleado = empleadosModel.query.get(id)
+        if not empleado:
+            return jsonify(success=False, mensaje='Empleado no encontrado.')
+
+        empleado_data = empleado.serialize_form()
+        return jsonify(success=True, data=empleado_data, mensaje='Datos del empleado obtenidos exitosamente.')
+
+    except Exception as e:
+        current_app.logger.error(f'Error al obtener datos del empleado: {str(e)}', exc_info=True)
+        return jsonify(success=False, mensaje='Error al obtener datos del empleado.', error=str(e))
+
+
 
 @empleados_bp.route('empleados/all', methods=['GET'])
 @login_required
@@ -154,6 +170,24 @@ def all_empleados():
         else:
             current_app.logger.error(f'Error desconocido: {error}', exc_info=True)
             return jsonify(success=False, mensaje=error)
+
+
+@empleados_bp.route('/tarifasOperadores/get_data/<int:id>', methods=['GET'])
+@login_required
+def get_tarifa_operador_data(id):
+    try:
+        tarifa = tarifasOperadoresModel.query.get(id)
+        if not tarifa:
+            return jsonify(success=False, mensaje='Tarifa no encontrada.')
+
+        tarifa_data = tarifa.serialize_form()
+        return jsonify(success=True, data=tarifa_data, mensaje='Datos de la tarifa obtenidos exitosamente.')
+
+    except Exception as e:
+        current_app.logger.error(f'Error al obtener datos de la tarifa: {str(e)}', exc_info=True)
+        return jsonify(success=False, mensaje='Error al obtener datos de la tarifa.', error=str(e))
+
+    
 
 
 @empleados_bp.route('/tarifasOperadores/all', methods=['GET'])

@@ -254,6 +254,17 @@ def facturas_clientes_all():
     }
     return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
  
+@facturacion_bp.route('/facturasClientes/get_data/<int:id>', methods=['GET'])
+def get_factura_cliente(id):
+    factura = facturasClientesModel.query.get(id)
+    
+    if not factura:
+        return jsonify(success=False, mensaje='Factura no encontrada.')
+
+    factura_data = factura.serialize_form()
+
+    return jsonify(success=True, mensaje='Factura obtenida exitosamente.', data=factura_data)
+
 @facturacion_bp.route('/facturasClientes', methods=['GET'])
 def facturas_clientes():
     current_app.logger.debug("Obteniendo facturas de clientes...")
@@ -290,6 +301,16 @@ def pagos_operadores():
     
     return render_template('pagosOperadores.html', User=user, form=form)
 
+@facturacion_bp.route('/pagosOperadores/get_data/<int:id>', methods=['GET'])
+def get_pago_operador(id):
+    pago = pagosOperadoresModel.query.get(id)
+
+    if not pago:
+        return jsonify(success=False, mensaje='Pago no encontrado.')
+    
+    pago_data = pago.serialize_form()
+
+    return jsonify(success=True, mensaje='Pago obtenido exitosamente.', data=pago_data)
 
 @facturacion_bp.route('/pagosOperadores/all', methods=['GET'])
 def pagos_operadores_all():

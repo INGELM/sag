@@ -122,6 +122,22 @@ def validar_coherencias(form):
         raise ValueError('La guía es obligatoria para finalizar un viaje.')
 
 
+@programacion_bp.route('/get_data/<int:id>', methods=['GET'])
+@login_required
+def get_data_by_id(id):
+    data = programacionModel.query.get(id)
+    
+    if not data:
+        return jsonify(success=False, mensaje='No se encontró la programación.'), 404
+    
+
+    
+    response = data.serialize_form() if data else None
+
+
+
+    return jsonify(success=True, data=response, mensaje='Programación obtenida exitosamente.')
+
 @programacion_bp.route('/get_data', methods=['GET'])
 @login_required
 def get_data():
