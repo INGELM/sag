@@ -160,7 +160,8 @@ def programacion():
         for field in ['csrf_token', 'submit', 'id', 'empresa', 'pasajeros']:
             programacion_data.pop(field, None)
         
-        programacion_data['direccion_origen'] = json.dumps(form.direccion_origen.data) if form.direccion_origen.data else None
+        # programacion_data['direccion_origen'] = json.dumps(form.direccion_origen.data) if form.direccion_origen.data else None
+        current_app.logger.debug("Datos de la programación DIRECCION ORIGEN", programacion_data['direccion_origen'])
 
         nueva_programacion = programacionModel(**programacion_data)
         
@@ -244,7 +245,7 @@ def programacion():
             if hasattr(value, 'id'):
                 programacion_data[key] = value.id
                 
-        programacion_data['direccion_origen'] = json.dumps(form.direccion_origen.data) if form.direccion_origen.data else None
+        # programacion_data['direccion_origen'] = json.dumps(form.direccion_origen.data) if form.direccion_origen.data else None
         
         try:
             db.session.query(programacionModel).filter_by(id=id_programacion).update(programacion_data)
@@ -328,4 +329,41 @@ def get_all_programaciones():
 
 
 
+@programacion_bp.route('/get/direcciones', methods=['GET'])
+def get_direcciones():
+    pasajeros_seleccionados = request.args.getlist('pasajeros[]')
+    pasajeros_seleccionados = [int(p) for p in pasajeros_seleccionados if p.isdigit()]
+    # pasajeros_seleccionados = [1]
+    print("Pasajeros seleccionados:", pasajeros_seleccionados)
+    # Filtrar direcciones para los pasajeros_seleccionados
+    
+    from app.clientes.models import pasajerosModel
+    
+    direcciones = programacionModel.query.\
+        with_entities(programacionModel.direccion_origen).\
+        join(programacionModel.pasajeros).\
+        filter(pasajerosModel.id.in_(pasajeros_seleccionados)).\
+        distinct().all()
 
+    data = [d[0] for d in direcciones if d[0]]
+    
+    # Separar direcciones múltiples en cada registro y aplanar la lista
+    direcciones_separadas = []
+    for direccion in data:
+        if isinstance(direccion, str):
+            partes = [d.strip() for d in direccion.split(',') if d.strip()]
+            direcciones_separadas.extend(partes)
+        elif isinstance(direccion, list):
+            direcciones_separadas.extend([d.strip() for d in direccion if d.strip()])
+        else:
+            continue
+    # Eliminar duplicados y mantener el orden
+    data = list(dict.fromkeys(direcciones_separadas))
+
+    opciones_selectize = [{'value': d, 'text': d} for d in data]
+
+    if not data:
+        return jsonify(success=False, mensaje='No se encontraron direcciones.', data=[])
+    # current_app.logger.debug("Direcciones obtenidas:", direcciones)
+
+    return jsonify(success=True, data=opciones_selectize, mensaje='Direcciones obtenidas exitosamente.')

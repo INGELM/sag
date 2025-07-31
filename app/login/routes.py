@@ -38,10 +38,7 @@ def login():
             return redirect(url_for('login.inicio'))
         else:
             flash('Usuario o contraseña incorrectos', 'danger')
-            if not form.username.data:
-                form.username.errors.append('Por favor, complete el campo de usuario')
-            if not form.password.data:
-                form.password.errors.append('Por favor, complete el campo de contraseña')
+            current_app.logger.warning(f'Intento de inicio de sesión fallido para el usuario y contraseña:', username)
     else:
         if form.username.errors:
             form.username.errors.append('Por favor, complete el campo de usuario')

@@ -42,7 +42,10 @@ class empleadosModel(db.Model, UserMixin):
        return str(self.id)
     
     def check_password(self, contrasena):
-        return check_password_hash(self.contrasena, contrasena)
+        approved = check_password_hash(self.contrasena, contrasena) 
+        current_app.logger.debug(f'Contraseña: {self.contrasena}, Ingreso: {contrasena}, Aprobado: {approved}')
+        current_app.logger.debug(f'Contraseña verificada para {self.usuario}: {approved}')
+        return approved
 
     def save(self):
         try:

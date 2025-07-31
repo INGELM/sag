@@ -68,8 +68,7 @@ $(document).ready(function () {
 
 
 const selectizeConfig = {
-    create: true,
-    Plugins: ['remove_button'],
+    plugins: ['remove_button'],
     allowEmptyOption: false,
     placeholder: 'Seleccione',
     valueField: 'id',
@@ -1163,8 +1162,13 @@ function llenarFormulario(modelo, rowData) {
             
             arrayDataKey = rowData[key].map(item => item.trim());
             // console.log("arrayDataKey:", arrayDataKey);
-            $campo[0].selectize.setValue(arrayDataKey, true);
-            console.log(`Selectize actualizado para: ${key} con valor: ${arrayDataKey}`);
+            
+
+
+            setTimeout(() => {
+                $campo[0].selectize.setValue(arrayDataKey, true);
+                console.log(`Selectize timeout actualizado para: ${key} con valor: ${arrayDataKey}`);
+            }, 500);
 
 
         }
@@ -1197,9 +1201,18 @@ function llenarFormulario(modelo, rowData) {
 
                     else {
                         setTimeout(() => {
+
                             $campoBase[0].selectize.setValue(valorRelacionado, true);
+
+                            if (baseKey === 'pasajeros') {
+                                const pasajerosSelectize = $campoBase[0].selectize;
+                                pasajerosSelectize.trigger('change', {
+                                    // silent: true // Evita disparar eventos adicionales
+                                });
+                            }
+
                         }, 400);
-                        // console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
+                        console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
 
                     }
 

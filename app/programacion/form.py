@@ -26,7 +26,7 @@ def get_operadores():
 def get_direcciones():
     # direcciones = programacionModel.query.with_entities(programacionModel.direccion_origen).distinct().all()
     programaciones = programacionModel.query.all()
-    direcciones = json.loads(programaciones[0].direccion_origen)
+    # direcciones = json.loads(programaciones[0].direccion_origen)
     # for programacion in programaciones:
     #     if programacion.direccion_origen:
     #         direcciones.append(json.loads(programacion.direccion_origen))
@@ -54,11 +54,11 @@ class programacionForm(FlaskForm):
         render_kw={"class": "form-control pasajero-select", "id": "pasajeros-select", "multiple": True}
     )
     operador = QuerySelectField('Operador', query_factory=get_operadores, allow_blank=True, blank_text="Seleccione Operador", get_label='nombres',render_kw={"class": "form-control operador-select", "id": "operador-select"})
-    direccion_origen = QuerySelectMultipleField(
+    direccion_origen = SelectMultipleField(
         'Dirección Origen',
-        query_factory=get_direcciones,
-        get_label='id',
+        choices=[],
         validators=[],
+        validate_choice=False,
         render_kw={"class": "form-control", "id": "direccion-origen"}
     )
     # direccion_origen = StringField('Dirección Origen', render_kw={"placeholder": "Dirección Origen", "class": "form-control", "id":"direccion-origen"}, validators=[Optional()])

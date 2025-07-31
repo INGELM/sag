@@ -1,5 +1,6 @@
 from flask import current_app
 from app.extensions import db
+from sqlalchemy import JSON as JSONType
 import json
 
 programacion_pasajeros = db.Table('programacion_pasajeros',
@@ -12,7 +13,7 @@ class programacionModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     workflow = db.Column(db.String(50), nullable=True)
     guia = db.Column(db.String(50), nullable=True)
-    direccion_origen = db.Column(db.String(255), nullable=True)
+    direccion_origen = db.Column(JSONType, nullable=True)
     origen = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
     direccion_destino = db.Column(db.String(255), nullable=True)
     destino = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
@@ -119,7 +120,7 @@ class programacionModel(db.Model):
             'pasajeros_rel': [p.id for p in self.pasajeros] if self.pasajeros else [],
             'hora_salida': self.hora_salida.strftime('%H:%M') if self.hora_salida else None,
             'hora_retorno': self.hora_retorno.strftime('%H:%M') if self.hora_retorno else None,
-            'direccion_origen': json.loads(self.direccion_origen) if self.direccion_origen else None,
+            'direccion_origen': self.direccion_origen,
             'origen': self.origen_rel.nombre,
             'origen_rel': self.origen,
             'destino': self.destino_rel.nombre if self.destino_rel else None,

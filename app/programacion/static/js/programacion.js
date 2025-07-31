@@ -61,9 +61,41 @@ $(document).ready(function () {
         var pasajerosSeleccionados = $(this).val();
         console.log("Pasajeros seleccionados:", pasajerosSeleccionados);
         if (pasajerosSeleccionados && pasajerosSeleccionados.length > 0) {
-            
+
+            cargarDirecciones(pasajerosSeleccionados, DIRECCION_ORIGEN[0].selectize);
+            cargarDirecciones(pasajerosSeleccionados, DIRECCION_DESTINO[0].selectize);
         }
     });
+
+   
+    function cargarDirecciones(pasajeros, selectize) {
+        if (!pasajeros || pasajeros.length === 0) {
+            selectize.clearOptions();
+            return;
+        }
+
+        var URL_CONSULTA_DIRECCIONES = '/programacion/get/direcciones';
+        
+        $.ajax({
+            type: "GET",
+            url: URL_CONSULTA_DIRECCIONES,
+            data: { 'pasajeros[]': pasajeros },
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    console.log("Direcciones cargadas:", response.data);
+                    selectize.clearOptions();
+                    selectize.addOption(response.data);
+                    selectize.refreshOptions(false);
+                } else {
+                    console.error("Error al cargar direcciones:", response.mensaje);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud AJAX:", error);
+            }
+        });
+    }
 
     // const EMPRESA_SELECTIZE = EMPRESA_SELECT[0].selectize;
     // EMPRESA_SELECTIZE.clearOptions();
