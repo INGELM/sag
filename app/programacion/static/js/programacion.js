@@ -19,6 +19,11 @@ $(document).ready(function () {
 
     cargarTabla2(lastSegment, "", "", [1, 3, 5, 15]);
     console.log("Tabla cargada para:", formulario);
+    
+    // Agregar funcionalidad de doble click para editar registros
+    setTimeout(() => {
+        agregarDobleClickPersonalizado(`#${lastSegment}Table`, 'abrir_modal');
+    }, 1000); // Esperar a que la tabla se cargue completamente
 
     $(formulario).submit(function (e) {
         e.preventDefault();

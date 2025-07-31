@@ -31,6 +31,11 @@ $(document).ready(function () {
     }
     else {
         cargarTabla2(modelo, 'facturacion');
+        
+        // Agregar funcionalidad de doble click con modal de detalle mejorado
+        setTimeout(() => {
+            agregarDobleClickPersonalizado(`#${modelo}Table`, 'abrir_modal');
+        }, 1000); // Esperar a que la tabla se cargue completamente
     }
 
     FORM_FACTURACION_CLIENTE.on('submit', function (e) {
@@ -52,6 +57,11 @@ $(document).ready(function () {
         $('#titulo-fact').text(cliente_nombre);
 
         cargarTabla2('facturasClientes', 'facturacion', cliente_id);
+        
+        // Agregar funcionalidad de doble click con modal de detalle mejorado para facturas de clientes
+        setTimeout(() => {
+            agregarDobleClickPersonalizado('#facturasClientesTable', 'abrir_modal');
+        }, 1000);
 
     });
 
