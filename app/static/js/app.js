@@ -481,15 +481,27 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                 }
             },
             createdRow: function (row, data, dataIndex) {
-                    if (data.status && (data.status.toLowerCase() === 'finalizado' || data.status.toLowerCase() === 'facturado')) {
-                        $(row).addClass('table-success');
-                    }
-                    if (data.status && (data.status.toLowerCase() === 'pendiente' || data.status.toLowerCase() === 'por facturar')) {
-                        $(row).addClass('table-danger');
-                    }
-                    if (data.status && (data.status.toLowerCase() === 'programado' )) {
-                        $(row).addClass('table-warning');
-                    }
+                // Validación temprana y normalización del status
+                if (!data || typeof data.status !== 'string' || !data.status.trim()) {
+                    return; // Salida temprana si no hay status válido
+                }
+
+                const status = data.status.toLowerCase().trim();
+                
+                // Mapeo de estados a clases CSS para mejor mantenibilidad
+                const statusClassMap = {
+                    'finalizado': 'table-success text-success',
+                    'facturado': 'table-success',
+                    'pendiente': 'table-danger',
+                    'por facturar': 'table-danger',
+                    'programado': 'table-warning'
+                };
+
+                // Aplicar clase CSS si existe mapeo para el status
+                const cssClass = statusClassMap[status];
+                if (cssClass) {
+                    $(row).addClass(cssClass);
+                }
             },
         };
 
