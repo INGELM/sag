@@ -1,4 +1,4 @@
-from flask import render_template,redirect, url_for, flash
+from flask import render_template,redirect, request, url_for, flash
 from . import login_bp
 from .form import *
 from datetime import datetime
@@ -39,13 +39,20 @@ def login():
         else:
             flash('Usuario o contraseña incorrectos', 'danger')
             current_app.logger.warning(f'Intento de inicio de sesión fallido para el usuario y contraseña:', username)
+            return render_template('login.html', form=form, year=datetime.now().year)
     else:
         if form.username.errors:
             form.username.errors.append('Por favor, complete el campo de usuario')
         if form.password.errors:
             form.password.errors.append('Por favor, complete el campo de contraseña')
 
-    return render_template('login.html', form=form, year=datetime.now().year)
+    if request.method == 'GET':
+        try:
+            empleadosModel.query.all()
+            flash('Conectado correctamente a la Base de datos', 'success' )
+        except:
+            flash('Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador.', 'danger')
+        return render_template('login.html', form=form, year=datetime.now().year)
 
 @login_bp.route('/logout')
 def logout():

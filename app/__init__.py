@@ -79,5 +79,9 @@ def create_app():
     
     from .auxiliares import tasa_bp
     app.register_blueprint(tasa_bp, url_prefix='/tasa')
+    
+    from .WA import wa_bp
+    app.register_blueprint(wa_bp, url_prefix = '/wa' )
+    
 
     return app

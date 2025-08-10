@@ -363,11 +363,38 @@ function mostrarModalDetalle(data) {
             });
         } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
             // Botón "Enviar" presionado
-            enviarRegistro(data);
+            // enviarRegistro(data);
+            enviarWA(data)
+            // alert("Funcion enviar registro no implementada aún")
         }
         // Si se presiona el botón X (cerrar) o se hace clic fuera del modal, no se ejecuta ninguna acción
     });
 }
+
+function enviarWA(data){
+    let jsonData = JSON.stringify(data)
+    let URL = "/wa/"
+    console.log(URL)
+
+    $.ajax({
+        type: "POST",
+        url: URL,
+        data: jsonData,
+        contentType: "application/Json",
+        success: function (response) {
+            if (response.success){
+                Swal.fire({
+                    title: "Mensaje Enviado"
+                })
+            }
+            
+        }
+    });
+
+}
+
+
+
 
 // Función auxiliar para copiar registro
 function copiarRegistro(data) {
@@ -383,67 +410,67 @@ function copiarRegistro(data) {
                 }
                 
                 // Función para manejar el envío de registros
-                function enviarRegistro(data) {
-                    Swal.fire({
-                        title: '¿Enviar registro?',
-                        text: `¿Estás seguro de que deseas enviar el registro con ID: ${data.id}?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: '<i class="bx bx-paper-plane me-1"></i>Sí, enviar',
-                        cancelButtonText: '<i class="bx bx-x me-1"></i>Cancelar',
-                        showLoaderOnConfirm: true,
-                        preConfirm: () => {
-                            // Aquí puedes personalizar la URL y los datos según tu aplicación
-                            const url = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/enviar` : `/${window.modelo}/enviar`;
+                // function enviarRegistro(data) {
+                //     Swal.fire({
+                //         title: '¿Enviar registro?',
+                //         text: `¿Estás seguro de que deseas enviar el registro con ID: ${data.id}?`,
+                //         icon: 'question',
+                //         showCancelButton: true,
+                //         confirmButtonColor: '#28a745',
+                //         cancelButtonColor: '#6c757d',
+                //         confirmButtonText: '<i class="bx bx-paper-plane me-1"></i>Sí, enviar',
+                //         cancelButtonText: '<i class="bx bx-x me-1"></i>Cancelar',
+                //         showLoaderOnConfirm: true,
+                //         preConfirm: () => {
+                //             // Aquí puedes personalizar la URL y los datos según tu aplicación
+                //             const url = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/enviar` : `/${window.modelo}/enviar`;
                             
-                            return fetch(url, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    id: data.id,
-                                    // Agregar otros datos necesarios para el envío
-                                    ...data
-                                })
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Error en la respuesta del servidor');
-                                }
-                                return response.json();
-                            })
-                            .then(result => {
-                                if (!result.success) {
-                                    throw new Error(result.mensaje || 'Error al enviar el registro');
-                                }
-                                return result;
-                            })
-                            .catch(error => {
-                                Swal.showValidationMessage(`Error: ${error.message}`);
-                            });
-                        },
-                        allowOutsideClick: () => !Swal.isLoading()
-                    }).then((result) => {
-                        if (result.isConfirmed && result.value) {
-                            Swal.fire({
-                                title: '¡Enviado!',
-                                text: result.value.mensaje || 'El registro ha sido enviado correctamente',
-                                icon: 'success',
-                                timer: 3000,
-                                timerProgressBar: true,
-                                confirmButtonText: 'Aceptar'
-                            }).then(() => {
-                                // Opcional: recargar la tabla o actualizar el estado
-                                if (typeof location !== 'undefined') {
-                                    location.reload();
-                                }
-                            });
-                        }
-                    });
-                }
+                //             return fetch(url, {
+                //                 method: 'POST',
+                //                 headers: {
+                //                     'Content-Type': 'application/json',
+                //                 },
+                //                 body: JSON.stringify({
+                //                     id: data.id,
+                //                     // Agregar otros datos necesarios para el envío
+                //                     ...data
+                //                 })
+                //             })
+                //             .then(response => {
+                //                 if (!response.ok) {
+                //                     throw new Error('Error en la respuesta del servidor');
+                //                 }
+                //                 return response.json();
+                //             })
+                //             .then(result => {
+                //                 if (!result.success) {
+                //                     throw new Error(result.mensaje || 'Error al enviar el registro');
+                //                 }
+                //                 return result;
+                //             })
+                //             .catch(error => {
+                //                 Swal.showValidationMessage(`Error: ${error.message}`);
+                //             });
+                //         },
+                //         allowOutsideClick: () => !Swal.isLoading()
+                //     }).then((result) => {
+                //         if (result.isConfirmed && result.value) {
+                //             Swal.fire({
+                //                 title: '¡Enviado!',
+                //                 text: result.value.mensaje || 'El registro ha sido enviado correctamente',
+                //                 icon: 'success',
+                //                 timer: 3000,
+                //                 timerProgressBar: true,
+                //                 confirmButtonText: 'Aceptar'
+                //             }).then(() => {
+                //                 // Opcional: recargar la tabla o actualizar el estado
+                //                 if (typeof location !== 'undefined') {
+                //                     location.reload();
+                //                 }
+                //             });
+                //         }
+                //     });
+                // }
             }
         }
     });
