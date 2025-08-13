@@ -8,3 +8,8 @@ class Config:
     DEBUG = False
     PROPAGATE_EXCEPTIONS = True
     PYTHONIOENCODING = 'utf-8'
+    
+    #CONFIGURACION WHATSAPP
+    
+    PHONE_ID = os.environ.get('PHONE_ID')
+    TOKEN = os.environ.get('TOKEN')
