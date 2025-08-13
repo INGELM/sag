@@ -258,7 +258,10 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
             // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
             if (campo === 'pasajeros' && modelo === 'programacion') {
                 if (Array.isArray(data_2)) {
-                    return data_2.map(p => `${p.nombre} [${p.telefono}]`).join('<br>');
+                    // return data_2.map(p => `${p.nombre} [${p.telefono}]`).join('<br>');
+                    return data_2.map(p => {
+                        return `${p.nombre}`;
+                    }).join('<br>');
                 }
                 return data_2;
             }
@@ -268,7 +271,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
                 }
                 return data_2;
             }
-
+            console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
             return data_2;
         }
     }));

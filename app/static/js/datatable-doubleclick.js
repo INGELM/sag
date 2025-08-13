@@ -373,7 +373,7 @@ function mostrarModalDetalle(data) {
 
 function enviarWA(data){
     let jsonData = JSON.stringify(data)
-    let URL = "/wa/"
+    let URL = "/wa/send-programacion"
     console.log(URL)
 
     $.ajax({
@@ -384,7 +384,12 @@ function enviarWA(data){
         success: function (response) {
             if (response.success){
                 Swal.fire({
-                    title: "Mensaje Enviado"
+                    icon: 'success',
+                    title: "Operación Exitosa",
+                    text: response.mensaje,
+                    timer: 3500,
+                    timerProgressBar: true
+
                 })
             }
             

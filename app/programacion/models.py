@@ -121,6 +121,7 @@ class programacionModel(db.Model):
             'hora_salida': self.hora_salida.strftime('%H:%M') if self.hora_salida else None,
             'hora_retorno': self.hora_retorno.strftime('%H:%M') if self.hora_retorno else None,
             'direccion_origen': self.direccion_origen,
+            'direccion_destino': self.direccion_destino,
             'origen': self.origen_rel.nombre,
             'origen_rel': self.origen,
             'destino': self.destino_rel.nombre if self.destino_rel else None,
