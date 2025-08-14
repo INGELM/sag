@@ -50,8 +50,8 @@ def login():
         try:
             empleadosModel.query.all()
             flash('Conectado correctamente a la Base de datos', 'success' )
-        except:
-            flash('Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador.', 'danger')
+        except Exception as e:
+            flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador. {str(e)}', 'danger')
         return render_template('login.html', form=form, year=datetime.now().year)
 
 @login_bp.route('/logout')
