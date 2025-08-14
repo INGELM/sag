@@ -6,6 +6,7 @@ from flask_login import login_user, current_user, logout_user
 from app.empleados.models import empleadosModel
 from flask import session
 from flask import current_app
+from config import Config
 
 
 
@@ -51,7 +52,7 @@ def login():
             empleadosModel.query.all()
             flash('Conectado correctamente a la Base de datos', 'success' )
         except Exception as e:
-            flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador. {str(e)}', 'danger')
+            flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador. \n {str(e)} \n []{Config.DATABASE_URL}', 'danger')
         return render_template('login.html', form=form, year=datetime.now().year)
 
 @login_bp.route('/logout')
