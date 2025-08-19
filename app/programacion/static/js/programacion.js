@@ -67,13 +67,13 @@ $(document).ready(function () {
         console.log("Pasajeros seleccionados:", pasajerosSeleccionados);
         if (pasajerosSeleccionados && pasajerosSeleccionados.length > 0) {
 
-            cargarDirecciones(pasajerosSeleccionados, DIRECCION_ORIGEN[0].selectize);
-            cargarDirecciones(pasajerosSeleccionados, DIRECCION_DESTINO[0].selectize);
+            cargarDirecciones(pasajerosSeleccionados, DIRECCION_ORIGEN[0].selectize, 'origen');
+            cargarDirecciones(pasajerosSeleccionados, DIRECCION_DESTINO[0].selectize, 'destino');
         }
     });
 
    
-    function cargarDirecciones(pasajeros, selectize) {
+    function cargarDirecciones(pasajeros, selectize, tipo) {
         if (!pasajeros || pasajeros.length === 0) {
             selectize.clearOptions();
             return;
@@ -84,7 +84,7 @@ $(document).ready(function () {
         $.ajax({
             type: "GET",
             url: URL_CONSULTA_DIRECCIONES,
-            data: { 'pasajeros[]': pasajeros },
+            data: { 'pasajeros[]': pasajeros, tipo: tipo },
             dataType: "json",
             success: function (response) {
                 if (response.success) {

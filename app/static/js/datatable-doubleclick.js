@@ -392,7 +392,16 @@ function enviarWA(data){
 
                 })
             }
-            
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Operación Fallida",
+                    text: response.mensaje,
+                    timer: 3500,
+                    timerProgressBar: true
+                })
+            }
+
         }
     });
 

@@ -271,7 +271,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
                 }
                 return data_2;
             }
-            console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
+            // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
             return data_2;
         }
     }));
@@ -848,6 +848,8 @@ function botonesAuxiliares() {
             {
                 init: function (dt, node, config) {
                     $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+                    $(node).removeClass('btn-primary').addClass('btn-outline-primary');
+                    $(node).text('Seleccionar todos');
                 },
                 text: 'Seleccionar todos',
                 action: function(e, dt, node, config) {
@@ -1260,13 +1262,13 @@ function llenarFormulario(id) {
                                 $campo[0].selectize.setValue(data[key], true);
                             }
 
-                            if (key.includes('direccion_origen')) {
+                            if (key.includes('direccion_destino') || key.includes('direccion_origen')) {
                                 // const arrayDataKey = rowData[key].map(item => item.trim());
                                 // console.log("arrayDataKey:", arrayDataKey); 
                                 setTimeout(() => {
                                     $campo[0].selectize.setValue(data[key], true);
                                     console.log(`Selectize timeout actualizado para: ${key} con valor: ${data[key]}`);
-                                }, 500);
+                                }, 600);
                             }
                         }
                         else {

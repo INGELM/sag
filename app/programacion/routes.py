@@ -347,6 +347,7 @@ def get_all_programaciones():
 
 @programacion_bp.route('/get/direcciones', methods=['GET'])
 def get_direcciones():
+    tipo = request.args.get('tipo', None)
     pasajeros_seleccionados = request.args.getlist('pasajeros[]')
     pasajeros_seleccionados = [int(p) for p in pasajeros_seleccionados if p.isdigit()]
     # pasajeros_seleccionados = [1]
@@ -355,11 +356,19 @@ def get_direcciones():
     
     from app.clientes.models import pasajerosModel
     
-    direcciones = programacionModel.query.\
-        with_entities(programacionModel.direccion_origen).\
-        join(programacionModel.pasajeros).\
-        filter(pasajerosModel.id.in_(pasajeros_seleccionados)).\
-        distinct().all()
+    if tipo == 'origen':
+        direcciones = programacionModel.query.\
+            with_entities(programacionModel.direccion_origen).\
+            join(programacionModel.pasajeros).\
+            filter(pasajerosModel.id.in_(pasajeros_seleccionados)).\
+            distinct().all()
+
+    elif tipo == 'destino':
+        direcciones = programacionModel.query.\
+            with_entities(programacionModel.direccion_destino).\
+            join(programacionModel.pasajeros).\
+            filter(pasajerosModel.id.in_(pasajeros_seleccionados)).\
+            distinct().all()
 
     data = [d[0] for d in direcciones if d[0]]
     

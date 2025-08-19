@@ -56,27 +56,54 @@ def ciudades():
             
             
     if request.method == 'DELETE':
-            ciudad_id = request.get_json().get('id')
+        try:
+            data = request.get_json()
+            if not data or 'id' not in data:
+                return jsonify(success=False, mensaje='Se requiere un ID o lista de IDs de ciudad.'), 400
+
+            ciudad_id = data['id']
             current_app.logger.debug(f'Recibido ID de ciudad para eliminar: {ciudad_id}')
-            if not ciudad_id:
-                return jsonify(success=False, mensaje='ID de ciudad inválido.')
 
-            ciudad = ciudadesModel.query.get(ciudad_id)
+            # Convert single ID to list for uniform handling
+            ids_to_delete = [ciudad_id] if not isinstance(ciudad_id, list) else ciudad_id
 
-            if not ciudad:
-                return jsonify(success=False, mensaje='Ciudad no encontrada.')
+            # Validate IDs are integers
+            try:
+                ids_to_delete = [int(id) for id in ids_to_delete]
+            except (ValueError, TypeError):
+                return jsonify(success=False, mensaje='IDs deben ser números enteros.'), 400
+
+            # Get and delete cities in a single transaction
+            ciudades = ciudadesModel.query.filter(ciudadesModel.id.in_(ids_to_delete)).all()
+            
+            if not ciudades:
+                return jsonify(success=False, mensaje='No se encontraron ciudades con los IDs proporcionados.'), 404
 
             try:
-                ciudad.delete()
-                return jsonify(success=True, mensaje='Ciudad eliminada exitosamente.')
-
+                # Bulk delete operation
+                delete_count = ciudadesModel.query.filter(ciudadesModel.id.in_(ids_to_delete)).delete()
+                db.session.commit()
+                
+                return jsonify(
+                    success=True,
+                    mensaje=f'Se eliminaron {delete_count} ciudades exitosamente.',
+                    eliminadas=ids_to_delete
+                )
             except Exception as e:
-                # current_app.logger.debug(f'Error al eliminar ciudad: {e}')
-                return jsonify({
-                    'success': False,
-                    'mensaje': 'Error al eliminar la ciudad.',
-                    'error': str(e)
-                }), 500
+                db.session.rollback()
+                current_app.logger.error(f'Error al eliminar ciudades: {str(e)}', exc_info=True)
+                return jsonify(
+                    success=False,
+                    mensaje='Error al eliminar ciudades.',
+                    errores=str(e)
+                ), 500
+
+        except Exception as error:
+            current_app.logger.error(f'Error inesperado: {str(error)}', exc_info=True)
+            return jsonify(
+                success=False,
+                mensaje='Error interno del servidor.'
+            ), 500
             
     elif form.validate_on_submit():
         ciudad = {**form.data}
@@ -351,7 +378,7 @@ def tasa():
                     current_app.logger.debug(f'Error al actualizar la tasa: {e}')
                     return {"error": "No se pudo actualizar"}, 500
             else:
-                nueva_tasa = tasaModel(tasa=nueva_tasa_valor, fecha=datetime.now())
+                nueva_tasa = tasaModel(tasa=nueva_tasa_valor)
                 try:
                     nueva_tasa.save()
                 except Exception as e:
@@ -371,7 +398,7 @@ def tasa():
         year=datetime.now().year,
         form=form,
         User=current_user,
-        tasa=tasa_actual,
+        tasa=data.tasa,
         fecha=fecha_actual,
         tasa_bcv=tasa_bcv,
         fecha_bcv=fecha_bcv

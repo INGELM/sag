@@ -2,6 +2,8 @@ import os
 from . import wa_bp
 from flask import jsonify, request, json
 from pywa import WhatsApp
+
+
 from app.auxiliares.logger_utils import get_logger
 
 log = get_logger()
@@ -30,8 +32,9 @@ def wa():
         )
         # log.debug(response)
         return jsonify({'success': True, "mensaje":"Mensaje enviado correctamente"})
-    
+
     except Exception as e:
+        print(f"❌ Error inesperado: {e}")
         log.error(f"Error al enviar mensaje: {str(e)}", exc_info=True)
         return jsonify({
             "success": False,
@@ -42,6 +45,7 @@ def wa():
 @wa_bp.route('/send-programacion', methods=['POST'])
 def send_programacion():
     data_str = request.data.decode("utf-8")
+    # log.info(f"Datos recibidos: {data_str}")
     
     # Verificar si el string está vacío
     if not data_str.strip():
@@ -54,6 +58,7 @@ def send_programacion():
         
     try:
         data_dict = json.loads(data_str)
+        # log.debug(f"Datos parseados: {data_dict}")
     
     except json.JSONDecodeError as e:
         log.error(f"Error decodificando JSON: {str(e)}", exc_info=True)
@@ -120,8 +125,10 @@ def send_programacion():
             
             if isinstance(direccion_destino, str) and direccion_destino.startswith('['):
                 direcciones_destino = json.loads(direccion_destino)
+                log.debug(f"Direcciones destino if: {direcciones_destino}")
             elif isinstance(direccion_destino, list):
                 direcciones_destino = direccion_destino
+                log.debug(f"Direcciones destino else: {direcciones_destino}")
             
             # Si hay más de un pasajero, mostrar formato detallado
             if len(pasajeros_list) > 1:
@@ -148,7 +155,7 @@ def send_programacion():
                 return resultado.strip()
             else:
                 # Un solo pasajero
-                resultado = f"👤*Pasajero ({len(pasajeros_list)}):*\n\n"
+                resultado = f"👤 *Pasajero ({len(pasajeros_list)}):*\n\n"
                 pasajero = pasajeros_list[0]
                 if isinstance(pasajero, dict):
                     resultado += f"*Nombre:* {pasajero.get('nombre', 'No especificado')}\n"
@@ -176,7 +183,7 @@ def send_programacion():
     # Construir mensaje profesional
     mensaje = f"""*PROGRAMACIÓN DE VIAJE*
 
-🏦*{cliente.upper()}*
+🏦 *{cliente.upper()}*
 {origen} {icono_viaje} {destino}
 
 
@@ -199,7 +206,7 @@ def send_programacion():
 🗒️ *OBSERVACIONES*
 {observaciones}"""
     
-    mensaje += "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    # mensaje += "\n\n━━━━━━━━━━━━━"
     
     log.debug(f"Mensaje a enviar: {mensaje}")
     
@@ -208,8 +215,8 @@ def send_programacion():
     token = os.environ.get('TOKEN')
     
     wa = WhatsApp(
-            phone_id='665506803323562',
-            token='EAAQTEZBPNOFEBPEuf0sCTtbVlvtxZBnOO6JhAZAdyKUx9DIDOd4AlVUlHW3truVIrEmYi8Lz8SVwvSnLUvZC6QFZBR8hjuFEfTSJv8OkfVX9mUZC34ygdsjTmCbttCpLL38GcnOfocm2KA6mFmvZBAV8rfM2zcUCDhSOLGHHaNkL2F3mQRyStm7tIXJJ5iTUgWvAUIq1v6zVSZAGXzehE9X0pztV7I5OD3ajO2XOrHRO5RMPHpJf'
+            phone_id=phone_id,
+            token=token
         )
     
     try:
@@ -218,11 +225,17 @@ def send_programacion():
                     text=mensaje)
                    
         # log.debug(response)
+        log.info(f'{response}')
         return jsonify({'success': True, "mensaje":"Mensaje enviado correctamente"})
+
     except Exception as e:
-        log.error(f"Error al enviar mensaje: {str(e)}", exc_info=True)
+        log.error(f"Error de WhatsApp API: {e.message}", exc_info=True)
+        if "Error validating access token" in str(e):
+            mensaje = "Token inválido o expirado. Por favor, contacta al administrador."
+        else:
+            mensaje = "Error en el envío del mensaje. Por favor, intenta nuevamente."
         return jsonify({
             "success": False,
-            "error": str(e),
-            "message": "Error al enviar mensaje"
-        }), 500
+            "error": "Mensaje no enviado",
+            "mensaje": mensaje
+        })
