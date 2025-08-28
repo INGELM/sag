@@ -5,7 +5,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
-    DEBUG = False
+    DEBUG = True
     PROPAGATE_EXCEPTIONS = True
     PYTHONIOENCODING = 'utf-8'
     
