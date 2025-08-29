@@ -14,5 +14,5 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=app.config['DEBUG'], port=5050)
+    app.run(port=5000)
 
