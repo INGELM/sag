@@ -4,6 +4,6 @@ deployment:
         - export DEPLOYPATH=/home2/globalstweb/public_html/app.globalst.com.ve  # Add /<app_folder> if required
         - /bin/cp -r * $DEPLOYPATH                        #copy all recursively to $DEPLOYPATH
 
-        #- /bin/cp .env $DEPLOYPATH/.env                         #copiar el archivo .env
+        - /bin/cp .env $DEPLOYPATH/.env                         #copiar el archivo .env
         
         
