@@ -338,67 +338,60 @@ def all_vehiculos():
 
 @tasa_bp.route('/', methods=['GET', 'PUT'])
 def tasa():
-    data = tasaModel.query.first()
     form = tasaForm()
-
-
-    # URL corregida: sin espacios extra
-    api_url = "https://pydolarve.org/api/v2/dollar"
+    API_URL = "https://ve.dolarapi.com/v1/dolares"
     
-    try:
-        response = requests.get(api_url)
-        if response.status_code == 200:
-            data_bcv = response.json()
-            tasa_bcv = data_bcv['monitors']['bcv']['price']
-            fecha_bcv = data_bcv['monitors']['bcv']['last_update']
-        else:
-            tasa_bcv = None
-            fecha_bcv = "Error al obtener datos"
-    except Exception as e:
-        current_app.logger.error(f'Error al consultar la API PyDolarVE: {e}')
-        tasa_bcv = None
-        fecha_bcv = "Error de conexión"
+    if request.method == 'GET':
+        try:
+            response = requests.get(API_URL)
+            
+            if response.status_code == 200:
+                
+                data = response.json()
+                tasa_bcv = data[0]['promedio']
+                fecha_bcv = data[0]['fechaActualizacion']
+                fecha_bcv = fecha_bcv.split("T")[0]
+                split_fecha = fecha_bcv.split("-")
+                fecha_bcv = f"{split_fecha[2]}-{split_fecha[1]}-{split_fecha[0]}"
+        
+                form.tasa.data = tasa_bcv
+               
 
-    # En caso de GET, si no hay tasa guardada, usar la del BCV como valor inicial
-    if request.method == 'GET' and tasa_bcv:
-   
-        form.tasa.data = tasa_bcv
-
-    # Si es PUT, se actualiza la tasa desde el formulario
-    if request.method == 'PUT':
-        if form.validate_on_submit():
-            nueva_tasa_valor = form.tasa.data
-
-            if data:
-                data.tasa = nueva_tasa_valor
-                data.fecha = datetime.now()
-                try:
-                    data.save()  # Suponiendo que tienes un método save()
-                except Exception as e:
-                    current_app.logger.debug(f'Error al actualizar la tasa: {e}')
-                    return {"error": "No se pudo actualizar"}, 500
             else:
-                nueva_tasa = tasaModel(tasa=nueva_tasa_valor)
-                try:
-                    nueva_tasa.save()
-                except Exception as e:
-                    current_app.logger.debug(f'Error al guardar nueva tasa: {e}')
-                    return {"error": "No se pudo guardar"}, 500
-
-            return {"success": True, "tasa": nueva_tasa_valor}, 200
+                tasa_bcv = "Error al obtener datos"
+                fecha_bcv = "Error al obtener datos"
+        except Exception as e:
+            current_app.logger.error(f'Error al consultar tarifas BCV: {e}')
+            tasa_bcv = "Error al obtener datos"
+            fecha_bcv = "Error de conexión"
+        finally:
+            current_app.logger.debug(f'Tasa BCV: {tasa_bcv}, Fecha BCV: {fecha_bcv}')
+        
+        data = tasaModel.query.order_by(tasaModel.id.desc()).first()
+        
+        if not data:
+            set_tasa = tasaModel(
+                    tasa=tasa_bcv,
+                )
+            set_tasa.save()
         else:
-            return {"errors": form.errors}, 400
+            tasa_actual = data.tasa
+            fecha_actual = data.fecha.strftime('%d-%m-%Y %H:%M:%S')
 
-    # Para GET: definir valores a mostrar
-    tasa_actual = data.tasa if data else tasa_bcv
-    fecha_actual = data.fecha if data else None
+    if request.method == 'PUT' and form.validate_on_submit():
+        set_tasa = tasaModel(
+            tasa=form.tasa.data
+        )
+        form.tasa.data = None
+        set_tasa.save()
+        return jsonify(success=True, mensaje='Tasa actualizada exitosamente.')
 
     return render_template(
         'tasa.html',
         year=datetime.now().year,
         form=form,
         User=current_user,
-        tasa=data.tasa,
+        tasa=tasa_actual,
         fecha=fecha_actual,
         tasa_bcv=tasa_bcv,
         fecha_bcv=fecha_bcv
