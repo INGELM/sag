@@ -162,7 +162,9 @@ function mostrarModalDetalle(data) {
         data.pasajeros.forEach((pasajero, index) => {
             const direccionOrigen = Array.isArray(data.direccion_origen) ? data.direccion_origen[index] || '' : data.direccion_origen || '';
             const direccionDestino = Array.isArray(data.direccion_destino) ? data.direccion_destino[index] || '' : data.direccion_destino || '';
+
             
+
             contenido += `
                     <div class="border rounded p-3 mb-3 bg-light">
                         <div class="row align-items-center">

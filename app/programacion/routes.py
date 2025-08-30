@@ -156,14 +156,14 @@ def programacion():
     form = programacionForm()
     dataForm = form.data
     programacion_data = {**form.data}
-    print("Datos de la programación:---------------------------", programacion_data)
+    # print("Datos de la programación:---------------------------", programacion_data)
     if request.method == 'GET':
         return render_template('/programacion.html', User=current_user, form=form)
 
     elif request.method == 'POST' and form.validate_on_submit():
         
         
-        print("Datos del formulario:", programacion_data)
+        # print("Datos del formulario:", programacion_data)
 
         try:
             # Validar coherencias antes de guardar

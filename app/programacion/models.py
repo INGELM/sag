@@ -15,7 +15,7 @@ class programacionModel(db.Model):
     guia = db.Column(db.String(50), nullable=True)
     direccion_origen = db.Column(JSONType, nullable=True)
     origen = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
-    direccion_destino = db.Column(db.String(255), nullable=True)
+    direccion_destino = db.Column(JSONType, nullable=True)
     destino = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=False)
     fecha_salida = db.Column(db.Date, nullable=False)
     hora_salida = db.Column(db.Time, nullable=False)
