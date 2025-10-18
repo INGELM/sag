@@ -10,6 +10,7 @@ class clientesModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(4), unique=True, nullable=False)
     empresa = db.Column(db.String(100), nullable=False)
+    rif = db.Column(db.String(100), nullable=True)
     direccion = db.Column(db.String(200), nullable=True)
     ciudad = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=True)
