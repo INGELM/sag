@@ -50,7 +50,7 @@ class vehiculosModel(db.Model):
     tipo = db.Column(db.String(100), nullable=False)
     
     # Relación corregida para mantener consistencia
-    # recargos_vehiculos = db.relationship('recargoVehiculosModel', back_populates='vehiculo_rel', cascade="all, delete-orphan")
+    recargos_vehiculos = db.relationship('recargoVehiculosModel', back_populates='vehiculo_rel', cascade="all, delete-orphan")
     tarifas = db.relationship('tarifasModel', back_populates='vehiculo_rel', cascade="all, delete-orphan")
 
 

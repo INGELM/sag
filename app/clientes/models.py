@@ -304,8 +304,7 @@ class recargoVehiculosModel(db.Model):
 
     # Relaciones mejoradas con nombres más descriptivos
     # Línea modificada: nombre coherente
-    # vehiculo_rel = db.relationship(
-    #     'vehiculosModel', back_populates='recargos_vehiculos')
+    vehiculo_rel = db.relationship('vehiculosModel', back_populates='recargos_vehiculos')
     # Línea modificada: nombre coherente
     cliente_rel = db.relationship(
         'clientesModel', back_populates='recargos_vehiculos')

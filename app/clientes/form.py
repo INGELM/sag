@@ -97,7 +97,7 @@ class tarifasForm(FlaskForm):
 
 class recargoVehiculosForm(FlaskForm):
     id = StringField('ID', render_kw={"placeholder": "ID del recargo", "class": "form-control", "type": "hidden"})
-    empresa = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del recargo", "class": "form-control"})
+    cliente = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del recargo", "class": "form-control"})
     vehiculo = QuerySelectField('Vehículo', query_factory=lambda: vehiculosModel.query.filter(vehiculosModel.tipo != 'Sedan').all(), get_label='tipo', allow_blank=True, blank_text='Seleccione un vehículo', render_kw={"placeholder": "Vehículo", "class": "form-control"})
     recargo = DecimalField('Recargo', validators=[DataRequired(message='El recargo es obligatorio.')], render_kw={"placeholder": "Recargo del vehículo", "class": "form-control"})
     submit = SubmitField('Guardar')

@@ -14,7 +14,6 @@ from app.extensions import db
         
 
 
-
 @clientes_bp.route('/clientes', methods=['GET', 'POST', 'DELETE', 'PUT'])
 # @login_required
 def clientes():
@@ -205,13 +204,15 @@ def crear_recargo_sedan(nuevo_cliente):
 def pasajeros():
     
     form = pasajerosForm()
-    pasajero_data = request.get_json() if request.method in ['PUT', 'DELETE'] else form.data
+    pasajero_data = request.get_json() if request.method in ['DELETE'] else form.data
     # current_app.logger.info(f'Datos recibidos del formulario: {pasajero_data}')
 
     # if 'ciudad' in pasajero_data and pasajero_data['ciudad']:
     #     pasajero_data['ciudad'] = pasajero_data['ciudad'].id
 
     if request.method == 'PUT' and form.validate_on_submit():
+        
+        pasajero_data = request.get_json()
 
         current_app.logger.debug(f'Recibido datos de pasajero para actualizar: {pasajero_data}')
         if not pasajero_data or 'id' not in pasajero_data:
@@ -382,40 +383,58 @@ def obtener_pasajeros():
 def tarifas():
     
     form = tarifasForm()
-    tarifa_data = request.get_json() if request.method in ['PUT', 'DELETE'] else form.data
+    tarifa_data = request.get_json() if request.method in ['DELETE'] else form.data
     current_app.logger.debug(f'Datos recibidos del formulario: {tarifa_data}')
 
     # if 'ciudad' in pasajero_data and pasajero_data['ciudad']:
     #     pasajero_data['ciudad'] = pasajero_data['ciudad'].id
 
     if request.method == 'PUT' and form.validate_on_submit():
+    # Obtener datos como dict con listas
+        tarifa_data_lists = request.form.to_dict(flat=False)
+        current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data_lists}')
 
-        current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data}')
-        if not tarifa_data or 'id' not in tarifa_data:
+        if not tarifa_data_lists or 'id' not in tarifa_data_lists:
             return jsonify(success=False, mensaje='Datos de tarifa inválidos.')
 
-        tarifa_id = tarifa_data.get('id')
+        # Extraer el ID (siempre es una lista, tomamos el primer valor)
+        tarifa_id = tarifa_data_lists.get('id', [None])[0]
+        if not tarifa_id:
+            return jsonify(success=False, mensaje='ID de tarifa no proporcionado.')
+
         tarifa = tarifasModel.query.get(tarifa_id)
+        current_app.logger.debug(f'Objeto tarifa obtenido: {tarifa}')
 
         if not tarifa:
-            return jsonify(success=False, mensaje='tarifa no encontrada.')
-        # Eliminar campos no relacionados con el modelo antes de actualizar
-        for field in ['csrf_token', 'validar_contrasena', 'submit', 'id']:
-            tarifa_data.pop(field, None)
+            return jsonify(success=False, mensaje='Tarifa no encontrada.')
 
+        # Convertir de {'campo': ['valor']} a {'campo': 'valor'}
+        tarifa_data = {key: values[0] for key, values in tarifa_data_lists.items()}
+
+        # Eliminar campos que no pertenecen al modelo
+        campos_a_eliminar = {'csrf_token', 'validar_contrasena', 'submit', 'id'}
+        for campo in campos_a_eliminar:
+            tarifa_data.pop(campo, None)
 
         try:
-            tarifa.update(**tarifa_data)
-            return jsonify(success=True, mensaje='tarifa actualizado exitosamente.')
+            # Actualizar el objeto con los datos planos
+            for key, value in tarifa_data.items():
+                if hasattr(tarifa, key):
+                    setattr(tarifa, key, value)
+                else:
+                    current_app.logger.warning(f"Campo '{key}' no existe en el modelo tarifasModel")
+
+            db.session.commit()  # ¡No olvides hacer commit!
+            return jsonify(success=True, mensaje='Tarifa actualizada exitosamente.')
 
         except Exception as e:
-            current_app.logger.debug(f'Error al actualizar tarifa: {e}')
+            db.session.rollback()
+            current_app.logger.error(f'Error al actualizar tarifa: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar la tarifa.',
                 'error': str(e)
             }), 500
-
 
     if request.method == 'DELETE':
             current_app.logger.debug('Recibida solicitud de eliminación de tarifa')
@@ -573,21 +592,58 @@ def recargo_vehiculos():
             current_app.logger.debug(f'Error al eliminar recargo de vehículo: {e}')
             return jsonify(success=False, mensaje='Error al eliminar el recargo de vehículo.', error=str(e))
         
-    elif request.method == 'PUT':
+    elif request.method == 'PUT' and form.validate_on_submit():
         # Lógica para actualizar un recargo de vehículo
-        pass
+        recargo_data = form.data
+        current_app.logger.debug(f'Recibido datos de recargo para actualizar: {recargo_data}')
+        
+        if not recargo_data or 'id' not in recargo_data:
+            return jsonify(success=False, mensaje='Datos de recargo inválidos.')
+
+        recargo_id = recargo_data.get('id')
+        recargo = recargoVehiculosModel.query.get(recargo_id)
+        
+        if not recargo:
+            return jsonify(success=False, mensaje='Recargo no encontrado.')
+        
+        # Eliminar campos no relacionados con el modelo antes de actualizar
+        for field in ['csrf_token', 'submit', 'id']:
+            recargo_data.pop(field, None)
+        
+        # Convertir objetos relacionados a sus IDs
+        if 'cliente' in recargo_data and hasattr(recargo_data['cliente'], 'id'):
+            recargo_data['cliente'] = recargo_data['cliente'].id
+            recargo_data.pop('cliente', None)
+        
+        if 'vehiculo' in recargo_data and hasattr(recargo_data['vehiculo'], 'id'):
+            recargo_data['vehiculo'] = recargo_data['vehiculo'].id
+
+        try:
+            recargo.update(**recargo_data)
+            return jsonify(success=True, mensaje='Recargo de vehículo actualizado exitosamente.')
+        
+        except Exception as e:
+            current_app.logger.debug(f'Error al actualizar recargo de vehículo: {e}')
+            return jsonify({
+                'success': False,
+                'mensaje': 'Error al actualizar el recargo de vehículo.',
+                'error': str(e)
+            }), 500
 
 @clientes_bp.route('recargoVehiculos/all', defaults={'id': None}, methods=['GET'])
-@clientes_bp.route('recargoVehiculos/get/<int:id>', methods=['GET'])
+@clientes_bp.route('recargoVehiculos/get_data/<int:id>', methods=['GET'])
 def handle_recargos(id):
     try:
         if not id:
             recargos = recargoVehiculosModel.query.all()
+            recargos = recargos if isinstance(recargos, list) else [recargos]
+            recargos_serialized = [r.serialize() for r in recargos]
+            
         else:
             recargos = recargoVehiculosModel.query.get(id)
+            recargos_serialized = recargos.serialize_form()
 
-        recargos = recargos if isinstance(recargos, list) else [recargos]
-        recargos_serialized = [r.serialize() for r in recargos]
+        
 
         response_data = {
             'success': True,
@@ -619,8 +675,12 @@ def vehiculos_empresa():
         return jsonify(success=False, data=[], mensaje='ID de empresa no proporcionado o inválido.')
 
     try:
-        vehiculos_empresa = tarifasModel.query.filter_by(empresa=empresa_id).all()
+        vehiculos_empresa = recargoVehiculosModel.query.filter_by(cliente=empresa_id).all()
+        current_app.logger.debug(f'Número de vehículos asociados a la empresa {empresa_id}: {len(vehiculos_empresa)}')
         vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
+        vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
+        if 1 not in vehiculos_ids:
+            vehiculos_ids.append(1)
         current_app.logger.debug(f'IDs de vehículos para la empresa {empresa_id}: {vehiculos_ids}')
 
         vehiculos = vehiculosModel.query.filter(vehiculosModel.id.in_(vehiculos_ids)).all()

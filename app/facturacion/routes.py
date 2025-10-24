@@ -7,6 +7,7 @@ from flask_login import login_required, current_user
 from app.facturacion.form import facturasClientesForm, pagosOperadoresForm
 from app.facturacion.models import pagosOperadoresModel, facturasClientesModel
 from app.programacion.models import programacionModel
+
 @facturacion_bp.before_request
 def before_request():
     if not current_user.is_authenticated:
@@ -52,6 +53,18 @@ def crear_factura_cliente(form):
     costo_desvios = tarifas.desvios if tarifas.desvios else 0
     costo_espera = tarifas.espera if tarifas.espera else 0
     costo_base = tarifas.base if tarifas.base else 0
+    
+    #calcular recargo por vehiculo
+    #if form.vehiculo.data == "CAMIONETA":
+        #recargo = recargoVehiculosModel.query.filter_by(vehiculo="CAMIONETA").first()
+        #if recargo:
+            #costo_base += costo_base * recargo.recargo
+            #current_app.logger.debug(f"Recargo por vehículo aplicado: {recargo.recargo}")
+        
+        
+    
+    
+    
     costo_distancia = tarifas.tarifa_km if tarifas.tarifa_km else 0
   
 

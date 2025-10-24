@@ -93,7 +93,7 @@ function cargarSelectize(url, empresaId, selectize) {
                 if (response.success) {
                     response.data.forEach(function (item) {
                         item.nombres = item.nombres || item.nombre || item.tipo || item.codigo;
-                        console.log(`Agregando opción: ${item.nombres}`);
+                       // console.log(`Agregando opción: ${item.nombres}`);
                         selectize.addOption({
                             id: item.id,
                             text: item.nombres,
@@ -924,8 +924,10 @@ async function guardarRegistro(modelo, varModulo = "") {
         isFormData = true;
     } else if (metodo === 'PUT') {
         // Usar FormData también en PUT para manejar arrays correctamente
+        console.log("PETICION PUT")
         formData = new FormData(FORMULARIO[0]);
-        isFormData = true;
+        isFormData = false;
+        console.log("Formdata: "+formData)
 
         // Opcional: eliminar campos vacíos o costo_total si no se usa
         if (!formData.get('costo_total')) {
@@ -947,8 +949,9 @@ async function guardarRegistro(modelo, varModulo = "") {
 
     if (isFormData) {
         // Enviar como multipart/form-data
+        console.log("es formData")
         fetchOptions.body = formData;
-        // No agregues 'Content-Type' aquí, el navegador lo hace automáticamente con boundary
+        // No agregar 'Content-Type' aquí, el navegador lo hace automáticamente con boundary
     } else {
         // Enviar como JSON
         fetchOptions.headers['Content-Type'] = 'application/json';
