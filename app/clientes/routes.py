@@ -563,7 +563,7 @@ def recargo_vehiculos():
     elif request.method == 'POST' and form.validate_on_submit():
         # Lógica para crear un nuevo recargo de vehículo
         nuevo_recargo = recargoVehiculosModel(
-            cliente=form.empresa.data.id,
+            cliente=form.cliente.data.id,
             vehiculo=form.vehiculo.data.id,
             recargo=form.recargo.data
         )
