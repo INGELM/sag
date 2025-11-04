@@ -362,7 +362,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
             responsive: true,
             columnDefs: AllColumnDefs,
             paging: true,
-            pageLength: 10,
+            pageLength: 50,
             pagingType: "numbers",
             select: {
                 style: 'multi',
@@ -440,7 +440,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             responsive: true,
             columnDefs: AllColumnDefs,
             paging: true,
-            pageLength: 20,
+            pageLength: 50,
             select: {
                 style: 'multi',
                 blurable: true,
@@ -912,7 +912,8 @@ $(".cerrar-form").click(function (e) {
     $(".formulario").addClass("visually-hidden");
 });
 
-async function guardarRegistro(modelo, varModulo = "") {
+// app.js
+async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     const FORMULARIO = $(`#${modelo}Form`);
     const metodo = FORMULARIO.attr('method');
 
@@ -923,13 +924,11 @@ async function guardarRegistro(modelo, varModulo = "") {
         formData = new FormData(FORMULARIO[0]);
         isFormData = true;
     } else if (metodo === 'PUT') {
-        // Usar FormData también en PUT para manejar arrays correctamente
-        console.log("PETICION PUT")
+        console.log("PETICION PUT");
         formData = new FormData(FORMULARIO[0]);
         isFormData = false;
-        console.log("Formdata: "+formData)
+        console.log("Formdata: " + formData);
 
-        // Opcional: eliminar campos vacíos o costo_total si no se usa
         if (!formData.get('costo_total')) {
             formData.delete('costo_total');
         }
@@ -937,8 +936,6 @@ async function guardarRegistro(modelo, varModulo = "") {
         formData = FORMULARIO.serialize();
     }
 
-    // Si usamos FormData, no se puede enviar como JSON directamente
-    // Pero si el backend espera JSON, necesitamos convertirlo correctamente
     const modulo = varModulo || window.modulo;
     const url = modulo !== "" ? `/${modulo}/${modelo}` : `/${modelo}`;
 
@@ -948,16 +945,12 @@ async function guardarRegistro(modelo, varModulo = "") {
     };
 
     if (isFormData) {
-        // Enviar como multipart/form-data
-        console.log("es formData")
+        console.log("es formData");
         fetchOptions.body = formData;
-        // No agregar 'Content-Type' aquí, el navegador lo hace automáticamente con boundary
     } else {
-        // Enviar como JSON
         fetchOptions.headers['Content-Type'] = 'application/json';
         const params = new URLSearchParams(formData);
         const formDataObject = Object.fromEntries(params);
-        // Manejar campos múltiples manualmente
         for (let [key, value] of params) {
             if (key.endsWith('[]')) {
                 const cleanKey = key.slice(0, -2);
@@ -995,6 +988,21 @@ async function guardarRegistro(modelo, varModulo = "") {
                     $(`#${modelo}Form`).attr('method', 'POST');
                 }
             });
+        } else if (data.mensaje === "Factura existente." && !reintentar) {
+            // Si es factura existente y no estamos en modo reintento
+            Swal.fire({
+                title: 'Confirmación',
+                text: 'Esta acción eliminará las facturas, ¿está seguro desea continuar? Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar y actualizar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    eliminarFacturasRecibos(data.factura_id, data.recibo_id, modelo, varModulo);
+                }
+            });
         } else {
             Swal.fire({
                 title: data.mensaje || "Error al guardar",
@@ -1014,57 +1022,74 @@ async function guardarRegistro(modelo, varModulo = "") {
     }
 }
 
-function eliminar(id, modelo) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "No podrás recuperar este registro",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminarlo'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            const url = window.modulo !== "" ? `/${window.modulo}/${modelo}` : `/${modelo}`;
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                contentType: 'application/json',
-                data: JSON.stringify({ id: id }),
-                success: function (data) {
-                    if (data.success) {
+function eliminarFacturasRecibos(factura_id, recibo_id, modelo, varModulo) {
+    const url_facturas = `/facturacion/facturasClientes`;
+    const url_recibos = `/facturacion/pagosOperadores`;
+    
+    $.ajax({
+        url: url_facturas,
+        type: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify({ id: factura_id }),
+        success: function (data) {
+            if (data.success) {
+                $.ajax({
+                    url: url_recibos,
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: recibo_id }),
+                    success: function (data) {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Facturas eliminadas',
+                                text: 'Facturas eliminadas correctamente, reintentando actualización...',
+                                icon: 'success',
+                                timer: 2000,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            }).then(() => {
+                                // Reintentar la actualización después de eliminar
+                                guardarRegistro(modelo, varModulo, true);
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.errores || 'Error al eliminar recibos',
+                                icon: 'error',
+                                timer: 2500,
+                                timerProgressBar: true,
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al eliminar el registro";
+                        console.error("Error al eliminar recibos:", mensaje);
                         Swal.fire({
-                            title: 'Éxito',
-                            text: data.mensaje,
-                            icon: 'success',
-                            timer: 2000,
-                            timerProgressBar: true,
-                            confirmButtonText: 'Aceptar'
-                        }).then(() => {
-                           
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: data.mensaje,
-                            text: data.errores,
+                            title: 'Error',
+                            text: mensaje,
                             icon: 'error',
-                            timer: 2500,
-                            timerProgressBar: true,
                             confirmButtonText: 'Aceptar'
                         });
                     }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al eliminar el registro";
-                    console.error("Error al eliminar:", mensaje);
-                    Swal.fire({
-                        title: 'Falló la eliminación',
-                        text: mensaje,
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.errores || 'Error al eliminar facturas',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al eliminar facturas";
+            console.error("Error al eliminar facturas:", mensaje);
+            Swal.fire({
+                title: 'Error',
+                text: mensaje,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
             });
         }
     });
@@ -1095,7 +1120,7 @@ function eliminarSeleccionados(modelo) {
 
     Swal.fire({
         title: '¿Estás seguro?',
-        text: "No podrás recuperar estos registros",
+        text: "No podrás recuperar los registros eliminados",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',

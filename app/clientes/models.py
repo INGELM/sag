@@ -90,7 +90,7 @@ class pasajerosModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     empresa = db.Column(db.Integer, db.ForeignKey(
         'clientes.id'), nullable=False)
-    numero = db.Column(db.String(20), unique=True, nullable=False)
+    numero = db.Column(db.String(20), unique=True, nullable=True)
     nombres = db.Column(db.String(100), nullable=False)
     ciudad = db.Column(db.Integer, db.ForeignKey('ciudades.id'), nullable=True)
     direccion = db.Column(db.String(200), nullable=True)

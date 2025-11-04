@@ -23,7 +23,7 @@ def create_codigo_desc(form):
         horario = "E"
 
     codigo_desc = f"{form.empresa.data.codigo}{form.origen.data.codigo}{form.destino.data.codigo}-{form.vehiculo.data.codigo}-{desplazamiento}-{horario}".upper()
-    current_app.logger.debug("Código de descripción generado:", codigo_desc)
+    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
     return codigo_desc
 
 @staticmethod
@@ -31,7 +31,7 @@ def crear_factura_cliente(form):
 
     codigo_desc = create_codigo_desc(form)
 
-    current_app.logger.debug("Código de descripción generado:", codigo_desc)
+    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
 
     tarifas = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
     current_app.logger.debug(f"Tarifas para factura encontradas: {tarifas}")
@@ -54,17 +54,14 @@ def crear_factura_cliente(form):
     costo_espera = tarifas.espera if tarifas.espera else 0
     costo_base = tarifas.base if tarifas.base else 0
     
-    #calcular recargo por vehiculo
-    #if form.vehiculo.data == "CAMIONETA":
-        #recargo = recargoVehiculosModel.query.filter_by(vehiculo="CAMIONETA").first()
-        #if recargo:
-            #costo_base += costo_base * recargo.recargo
-            #current_app.logger.debug(f"Recargo por vehículo aplicado: {recargo.recargo}")
-        
-        
-    
-    
-    
+    # calcular recargo por vehiculo
+
+    recargo = recargoVehiculosModel.query.filter_by(vehiculo=form.vehiculo.data.id).first()
+    if recargo:
+        costo_base += costo_base * recargo.recargo
+        current_app.logger.debug(f"Recargo por vehículo aplicado: {recargo.recargo}")
+
+
     costo_distancia = tarifas.tarifa_km if tarifas.tarifa_km else 0
   
 
@@ -340,7 +337,7 @@ def pagos_operadores_all():
 def crear_pago_operador(form):
     
     codigo_desc = create_codigo_desc(form)
-    current_app.logger.debug("Código de descripción generado:", codigo_desc)
+    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
     programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
     
     current_app.logger.debug(f"Programación encontrada: {programacion}")
