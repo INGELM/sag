@@ -273,7 +273,7 @@ def programacion():
             return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 
     elif request.method == 'DELETE':
-        if not current_user.is_admin:
+        if not current_user.is_admin and current_user.rol != 'Programador':
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.')
 
         id_programacion = request.json.get('id')
