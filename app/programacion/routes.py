@@ -274,6 +274,8 @@ def programacion():
 
     elif request.method == 'DELETE':
         if not current_user.is_admin and current_user.rol != 'Programador':
+            current_app.logger.warning(f"Usuario sin permiso intentó eliminar programación: {current_user.usuario}")
+            current_app.logger.warning("Rol del usuario: %s", current_user.rol)
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.')
 
         id_programacion = request.json.get('id')
