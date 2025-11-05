@@ -144,17 +144,50 @@ $.extend(true, $.fn.DataTable.defaults, {
 
 // Filtro por rango de fechas
 $.fn.dataTable.ext.search.push(
-    function (settings, data, dataIndex) {
+    function (_settings, data, _dataIndex) {
         var min = $('#f-desde').val();
         var max = $('#f-hasta').val();
-        var fecha = data[1]; // Ajusta este índice según la posición real de tu columna de fecha
+        var fecha = data[1];
 
         if (!fecha) return true;
 
-        var fechaParts = fecha.split('-'); // Formato esperado: dd-mm-yyyy
-        var fechaData = new Date(fechaParts[2], fechaParts[1] - 1, fechaParts[0]); // YYYY, MM-1, DD
-        var minDate = min ? new Date(min) : null;
-        var maxDate = max ? new Date(max) : null;
+        // Función auxiliar para parsear fechas en formatos DD-MM-YYYY o YYYY-MM-DD y establecer inicio/fin del día
+        function parseDateInput(value, endOfDay) {
+            if (!value) return null;
+            var parts = value.split('-');
+            var d;
+            if (parts.length === 3) {
+                if (parts[0].length === 4) {
+                    // YYYY-MM-DD
+                    var y = parseInt(parts[0], 10);
+                    var m = parseInt(parts[1], 10) - 1;
+                    var day = parseInt(parts[2], 10);
+                    d = new Date(y, m, day);
+                } else {
+                    // DD-MM-YYYY
+                    var day2 = parseInt(parts[0], 10);
+                    var m2 = parseInt(parts[1], 10) - 1;
+                    var y2 = parseInt(parts[2], 10);
+                    d = new Date(y2, m2, day2);
+                }
+            } else {
+                d = new Date(value);
+                if (isNaN(d)) return null;
+            }
+            if (endOfDay) {
+                d.setHours(23, 59, 59, 999);
+            } else {
+                d.setHours(0, 0, 0, 0);
+            }
+            return d;
+        }
+
+        var fechaParts = fecha.split('-');
+        var fechaData = new Date(fechaParts[2], fechaParts[1] - 1, fechaParts[0]);
+        fechaData.setHours(12, 0, 0, 0); // Evitar problemas por zona horaria usando hora intermedia
+
+        var minDate = parseDateInput(min, false);
+        var maxDate = parseDateInput(max, true);
 
         if (
             (!minDate || fechaData >= minDate) &&
@@ -1152,8 +1185,6 @@ function eliminarSeleccionados(modelo) {
                             title: "Existen facturas o recibos asociados",
                             text: "Esta acción eliminará las facturas y recibos asociados ¿desea continuar?",
                             icon: 'warning',
-                            timer: 10000,
-                            timerProgressBar: true,
                             confirmButtonText: 'Sí, Eliminar de todas formas',
                             showCancelButton: true,
                             cancelButtonText: 'Cancelar',

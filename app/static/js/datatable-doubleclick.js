@@ -363,7 +363,7 @@ function mostrarModalDetalle(data) {
                 cancelButtonText: '<i class="bx bx-x me-1"></i>Cancelar'
             }).then((deleteResult) => {
                 if (deleteResult.isConfirmed) {
-                    eliminar(data.id, window.modelo);
+                    eliminarSeleccionados(data.id, window.modelo);
                 }
             });
         } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
