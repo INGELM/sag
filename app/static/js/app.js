@@ -248,7 +248,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
             const jsonTasa = await responseTasa.json();
 
             if (jsonTasa.success && jsonTasa.data.length > 0) {
-                tasaGlobal = jsonTasa.data[0].tasa || 1;
+                tasaGlobal = jsonTasa.data.at(-1)?.tasa || 1;
             } else {
                 Swal.fire({
                     icon: 'warning',

@@ -363,6 +363,7 @@ function mostrarModalDetalle(data) {
                 cancelButtonText: '<i class="bx bx-x me-1"></i>Cancelar'
             }).then((deleteResult) => {
                 if (deleteResult.isConfirmed) {
+                    console.log(`🆔 Registro ID: ${data.id} | Modelo: ${window.modelo}`);
                     eliminarSeleccionados(data.id, window.modelo);
                 }
             });
