@@ -279,6 +279,7 @@ def programacion():
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.')
 
         id_programacion = request.json.get('id')
+        current_app.logger.debug(f"ID de programación a eliminar: {id_programacion}")
 
         if not id_programacion:
             return jsonify(success=False, mensaje='ID de programación no proporcionado.')
@@ -286,6 +287,19 @@ def programacion():
         programacion = programacionModel.query.filter(programacionModel.id.in_(id_programacion)).all()
         if not programacion:
             return jsonify(success=False, mensaje='Programación no encontrada.')
+        
+        factura_existing = facturasClientesModel.query.filter(facturasClientesModel.programacion.in_(id_programacion)).all()
+        recibo_operador_existing = pagosOperadoresModel.query.filter(pagosOperadoresModel.programacion.in_(id_programacion)).all()
+        
+        current_app.logger.debug(f"Factura existente: {factura_existing}, Recibo existente: {recibo_operador_existing}")
+        
+        if factura_existing or recibo_operador_existing:
+            return jsonify(success=False, 
+                           errores='No se puede eliminar la programación. Consulte a un administrador', 
+                           mensaje='Existen facturas o recibos asociados.',
+                           factura_ids=[f.id for f in factura_existing] if factura_existing else [],
+                           recibo_ids=[r.id for r in recibo_operador_existing] if recibo_operador_existing else [])
+        
 
         try:
             for item in programacion:

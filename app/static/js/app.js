@@ -1147,12 +1147,68 @@ function eliminarSeleccionados(modelo) {
                         }).then(() => {
                             location.reload();
                         });
+                    } else if ((data.factura_ids && data.factura_ids.length > 0) || (data.recibo_ids && data.recibo_ids.length > 0)) {
+                        Swal.fire({
+                            title: "Existen facturas o recibos asociados",
+                            text: "Esta acción eliminará las facturas y recibos asociados ¿desea continuar?",
+                            icon: 'warning',
+                            timer: 10000,
+                            timerProgressBar: true,
+                            confirmButtonText: 'Sí, Eliminar de todas formas',
+                            showCancelButton: true,
+                            cancelButtonText: 'Cancelar',
+                        }).then((result) => {
+                            const url_facturas = `/facturacion/facturasClientes`;
+                            const url_recibos = `/facturacion/pagosOperadores`;
+                            if (result.isConfirmed) {
+                                // Preparar las llamadas AJAX para eliminar facturas y recibos si existen
+                                const borrarFacturas = (data.factura_ids && data.factura_ids.length)
+                                    ? $.ajax({
+                                        url: url_facturas,
+                                        type: 'DELETE',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify({ ids: data.factura_ids })
+                                    })
+                                    : $.Deferred().resolve();
+
+                                const borrarRecibos = (data.recibo_ids && data.recibo_ids.length)
+                                    ? $.ajax({
+                                        url: url_recibos,
+                                        type: 'DELETE',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify({ ids: data.recibo_ids })
+                                    })
+                                    : $.Deferred().resolve();
+
+                                // Ejecutar ambas peticiones y manejar resultados
+                                $.when(borrarFacturas, borrarRecibos).done(function () {
+                                    Swal.fire({
+                                        title: 'Facturas/Recibos eliminados',
+                                        text: 'Operación completada correctamente. Procediendo con la eliminación solicitada...',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                }).fail(function (jqXHR) {
+                                    let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al eliminar facturas o recibos";
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: mensaje,
+                                        icon: 'error',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                });
+                            }
+                        });
                     } else {
                         Swal.fire({
                             title: data.mensaje,
                             text: data.errores,
                             icon: 'error',
-                            timer: 2500,
+                            timer: 5500,
                             timerProgressBar: true,
                             confirmButtonText: 'Aceptar'
                         });

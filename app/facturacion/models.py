@@ -37,7 +37,7 @@ class facturasClientesModel(db.Model):
         self.costo_total = costo_total
     
     def __repr__(self):
-        return f"<Facturacion {self.id} - Programacion: {self.programacion}, Costo Total: {self.costo_total}>"
+        return f"<Facturacion_id: {self.id}>"
     
     def delete(self):
         db.session.delete(self)
@@ -141,7 +141,7 @@ class pagosOperadoresModel(db.Model):
         self.costo_total = costo_total
 
     def __repr__(self):
-        return f"<Facturacion {self.id} - Programacion: {self.programacion}, Costo Base: {self.costo_base}>"
+        return f"<Recibo {self.id}>"
 
     def serialize(self):
        

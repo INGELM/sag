@@ -73,12 +73,6 @@ def crear_factura_cliente(form):
 
     costo_total = total_base + total_desvios + total_espera + total_distancia
 
-
-  
-
-    
-    
-
     nueva_factura = {
 
         "tarifas_cliente": tarifas.id,
@@ -98,9 +92,6 @@ def crear_factura_cliente(form):
     
     return nueva_factura
     
-    
-
-
 @facturacion_bp.route('/facturasClientes', methods=['GET'])
 def facturacion():
     form = facturasClientesForm()
