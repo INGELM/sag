@@ -5,6 +5,7 @@ $(document).ready(function () {
     window.modulo = 'facturacion';
 
     const modelo = window.location.pathname.split('/').filter(Boolean).pop();
+    window.tablaId = `#${modelo}Table`;
 
     console.log("Modelo actual:", modelo);
 

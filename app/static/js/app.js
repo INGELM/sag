@@ -217,6 +217,8 @@ $.fn.dataTable.ext.search.push(
 
 $('#f-filtrar').on('click', function () {
     $(window.tablaId).DataTable().draw();
+    console.log("Tabla filtrada: ", window.tablaId);
+    console.log("Filtro aplicado: desde", $('#f-desde').val(), "hasta", $('#f-hasta').val());
 });
 
 $('#f-limpiar').on('click', function () {
@@ -533,7 +535,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             
             layout: {
                 topStart: {
-                    buttons: modulo === 'programacion' ? getTablaBotones() : [getTablaBotones(), ...botonesEspeciales()],
+                    buttons: modelo === 'programacion' ? [getTablaBotones(), ...botonesEspeciales()] : [botonesEspeciales()],
                 },
                 topEnd: {
                     buttons: botonesAuxiliares(),
@@ -632,35 +634,32 @@ function botonBs() {
 }
 
 function crearTabla(url, tablaId, columnas) {
-console.log("Creando tabla en:", tablaId, "y URL:", url);
+    console.log("Creando tabla en:", tablaId, "y URL:", url);
 
-if ($(tablaId).hasClass('dataTable')) {
-    $(tablaId).DataTable().clear().destroy();
-}
-
-
-
-    $(tablaId).DataTable({
-        ajax: {
-            url: url,
-            dataSrc: 'data'
-        },
-        columns: columnas,
-        responsive: true,
-        paging: true,
-        searching: true,
-        layout: {
-            topStart: {
-                buttons: botonesEspeciales() 
+    if ($(tablaId).hasClass('dataTable')) {
+        $(tablaId).DataTable().clear().destroy();
+    }
+        $(tablaId).DataTable({
+            ajax: {
+                url: url,
+                dataSrc: 'data'
             },
-            topEnd: {
-                buttons: botonBs(),
-                search: true
-            }
+            columns: columnas,
+            responsive: true,
+            paging: true,
+            searching: true,
+            layout: {
+                topStart: {
+                    buttons: botonesEspeciales() 
+                },
+                topEnd: {
+                    buttons: botonBs(),
+                    search: true
+                }
 
-    
-        }
-    });
+        
+            }
+        });
 }
 
 function botonesAcciones(){
