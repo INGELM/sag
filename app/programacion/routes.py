@@ -244,6 +244,7 @@ def programacion():
             db.session.commit()
             
             if form.pasajeros.data:
+                current_app.logger.debug(f"Pasajeros a asignar: {[p.id for p in form.pasajeros.data]}")
                 programacion.pasajeros = form.pasajeros.data
             
             db.session.add(programacion)
