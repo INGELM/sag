@@ -118,6 +118,22 @@ function cargarSelectize(url, empresaId, selectize) {
     }
 }
 
+// Función de ordenamiento personalizada para fechas en formato DD-MM-YYYY
+$.fn.dataTable.ext.type.order['date-dd-mm-yyyy-pre'] = function (data) {
+    if (!data || data === '') {
+        return 0;
+    }
+    var dateParts = data.split('-');
+    if (dateParts.length === 3) {
+        // Convertir DD-MM-YYYY a timestamp para ordenamiento correcto
+        var day = parseInt(dateParts[0], 10);
+        var month = parseInt(dateParts[1], 10) - 1; // Los meses en JS van de 0-11
+        var year = parseInt(dateParts[2], 10);
+        return new Date(year, month, day).getTime();
+    }
+    return 0;
+};
+
 $.extend(true, $.fn.DataTable.defaults, {
     language: {
 
@@ -131,7 +147,7 @@ $.extend(true, $.fn.DataTable.defaults, {
         
     },
     lengthChange: false,
-    ordering: false,
+    ordering: true,
     responsive: true,
     columnDefs: [
         {
@@ -283,31 +299,39 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     }
 
     const keys = json.data.length > 0 ? Object.keys(json.data[0]) : [];
-    const columnas = keys.map(campo => ({
-        data: campo,
-        title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
-       
-        render: function (data_2) {
-            // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
-            if (campo === 'pasajeros' && modelo === 'programacion') {
-                if (Array.isArray(data_2)) {
-                    // return data_2.map(p => `${p.nombre} [${p.telefono}]`).join('<br>');
-                    return data_2.map(p => {
-                        return `${p.nombre}`;
-                    }).join('<br>');
+    const columnas = keys.map((campo, index) => {
+        const columna = {
+            data: campo,
+            title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
+            render: function (data_2) {
+                // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
+                if (campo === 'pasajeros' && modelo === 'programacion') {
+                    if (Array.isArray(data_2)) {
+                        // return data_2.map(p => `${p.nombre} [${p.telefono}]`).join('<br>');
+                        return data_2.map(p => {
+                            return `${p.nombre}`;
+                        }).join('<br>');
+                    }
+                    return data_2;
                 }
+                else if (campo === 'pasajeros') {
+                    if (Array.isArray(data_2)) {
+                        return data_2.map(p => `${p.nombre}`).join('<br>');
+                    }
+                    return data_2;
+                }
+                // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
                 return data_2;
             }
-            else if (campo === 'pasajeros') {
-                if (Array.isArray(data_2)) {
-                    return data_2.map(p => `${p.nombre}`).join('<br>');
-                }
-                return data_2;
-            }
-            // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
-            return data_2;
+        };
+        
+        // Aplicar tipo de ordenamiento personalizado para la columna de fecha (índice 1)
+        if (index === 1) {
+            columna.type = 'date-dd-mm-yyyy';
         }
-    }));
+        
+        return columna;
+    });
 
     if (modelo === 'facturasClientes' || modelo === 'pagosOperadores') {
 
@@ -503,7 +527,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                 }
             },
             // orderable: true,
-            // order: [[0, 'desc']], // Ordenar por la primera columna (id) de forma descendente
+            order: [[1, 'desc']], // Ordenar por la primera columna (id) de forma descendente
 
             pagingType: "numbers",
             
