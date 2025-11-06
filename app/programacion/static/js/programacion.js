@@ -145,9 +145,16 @@ $(document).ready(function () {
         }
         else {
             $("#h-retorno").addClass("visually-hidden");
+            $("#h-retorno").val('');
+
         }
 
     });
+
+    
+
+  
+
 
     // $("#status").change(function (e) {
     //     e.preventDefault();

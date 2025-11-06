@@ -136,7 +136,8 @@ class programacionModel(db.Model):
             'tiempo_espera': self.tiempo_espera,
             'desvios': self.desvios,
             'status': self.status,
-            'observaciones': self.observaciones
+            'observaciones': self.observaciones,
+            'retorno': True if self.hora_retorno else False,
         }
     
     def serialize_form(self):
@@ -161,5 +162,7 @@ class programacionModel(db.Model):
             'tiempo_espera': self.tiempo_espera if self.tiempo_espera is not None else '',
             'desvios': self.desvios if self.desvios is not None else '',
             'status': self.status if self.status is not None else '',
-            'observaciones': self.observaciones if self.observaciones is not None else ''
+            'observaciones': self.observaciones if self.observaciones is not None else '',
+            'retorno': True if self.hora_retorno else False
+            
         }

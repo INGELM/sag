@@ -237,6 +237,12 @@ def programacion():
         for key, value in list(programacion_data.items()):
             if hasattr(value, 'id'):
                 programacion_data[key] = value.id
+        
+        if form.retorno.data is False:
+            programacion_data['hora_retorno'] = None
+            programacion_data['desplazamiento'] = "ida"
+        else:
+            programacion_data['desplazamiento'] = "idav"
                         
         try:
             db.session.query(programacionModel).filter_by(id=id_programacion).update(programacion_data)

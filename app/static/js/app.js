@@ -1372,8 +1372,6 @@ function editar(id) {
 // }
 
 function llenarFormulario(id) {
-    // const id = rowData.id;
-
     const URL = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/get_data/${id}` : `/${window.modelo}/get_data/${id}`;
 
     console.log(`Llenando formulario para el modelo: ${modelo}, ID: ${id}, URL: ${URL}`);
@@ -1390,8 +1388,19 @@ function llenarFormulario(id) {
                 Object.keys(data).forEach(key => {
                     const $campo = $(`#${modelo}Form [name="${key}"]`);
                     console.log(`Procesando campo: ${key}, valor: ${data[key]}`);
+                    
                     if ($campo.length) {
-                        if ($campo[0].selectize) {
+                        // CASO ESPECIAL PARA CHECKBOX
+                        if ($campo.attr('type') === 'Checkbox') {
+                            console.log(`🔘 Checkbox detectado: ${key}, valor: ${data[key]}`);
+                            
+                            // Convertir el valor a booleano
+                            const isChecked = Boolean(data[key]);
+                            $campo.prop('checked', isChecked);
+                            console.log(`✓ Checkbox ${key} ${isChecked ? 'marcado' : 'desmarcado'}`);
+                        }
+                        // CASO PARA SELECTIZE
+                        else if ($campo[0].selectize) {
                             if (key === "pasajeros") {
                                 $campo[0].selectize.setValue(data[key], true);
                                 $campo[0].selectize.trigger('change');
@@ -1401,25 +1410,32 @@ function llenarFormulario(id) {
                             }
 
                             if (key.includes('direccion_destino') || key.includes('direccion_origen')) {
-                                // const arrayDataKey = rowData[key].map(item => item.trim());
-                                // console.log("arrayDataKey:", arrayDataKey); 
                                 setTimeout(() => {
                                     $campo[0].selectize.setValue(data[key], true);
                                     console.log(`Selectize timeout actualizado para: ${key} con valor: ${data[key]}`);
                                 }, 600);
                             }
                         }
+                        // CASO PARA INPUTS NORMALES
                         else {
                             $campo.val(data[key]);
                             console.log(`Llenando campo: ${key} con valor: ${data[key]}`);
                         }
                     }
-                    
                 });
             } else {
                 console.error(response.mensaje);
             }
+
+            if ($("#retorno-form").is(':checked')) {
+                $("#h-retorno").removeClass("visually-hidden");
+                console.log("Hora de retorno visible");
+            } else {
+                $("#h-retorno").addClass("visually-hidden");
+            }
+
         }
+        
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.error("Error al obtener los datos:", textStatus, errorThrown);
         Swal.fire({
