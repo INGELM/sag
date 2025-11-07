@@ -30,13 +30,69 @@ $(document).ready(function () {
         console.log("Formulario enviado:", this);
         var formData = new FormData(this);
         console.log("Datos del formulario:", formData);
+        const metodo = formulario.attr('method');
 
-
-        guardarRegistro(lastSegment);
+        if (metodo === 'PUT') {
+            ActualizarRegistro(formData);
+        } else {
+            GuardarRegistro(lastSegment);
+        }
     });
 
+    function ActualizarRegistro(formData) {
+        const id = formData.get('id');
+        console.log("ID para actualizar:", id);
+        const URL_ACTUALIZAR = `programacion/${id}/update`;
+        
+        // Debug: mostrar todos los datos del FormData
+        console.log("=== DEBUG FORM DATA ===");
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        console.log("=== FIN DEBUG ===");
+        
+        // Especialmente importante: verificar pasajeros
+        const pasajerosValues = formulario.find('[name="pasajeros"]').val();
+        console.log("Valores de pasajeros:", pasajerosValues);
 
-
+        $.ajax({
+            type: "PUT",
+            url: URL_ACTUALIZAR,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    console.log("Programación actualizada con éxito:", response);
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: response.mensaje,
+                        icon: 'success',
+                        timer: 2000
+                    }).then(() => {
+                        // limpiarFormulario(formulario);
+                        // recargarTabla(window.tablaId);
+                        location.reload(); // Opcional
+                    });
+                } else {
+                    console.error("Error al actualizar la programación:", response.mensaje);
+                    Swal.fire({
+                        title: 'Error al Actualizar',
+                        text: response.mensaje,
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud AJAX:", error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error de conexión',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     // EMPRESA_SELECT.selectize(selectizeConfig);
     EMPRESA_SELECT.selectize(selectizeConfig);

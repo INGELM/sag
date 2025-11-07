@@ -1,6 +1,7 @@
 from flask import Response, json, redirect, request, url_for, render_template, jsonify, flash, current_app
 from flask_login import current_user, login_required
-from app.clientes.models import tarifasModel
+from app.auxiliares.models import ciudadesModel, vehiculosModel
+from app.clientes.models import clientesModel, pasajerosModel, tarifasModel
 from app.empleados.models import empleadosModel, tarifasOperadoresModel
 from app.facturacion.models import facturasClientesModel, pagosOperadoresModel
 from app.facturacion.routes import crear_factura_cliente, crear_pago_operador
@@ -321,7 +322,108 @@ def programacion():
     elif form.errors:
         primer_error = next(iter(form.errors.values()))[0] if form.errors else 'Error desconocido.'
         return jsonify(success=False, mensaje='Error en el formulario.', errores=primer_error)
-    
+
+@programacion_bp.route('/programacion/<int:id>/update', methods=['PUT'])
+@login_required
+def update_programacion(id):
+    programacion = programacionModel.query.get(id)
+    if not programacion:
+        return jsonify(success=False, mensaje='Programación no encontrada.')
+
+    try:
+        # Procesar los campos del FormData manualmente
+        
+        if 'fecha_salida' in request.form:
+            programacion.fecha_salida = datetime.strptime(request.form['fecha_salida'], '%Y-%m-%d').date()
+        
+        if 'hora_salida' in request.form:
+            programacion.hora_salida = datetime.strptime(request.form['hora_salida'], '%H:%M').time()
+        
+        if 'hora_retorno' in request.form and request.form['hora_retorno']:
+            programacion.hora_retorno = datetime.strptime(request.form['hora_retorno'], '%H:%M').time()
+        else:
+            programacion.hora_retorno = None
+        
+        # Manejar campos booleanos
+        programacion.retorno = 'retorno' in request.form
+        
+        # Campos de texto
+        programacion.workflow = request.form.get('workflow', '')
+        programacion.guia = request.form.get('guia', '')
+        programacion.observaciones = request.form.get('observaciones', '')
+        programacion.status = request.form.get('status', 'Pendiente')
+        
+        # Campos numéricos
+        programacion.distancia = float(request.form.get('distancia', 0.0))
+        programacion.tiempo_espera = int(request.form.get('tiempo_espera', 0))
+        programacion.desvios = int(request.form.get('desvios', 0))
+        
+        # **CORRECCIÓN CLAVE: Asignar IDs en lugar de objetos para Foreign Keys**
+        if 'empresa' in request.form and request.form['empresa']:
+            empresa_id = int(request.form['empresa'])
+            programacion.empresa = empresa_id  # ← ASIGNAR ID, no objeto
+        
+        if 'operador' in request.form and request.form['operador']:
+            operador_id = int(request.form['operador'])
+            programacion.operador = operador_id  # ← ASIGNAR ID, no objeto
+        
+        if 'origen' in request.form and request.form['origen']:
+            origen_id = int(request.form['origen'])
+            programacion.origen = origen_id  # ← ASIGNAR ID, no objeto
+        
+        if 'destino' in request.form and request.form['destino']:
+            destino_id = int(request.form['destino'])
+            programacion.destino = destino_id  # ← ASIGNAR ID, no objeto
+        
+        if 'vehiculo' in request.form and request.form['vehiculo']:
+            vehiculo_id = int(request.form['vehiculo'])
+            programacion.vehiculo = vehiculo_id  # ← ASIGNAR ID, no objeto
+        
+        # **MANEJO CRÍTICO: Pasajeros (relación many-to-many)**
+        if 'pasajeros' in request.form:
+            pasajeros_ids = request.form.getlist('pasajeros')
+            current_app.logger.debug(f"IDs de pasajeros recibidos: {pasajeros_ids}")
+            
+            pasajeros_objects = []
+            for pasajero_id in pasajeros_ids:
+                if pasajero_id:
+                    pasajero = pasajerosModel.query.get(int(pasajero_id))
+                    if pasajero:
+                        pasajeros_objects.append(pasajero)
+            
+            programacion.pasajeros = pasajeros_objects
+            current_app.logger.debug(f"Pasajeros asignados: {[p.id for p in pasajeros_objects]}")
+        
+        # **MANEJO CRÍTICO: Direcciones (arrays)**
+        if 'direccion_origen' in request.form:
+            direcciones_origen = request.form.getlist('direccion_origen')
+            programacion.direccion_origen = [d.strip() for d in direcciones_origen if d.strip()]
+        
+        if 'direccion_destino' in request.form:
+            direcciones_destino = request.form.getlist('direccion_destino')
+            programacion.direccion_destino = [d.strip() for d in direcciones_destino if d.strip()]
+        
+        # Manejar desplazamiento basado en retorno
+        if programacion.retorno:
+            programacion.desplazamiento = "idav"
+        else:
+            programacion.desplazamiento = "ida"
+            programacion.hora_retorno = None
+
+        # Debug antes del commit
+        current_app.logger.debug(f"Valor de origen antes de commit: {programacion.origen} (tipo: {type(programacion.origen)})")
+        current_app.logger.debug(f"Valor de destino antes de commit: {programacion.destino} (tipo: {type(programacion.destino)})")
+
+        db.session.commit()
+        
+        return jsonify(success=True, mensaje='Programación actualizada correctamente.')
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error al actualizar programación: {str(e)}")
+        return jsonify(success=False, mensaje='Error al actualizar la programación.', error=str(e))
+
+
 @programacion_bp.route('/all', methods=['GET'])
 def get_all_programaciones():
     programaciones = programacionModel.query.all()

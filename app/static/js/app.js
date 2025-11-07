@@ -304,29 +304,24 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     const columnas = keys.map((campo, index) => {
         const columna = {
             data: campo,
-            title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
-            render: function (data_2) {
-                // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
-                if (campo === 'pasajeros' && modelo === 'programacion') {
-                    if (Array.isArray(data_2)) {
-                        // return data_2.map(p => `${p.nombre} [${p.telefono}]`).join('<br>');
-                        return data_2.map(p => {
-                            return `${p.nombre}`;
-                        }).join('<br>');
+            title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', ' '),
+            render: function(data) {
+                // Debug opcional (solo si necesitas)
+                // console.log(`Columna: ${campo}, Datos:`, data);
+                
+                // Manejo específico para pasajeros
+                if (campo === 'pasajeros') {
+                    if (Array.isArray(data)) {
+                        const separador = modelo === 'programacion' ? ' /<br>' : '<br>';
+                        return data.map(p => p.nombre).join(separador);
                     }
-                    return data_2;
+                    return data;
                 }
-                else if (campo === 'pasajeros') {
-                    if (Array.isArray(data_2)) {
-                        return data_2.map(p => `${p.nombre}`).join('<br>');
-                    }
-                    return data_2;
-                }
-                // console.log(`Columna creada: ${campo} (índice: ${keys.indexOf(campo)})`);
-                return data_2;
+                
+                return data;
             }
         };
-        
+                
         // Aplicar tipo de ordenamiento personalizado para la columna de fecha (índice 1)
         if (index === 1) {
             columna.type = 'date-dd-mm-yyyy';
@@ -1150,6 +1145,8 @@ function eliminarFacturasRecibos(factura_id, recibo_id, modelo, varModulo) {
         }
     });
 }
+
+
 
 function eliminarSeleccionados(modelo) {
     const tabla = `#${modelo}Table`;
