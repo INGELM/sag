@@ -73,6 +73,7 @@ const selectizeConfig = {
     placeholder: 'Seleccione',
     valueField: 'id',
     labelField: 'text',
+    sortField: 'text',
     searchField: ['text', 'nombres'],
     render: {
         option: function (item, escape) {
@@ -111,10 +112,10 @@ function cargarSelectize(url, empresaId, selectize) {
         console.log("No se ha seleccionado una empresa válida.");
         selectize.clear();
         selectize.clearOptions();
-        selectize.addOption({
-            id: 0,
-            text: 'Seleccione una empresa'
-        });
+        // selectize.addOption({
+        //     id: 0,
+        //     text: 'Seleccione una empresa'
+        // });
     }
 }
 

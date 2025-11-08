@@ -43,7 +43,7 @@ class programacionForm(FlaskForm):
     fecha_salida = DateField('Fecha de Salida', validators=[DataRequired(message='La fecha de salida es obligatoria.')], render_kw={"class": "form-control", "id": "fecha_salida", "placeholder": "Fecha de Salida"})
     hora_salida = TimeField('Hora de Salida', render_kw={"class": "form-control"})
     hora_retorno = TimeField('Hora de Retorno', validators=[Optional()], render_kw={"class": "form-control", "id": "hora-retorno-form"})
-    empresa = QuerySelectField('Empresa', query_factory=get_empresas, allow_blank=True, blank_text="Seleccione Empresa", get_label='empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"class": "form-control ", "id": "empresa-select"})
+    empresa = QuerySelectField('Empresa', query_factory=get_empresas, get_label='empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"class": "form-control ", "id": "empresa-select"})
     pasajeros = QuerySelectMultipleField(
         'Pasajeros',
         query_factory=get_pasajeros,
