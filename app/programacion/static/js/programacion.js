@@ -35,7 +35,7 @@ $(document).ready(function () {
         if (metodo === 'PUT') {
             ActualizarRegistro(formData);
         } else {
-            GuardarRegistro(lastSegment);
+            guardarRegistro(lastSegment);
         }
     });
 

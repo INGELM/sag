@@ -989,7 +989,7 @@ $(".cerrar-form").click(function (e) {
 });
 
 // app.js
-async function GuardarRegistro(modelo, varModulo = "", reintentar = false) {
+async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     const FORMULARIO = $(`#${modelo}Form`);
     const metodo = FORMULARIO.attr('method');
 
