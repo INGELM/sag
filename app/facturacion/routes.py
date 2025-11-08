@@ -189,7 +189,47 @@ def facturasClientes_update():
             factura.status = form_data['status']
             
             db.session.commit()
-            return jsonify(success=True, mensaje="Factura actualizada exitosamente.", icon='success')
+            
+            mensaje = "Factura actualizada exitosamente."
+            
+            # Si el status es Finalizado, crear el pago al operador si no existe
+            if form_data['status'] == 'Finalizado':
+                programacion = factura.programacion_rel
+                
+                if programacion:
+                    # Verificar si ya existe un pago para esta programación
+                    pago_existente = pagosOperadoresModel.query.filter_by(programacion=programacion.id).first()
+                    
+                    if not pago_existente:
+                        try:
+                            # Crear un objeto form-like para pasar a la función de creación
+                            from types import SimpleNamespace
+                            
+                            form_data_pago = SimpleNamespace()
+                            form_data_pago.guia = SimpleNamespace(data=programacion.guia)
+                            form_data_pago.empresa = SimpleNamespace(data=programacion.pasajeros[0].cliente if programacion.pasajeros else None)
+                            form_data_pago.origen = SimpleNamespace(data=programacion.origen_rel)
+                            form_data_pago.destino = SimpleNamespace(data=programacion.destino_rel)
+                            form_data_pago.vehiculo = SimpleNamespace(data=programacion.vehiculo_rel)
+                            form_data_pago.hora_salida = SimpleNamespace(data=programacion.hora_salida)
+                            form_data_pago.retorno = SimpleNamespace(data=programacion.retorno)
+                            form_data_pago.desvios = SimpleNamespace(data=programacion.desvios if programacion.desvios else 0)
+                            form_data_pago.tiempo_espera = SimpleNamespace(data=programacion.tiempo_espera if programacion.tiempo_espera else 0)
+                            
+                            # Crear pago al operador
+                            crear_pago_operador(form_data_pago)
+                            
+                            mensaje = "Factura actualizada y Pago Operador generado exitosamente."
+                            current_app.logger.debug(f"Pago al operador creado para programación: {programacion.id}")
+                            
+                        except Exception as e:
+                            current_app.logger.error(f"Error al crear pago operador: {str(e)}")
+                            # No fallar la actualización de la factura si falla el pago
+                            mensaje = f"Factura actualizada, pero error al crear pago operador: {str(e)}"
+                    else:
+                        current_app.logger.debug(f"Ya existe un pago para esta programación: {pago_existente.id}")
+            
+            return jsonify(success=True, mensaje=mensaje, icon='success')
         except Exception as e:
             db.session.rollback()
             return jsonify(success=False, mensaje=f"Error al actualizar la factura: {str(e)}", icon='danger')

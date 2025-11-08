@@ -18,7 +18,7 @@ class facturasClientesModel(db.Model):
     costo_total = db.Column(db.Float, nullable=True)
     status = db.Column(db.String(20), nullable=True, default='Por facturar')
 
-    programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref='facturas_clientes')
+    programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref=db.backref('facturas_clientes', cascade='all, delete-orphan'))
     tarifas_cliente_rel = db.relationship('tarifasModel', foreign_keys=[tarifas_cliente], backref='facturas_clientes')
   
 
@@ -128,7 +128,7 @@ class pagosOperadoresModel(db.Model):
     costo_base = db.Column(db.Float, nullable=True)
     costo_total = db.Column(db.Float, nullable=True)
     
-    programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref='facturas_operadores')
+    programacion_rel = db.relationship('programacionModel', foreign_keys=[programacion], backref=db.backref('facturas_operadores', cascade='all, delete-orphan'))
     tarifas_operador_rel = db.relationship('tarifasOperadoresModel', foreign_keys=[tarifas_operador], backref='facturas_operadores')
     # recargo_vehiculo_rel = db.relationship('recargoVehiculosModel', foreign_keys=[recargo_vehiculo], backref='facturas_operadores')
 

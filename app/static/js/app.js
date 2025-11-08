@@ -964,7 +964,7 @@ $(".cerrar-form").click(function (e) {
 });
 
 // app.js
-async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
+async function GuardarRegistro(modelo, varModulo = "", reintentar = false) {
     const FORMULARIO = $(`#${modelo}Form`);
     const metodo = FORMULARIO.attr('method');
 
@@ -1171,9 +1171,14 @@ function eliminarSeleccionados(modelo) {
 
     console.log("IDs de registros seleccionados para eliminar:", registroIds);
 
+    // Mensaje especial para programaciones
+    const mensajeTexto = modelo === 'programacion'
+        ? "Esta acción eliminará la programación y todos sus registros asociados (facturas y pagos de operador). No podrás recuperar los registros eliminados."
+        : "No podrás recuperar los registros eliminados";
+
     Swal.fire({
         title: '¿Estás seguro?',
-        text: "No podrás recuperar los registros eliminados",
+        text: mensajeTexto,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -1187,7 +1192,7 @@ function eliminarSeleccionados(modelo) {
                 url: url,
                 type: 'DELETE',
                 contentType: 'application/json',
-                data: JSON.stringify({ id: registroIds }), 
+                data: JSON.stringify({ id: registroIds }),
                 success: function (data) {
                     if (data.success) {
                         Swal.fire({
@@ -1199,60 +1204,6 @@ function eliminarSeleccionados(modelo) {
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
                             location.reload();
-                        });
-                    } else if ((data.factura_ids && data.factura_ids.length > 0) || (data.recibo_ids && data.recibo_ids.length > 0)) {
-                        Swal.fire({
-                            title: "Existen facturas o recibos asociados",
-                            text: "Esta acción eliminará las facturas y recibos asociados ¿desea continuar?",
-                            icon: 'warning',
-                            confirmButtonText: 'Sí, Eliminar de todas formas',
-                            showCancelButton: true,
-                            cancelButtonText: 'Cancelar',
-                        }).then((result) => {
-                            const url_facturas = `/facturacion/facturasClientes`;
-                            const url_recibos = `/facturacion/pagosOperadores`;
-                            if (result.isConfirmed) {
-                                // Preparar las llamadas AJAX para eliminar facturas y recibos si existen
-                                const borrarFacturas = (data.factura_ids && data.factura_ids.length)
-                                    ? $.ajax({
-                                        url: url_facturas,
-                                        type: 'DELETE',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify({ ids: data.factura_ids })
-                                    })
-                                    : $.Deferred().resolve();
-
-                                const borrarRecibos = (data.recibo_ids && data.recibo_ids.length)
-                                    ? $.ajax({
-                                        url: url_recibos,
-                                        type: 'DELETE',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify({ ids: data.recibo_ids })
-                                    })
-                                    : $.Deferred().resolve();
-
-                                // Ejecutar ambas peticiones y manejar resultados
-                                $.when(borrarFacturas, borrarRecibos).done(function () {
-                                    Swal.fire({
-                                        title: 'Facturas/Recibos eliminados',
-                                        text: 'Operación completada correctamente. Procediendo con la eliminación solicitada...',
-                                        icon: 'success',
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                }).fail(function (jqXHR) {
-                                    let mensaje = jqXHR.responseJSON?.mensaje || jqXHR.statusText || "Error al eliminar facturas o recibos";
-                                    Swal.fire({
-                                        title: 'Error',
-                                        text: mensaje,
-                                        icon: 'error',
-                                        confirmButtonText: 'Aceptar'
-                                    });
-                                });
-                            }
                         });
                     } else {
                         Swal.fire({
@@ -1291,82 +1242,7 @@ function editar(id) {
     $(`#${window.modelo}Form`).attr('method', 'PUT');
 }
 
-// function llenarFormulario(modelo, rowData) {
-//     Object.keys(rowData).forEach(key => {
-//         const $campo = $(`#${modelo}Form [name="${key}"]`);
-//         if ($campo.length && !$campo[0].selectize) {
-//             $campo.val(rowData[key]);
-//             console.log(`Llenando campo: ${key} con valor: ${rowData[key]}`);
-//         }
 
-//         if ($campo.length && $campo[0].selectize && key.includes('direccion_origen') && rowData[key]) {
-            
-//             arrayDataKey = rowData[key].map(item => item.trim());
-//             // console.log("arrayDataKey:", arrayDataKey);
-            
-
-
-//             setTimeout(() => {
-//                 $campo[0].selectize.setValue(arrayDataKey, true);
-//                 console.log(`Selectize timeout actualizado para: ${key} con valor: ${arrayDataKey}`);
-//             }, 500);
-
-
-//         }
-
-    
-
-
-   
-
-
-
-//         if (key.includes('_rel')) {
-//             const baseKey = key.replace('_rel', '');
-//             const valorRelacionado = rowData[key];
-//             const $campoBase = $(`#${modelo}Form [name="${baseKey}"]`);
-
-//             if ($campoBase.length) {
-//                 $campoBase.val(valorRelacionado);
-
-//                 // console.log(`Llenando campo relacionado: ${baseKey} con valor: ${valorRelacionado}`);
-//                 if ($campoBase[0] && $campoBase[0].selectize) {
-
-//                     if (baseKey === 'empresa' || baseKey === 'origen') {
-//                         $campoBase[0].selectize.setValue(valorRelacionado, false);
-//                         console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
-//                         setTimeout(() => {
-//                             $campoBase[0].selectize.setValue(valorRelacionado, false);
-//                         }, 300);
-//                     }
-
-//                     else {
-//                         setTimeout(() => {
-
-//                             $campoBase[0].selectize.setValue(valorRelacionado, true);
-
-//                             if (baseKey === 'pasajeros') {
-//                                 const pasajerosSelectize = $campoBase[0].selectize;
-//                                 pasajerosSelectize.trigger('change', {
-//                                     // silent: true // Evita disparar eventos adicionales
-//                                 });
-//                             }
-
-//                         }, 400);
-//                         console.log(`Selectize timeout actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
-
-//                     }
-
-//                     // console.log(`Selectize actualizado para: ${baseKey} con valor: ${valorRelacionado}`);
-//                 }
-
-//             }
-//         }
-
-    
-//     });
-
-// }
 
 function llenarFormulario(id) {
     const URL = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/get_data/${id}` : `/${window.modelo}/get_data/${id}`;
