@@ -1283,6 +1283,13 @@ function llenarFormulario(id) {
             if (response.success) {
                 console.log("Datos obtenidos:", response.data);
                 const data = response.data;
+                
+                // Guardar el status original en el formulario para detectar cambios
+                if (data.status) {
+                    $(`#${modelo}Form`).data('status-original', data.status);
+                    console.log(`Status original guardado: ${data.status}`);
+                }
+                
                 Object.keys(data).forEach(key => {
                     const $campo = $(`#${modelo}Form [name="${key}"]`);
                     console.log(`Procesando campo: ${key}, valor: ${data[key]}`);

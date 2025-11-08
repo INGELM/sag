@@ -55,9 +55,44 @@ $(document).ready(function () {
         const pasajerosValues = formulario.find('[name="pasajeros"]').val();
         console.log("Valores de pasajeros:", pasajerosValues);
 
+        // Obtener el status actual del formulario y el status original
+        const statusNuevo = formData.get('status');
+        const statusOriginal = formulario.data('status-original');
+        
+        console.log("Status original:", statusOriginal);
+        console.log("Status nuevo:", statusNuevo);
+
+        // Verificar si se está cambiando de "Finalizado" a otro estado
+        if (statusOriginal === 'Finalizado' && statusNuevo !== 'Finalizado') {
+            Swal.fire({
+                title: 'Advertencia',
+                html: '<strong>Esta acción eliminará las facturas y pagos asociados a esta programación.</strong><br><br>¿Está seguro de que desea cambiar el estado de "Finalizado"?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, cambiar estado',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Usuario confirmó, proceder con la actualización
+                    ejecutarActualizacion(URL_ACTUALIZAR, formData);
+                } else {
+                    // Usuario canceló, restaurar el valor original del select
+                    $('#status').val(statusOriginal).trigger('change');
+                }
+            });
+        } else {
+            // No hay cambio crítico, proceder normalmente
+            ejecutarActualizacion(URL_ACTUALIZAR, formData);
+        }
+    }
+
+    function ejecutarActualizacion(url, formData) {
         $.ajax({
             type: "PUT",
-            url: URL_ACTUALIZAR,
+            url: url,
             data: formData,
             processData: false,
             contentType: false,
@@ -70,9 +105,7 @@ $(document).ready(function () {
                         icon: 'success',
                         timer: 2000
                     }).then(() => {
-                        // limpiarFormulario(formulario);
-                        // recargarTabla(window.tablaId);
-                        location.reload(); // Opcional
+                        location.reload();
                     });
                 } else {
                     console.error("Error al actualizar la programación:", response.mensaje);
