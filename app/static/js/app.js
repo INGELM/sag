@@ -142,8 +142,8 @@ $.extend(true, $.fn.DataTable.defaults, {
         searchPlaceholder: "Buscar...",
         info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
         infoEmpty: "No hay registros disponibles",
-        
-       
+        emptyTable: "No hay datos disponibles en la tabla",
+        zeroRecords: "No se encontraron registros coincidentes"
         
     },
     lengthChange: false,
@@ -300,7 +300,32 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
         return Promise.reject("Datos no cargados");
     }
 
-    const keys = json.data.length > 0 ? Object.keys(json.data[0]) : [];
+    // Validar si hay datos antes de procesar columnas
+    if (!json.data || json.data.length === 0) {
+        console.log("No hay datos disponibles para mostrar en la tabla");
+        
+        // Crear tabla vacía con mensaje
+        if ($(tabla).hasClass('dataTable')) {
+            $(tabla).DataTable().clear().destroy();
+        }
+        
+        $(tabla).DataTable({
+            data: [],
+            columns: [{ data: null, defaultContent: '', title: 'Sin datos' }],
+            language: {
+                emptyTable: "No hay datos disponibles en la tabla"
+            }
+        });
+        
+        return Promise.resolve({
+            tabla,
+            columnas: [],
+            columnDefs: [],
+            jsonData: []
+        });
+    }
+
+    const keys = Object.keys(json.data[0]);
     const columnas = keys.map((campo, index) => {
         const columna = {
             data: campo,
