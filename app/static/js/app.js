@@ -36,7 +36,12 @@ $(document).ready(function () {
                         confirmButtonText: 'Aceptar'
                     }).then(() => {
                         $('#agregarFacturaModal').modal('hide');
-                        location.reload();
+                        // Limpiar el campo de número de factura
+                        $('#numero-factura').val('');
+                        // Deseleccionar las filas
+                        dt.rows({ selected: true }).deselect();
+                        // Recargar solo la tabla
+                        cargarTabla2(window.modelo, window.modulo, "", []);
                     });
                 } else {
                     Swal.fire({
@@ -150,6 +155,7 @@ $.extend(true, $.fn.DataTable.defaults, {
     lengthChange: false,
     ordering: true,
     responsive: true,
+    // scrollX: true,
     columnDefs: [
         {
             targets: [0],
@@ -488,6 +494,8 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
     });
 }
 
+
+
 function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = []) {
     console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
@@ -669,17 +677,30 @@ function crearTabla(url, tablaId, columnas) {
             responsive: true,
             paging: true,
             searching: true,
-            layout: {
-                topStart: {
-                    buttons: botonesEspeciales() 
+            // VisibleColumns: [1,2,3,4,11,12,13,14],
+            // targets: [1,2,3,4,11,12,13,14],
+            // responsivePriority: 1,
+            columnDefs: [
+                {
+                    // columns: columnas,
+                    targets: [1,2,3,4,11,12,13,14,15],
+                    visible: true,
+                    responsivePriority: 1,
                 },
-                topEnd: {
-                    buttons: botonBs(),
-                    search: true
-                }
+            ],
+            select: {
+                layout: {
+                    topStart: {
+                        buttons: botonesEspeciales() 
+                    },
+                    topEnd: {
+                        // buttons: botonBs(),
+                        search: true
+                    }
 
-        
-            }
+            
+                }
+            },
         });
 }
 
@@ -744,8 +765,8 @@ function botonesAcciones(){
                                     confirmButtonText: 'Aceptar'
                                 }).then(() => {
                                     dt.rows({ selected: true }).deselect();
-                                    location.reload();
-                                    
+                                    // Recargar solo la tabla
+                                    cargarTabla2(window.modelo, window.modulo, "", [1, 2, 4, 5, 6, 7, 9, 10, 11, 19]);
                                 });
                             } else {
                                 Swal.fire({
@@ -1050,20 +1071,23 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 timer: 3000,
                 timerProgressBar: true,
             }).then(() => {
-                $(`#${modelo}Form`)[0].reset();
-                $(`#${modelo}Form .selectized`).each(function () {
-                    if (this.selectize) {
-                        this.selectize.clear();
-                    }
-                });
-                location.reload();
+                // $(`#${modelo}Form`)[0].reset();
+                // $(`#${modelo}Form .selectized`).each(function () {
+                //     if (this.selectize) {
+                //         this.selectize.clear();
+                //     }
+                // });
+                
                 if (metodo === 'PUT') {
                     $(".formulario").addClass("visually-hidden");
                     window.registroIdEditar = null;
                     $(".tituloForm").text(`Registrar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
                     $(".botonForm").text('Registrar');
-                    $(`#${modelo}Form`).attr('method', 'POST');
+                    // $(`#${modelo}Form`).attr('method', 'POST');
                 }
+                
+                // Recargar solo la tabla sin refrescar la página
+                cargarTabla2(window.modelo, window.modulo, "", []);
             });
         } else if (data.mensaje === "Factura existente." && !reintentar) {
             // Si es factura existente y no estamos en modo reintento
@@ -1229,7 +1253,8 @@ function eliminarSeleccionados(modelo) {
                             timerProgressBar: true,
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
-                            location.reload();
+                            // Recargar solo la tabla
+                            cargarTabla2(window.modelo, window.modulo, "", []);
                         });
                     } else {
                         Swal.fire({

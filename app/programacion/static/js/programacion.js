@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     window.tablaId = `#${lastSegment}Table`;
 
-    cargarTabla2(lastSegment, "", "", [1, 3, 5, 15]);
+    cargarTabla2(lastSegment, "", "", [1, 3, 6, 9, 10, 13, 15, 18, 20, 27]);
     console.log("Tabla cargada para:", formulario);
     
     // Agregar funcionalidad de doble click para editar registros
@@ -27,9 +27,9 @@ $(document).ready(function () {
 
     $(formulario).submit(function (e) {
         e.preventDefault();
-        console.log("Formulario enviado:", this);
+        // console.log("Formulario enviado:", this);
         var formData = new FormData(this);
-        console.log("Datos del formulario:", formData);
+        // console.log("Datos del formulario:", formData);
         const metodo = formulario.attr('method');
 
         if (metodo === 'PUT') {
@@ -105,7 +105,28 @@ $(document).ready(function () {
                         icon: 'success',
                         timer: 2000
                     }).then(() => {
-                        location.reload();
+                        // Cerrar el formulario
+                        // $(".formulario").addClass("visually-hidden");
+                        
+                        // // Resetear el formulario
+                        // formulario[0].reset();
+                        // formulario.find('.selectized').each(function () {
+                        //     if (this.selectize) {
+                        //         this.selectize.clear();
+                        //     }
+                        // });
+                        
+                        // Cambiar el método del formulario de vuelta a POST
+                        // formulario.attr('method', 'POST');
+                        // $(".tituloForm").text('Registrar Programacion');
+                        // $(".botonForm").text('Registrar');
+                        
+                        // Recargar solo la tabla sin refrescar la página
+                        var urlSegments = window.location.pathname.split('/').filter(Boolean);
+                        var lastSegment = urlSegments[urlSegments.length - 1];
+                        cargarTabla2(lastSegment, "", "", [1, 3, 6, 9, 10, 13, 15, 18, 20, 27]);
+                        
+                        console.log("Tabla recargada exitosamente");
                     });
                 } else {
                     console.error("Error al actualizar la programación:", response.mensaje);

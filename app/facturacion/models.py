@@ -73,7 +73,7 @@ class facturasClientesModel(db.Model):
             "status": self.status if self.status else "--",
         }
 
-    def serialize_detalle(self, x):
+    def serialize_detalle(self, x, total_pasajeros):
 
         return {
             "id": self.id,
@@ -96,13 +96,13 @@ class facturasClientesModel(db.Model):
             # "total_distancia": self.total_distancia if self.total_distancia else "--",
             # "tiempo_espera": self.programacion_rel.tiempo_espera if self.programacion_rel.tiempo_espera else "--",
             # # "Costo espera": self.tarifas_cliente_rel.espera if self.tarifas_cliente_rel.espera else "--",
-            # "total_espera": self.total_espera if self.total_espera else "--",
+            "total_espera": self.total_espera if self.total_espera else "--",
             # "desvíos": self.programacion_rel.desvios if self.programacion_rel.desvios else "--",
             # # "Costo Desvíos": self.tarifas_cliente_rel.desvios if self.tarifas_cliente_rel.desvios else "--",
-            # "total_desvios": self.total_desvios if self.total_desvios else "--",
+            "total_desvios": self.total_desvios if self.total_desvios else "--",
             # "costo_base": self.costo_base if self.costo_base else "--",
-            # "total_": self.costo_total if self.costo_total else "--",
-            "status": self.status if self.status else "--",
+            "total_": round(self.costo_total/total_pasajeros, 2) if self.costo_total else "--",
+            # "status": self.status if self.status else "--",
         }
     
     def serialize_form(self):

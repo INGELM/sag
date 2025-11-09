@@ -31,7 +31,11 @@ $(document).ready(function () {
        });
     }
     else {
-        cargarTabla2(modelo, 'facturacion', null, [1, 2, 4, 5, 6, 7, 9, 10, 11, 19]);
+        const columnasVisibles = {
+            'facturasClientes': [1, 2, 4, 5, 6, 7, 9, 10, 11, 19],
+            'pagosOperadores': [1, 2, 3, 4, 5, 8, 9, 10, 11, 14, 16, 18],
+        };
+        cargarTabla2(modelo, 'facturacion', null, columnasVisibles[modelo]);
         
         // // Agregar funcionalidad de doble click con modal de detalle mejorado
         // setTimeout(() => {
@@ -57,7 +61,7 @@ $(document).ready(function () {
 
         $('#titulo-fact').text(cliente_nombre);
 
-        cargarTabla2('facturasClientes', 'facturacion', cliente_id, [1, 2, 5, 6, 7, 8, 10, 11, 12, 23]);
+        // cargarTabla2('facturasClientes', 'facturacion', cliente_id, [1, 2, 5, 6, 7, 8, 10, 11, 12, 23]);
         
         // Agregar funcionalidad de doble click con modal de detalle mejorado para facturas de clientes
         setTimeout(() => {

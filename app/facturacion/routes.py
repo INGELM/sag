@@ -497,8 +497,9 @@ def get_cobro_detalle():
     
     data = []
     for factura in facturas:
+        total_pasajeros = len(factura.programacion_rel.pasajeros)
         for x, pasajero in enumerate(factura.programacion_rel.pasajeros):
-            data.append(factura.serialize_detalle(x))
+            data.append(factura.serialize_detalle(x, total_pasajeros))
 
     response_data = {
         'success': True,
