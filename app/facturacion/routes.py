@@ -153,6 +153,7 @@ def facturasClientes_agregar_factura():
         
         try:
             factura.factura = numero_factura
+            factura.status = 'Facturado'
             db.session.commit()
         except Exception as e:
             db.session.rollback()

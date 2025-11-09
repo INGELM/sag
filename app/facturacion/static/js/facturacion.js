@@ -57,7 +57,7 @@ $(document).ready(function () {
 
         $('#titulo-fact').text(cliente_nombre);
 
-        cargarTabla2('facturasClientes', 'facturacion', cliente_id);
+        cargarTabla2('facturasClientes', 'facturacion', cliente_id, [1, 2, 5, 6, 7, 8, 10, 11, 12, 23]);
         
         // Agregar funcionalidad de doble click con modal de detalle mejorado para facturas de clientes
         setTimeout(() => {

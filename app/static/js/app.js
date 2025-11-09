@@ -712,7 +712,7 @@ function botonesAcciones(){
             }
         },
         {
-            text: "Cambiar a Facturado",
+            text: "Cambiar a Por Facturar",
             className: 'btn btn-success btn-sm mb-1',
             action: function (e, dt, node, config) {
                 const selectedRows = dt.rows({ selected: true });
@@ -726,13 +726,13 @@ function botonesAcciones(){
                         timer: 2000
                     });
                 } else {
-                    console.log(`Cambiar el estado de la fila con ID: ${selectedIds.join(", ")} a "Facturado"`);
+                    // console.log(`Cambiar el estado de la fila con ID: ${selectedIds.join(", ")} a "Por Facturar"`);
                     const url = '/facturacion/facturasClientes/cambio-status';
                     $.ajax({
                         url: url,
                         type: 'PUT',
                         contentType: 'application/json',
-                        data: JSON.stringify({ ids: selectedIds, nuevo_status: 'Facturado' }),
+                        data: JSON.stringify({ ids: selectedIds, nuevo_status: 'Por Facturar' }),
                         success: function (data) {
                             if (data.success) {
                                 Swal.fire({
