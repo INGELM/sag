@@ -31,7 +31,7 @@ $(document).ready(function () {
        });
     }
     else {
-        cargarTabla2(modelo, 'facturacion');
+        cargarTabla2(modelo, 'facturacion', null, [1, 2, 4, 5, 6, 7, 9, 10, 11, 19]);
         
         // // Agregar funcionalidad de doble click con modal de detalle mejorado
         // setTimeout(() => {
