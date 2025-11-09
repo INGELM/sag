@@ -488,7 +488,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
     });
 }
 
-function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [2]) {
+function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = []) {
     console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
         // Configuración base de DataTable
@@ -639,7 +639,7 @@ function botonBs() {
                     const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
                     $(node).attr('class', clase);
                 },
-                text: 'Bs',
+                text: 'Bolivares',
                 action: function (e, dt, node, config) {
                     const current = localStorage.getItem('Bs') === 'true';
                     localStorage.setItem('Bs', !current);
@@ -910,7 +910,7 @@ function botonesAuxiliares() {
                     const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
                     $(node).attr('class', clase);
                 },
-                text: 'Bs',
+                text: 'Bolivares',
                 action: function (e, dt, node, config) {
                     const current = localStorage.getItem('Bs') === 'true';
                     localStorage.setItem('Bs', !current);
