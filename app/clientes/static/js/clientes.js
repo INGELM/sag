@@ -29,6 +29,31 @@ $(document).ready(function () {
 
     });
 
+    var origenSelect = $(`#origenTarSelectize`).selectize({
+        create: false,
+        sortField: 'text',
+        loadThrottle: 500,
+        // preload: true,
+        load: function(query, callback) {
+            if (!query.length) return callback();
+            $.ajax({
+                url: '/ciudades/buscar',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    q: query
+                },
+                success: function(results) {
+                    callback(results.data);
+                },
+                error: function() {
+                    callback();
+                }
+            });
+        }
+    });
+
+
     
 
 

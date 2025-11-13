@@ -40,6 +40,7 @@ $(document).ready(function () {
     });
 
     function ActualizarRegistro(formData) {
+       
         const id = formData.get('id');
         console.log("ID para actualizar:", id);
         const URL_ACTUALIZAR = `programacion/${id}/update`;

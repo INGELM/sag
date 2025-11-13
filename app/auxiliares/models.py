@@ -41,6 +41,9 @@ class ciudadesModel(db.Model):
             'codigo': self.codigo,
             'nombre': self.nombre
         }
+    
+    def data_selectize(self):
+        return {'value': self.id, 'text': self.nombre}
 
 
 class vehiculosModel(db.Model):

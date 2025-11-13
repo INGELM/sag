@@ -70,6 +70,14 @@ def validar_coherencias(form):
         if guia_existente:
             raise ValueError('La guía ya está registrada en otra programación.')
     
+    # WorkFlow repetido
+    if form.workflow.data:
+        workflow_existente = programacionModel.query.filter_by(workflow=form.workflow.data).first()
+                
+        if workflow_existente and (workflow_existente.id != form.id.data):
+            print ('Workflow existente:', workflow_existente.id, 'Formulario ID:', form.id.data)
+            raise ValueError('El WorkFlow ingresado ya está registrado en otra programación.')
+    
     # Validar hora de retorno mayor a hora de salida
     if form.hora_retorno.data and form.hora_retorno.data <= form.hora_salida.data:
         raise ValueError(
@@ -361,6 +369,7 @@ def programacion():
 def update_programacion(id):
     programacion = programacionModel.query.get(id)
     form = programacionForm()
+    # validar_coherencias(form)
     if not programacion:
         return jsonify(success=False, mensaje='Programación no encontrada.')
     
@@ -370,6 +379,7 @@ def update_programacion(id):
     
     try:
         validar_coherencias(form)
+        print(f'Validación exitosa para la programación ID: {form.workflow.data}')
     except ValueError as e:
         return jsonify(success=False, mensaje=str(e), errores=str(e))
     

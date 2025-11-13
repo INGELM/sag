@@ -48,15 +48,18 @@ class tarifasForm(FlaskForm):
         validators=[DataRequired(message='La empresa es obligatoria.')],
         render_kw={"placeholder": "Empresa de la tarifa", "class": "form-control"}
     )
-    origen = QuerySelectField(
-        'Origen',
-        query_factory=lambda: ciudadesModel.query.all(),
-        get_label='nombre',
-        allow_blank=True,
-        blank_text='Seleccione una ciudad de origen',
-        validators=[DataRequired(message='El origen es obligatorio.')],
-        render_kw={"placeholder": "Ciudad de origen", "class": "form-control"}
-    )
+    # origen = QuerySelectField(
+    #     'Origen',
+    #     query_factory=lambda: ciudadesModel.query.all(),
+    #     get_label='nombre',
+    #     allow_blank=True,
+    #     blank_text='Seleccione una ciudad de origen',
+    #     validators=[DataRequired(message='El origen es obligatorio.')],
+    #     render_kw={"placeholder": "Ciudad de origen", "class": "form-control", "id": "pepegrillo"}
+    # )
+
+    origen = StringField('Origen', validators=[DataRequired(message='El origen es obligatorio.')], render_kw={"placeholder": "Ciudad de origen", "class": "form-control", "id": "origenTarSelectize"})
+
     destino = QuerySelectField(
         'Destino',
         query_factory=lambda: ciudadesModel.query.all(),

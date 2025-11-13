@@ -158,6 +158,26 @@ def all_ciudades():
             # current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
+@ciudades_bp.route('/buscar', methods=['GET'])
+def buscar_ciudad():
+    termino = request.args.get('q', '', type=str)
+    # current_app.logger.debug(f'Término de búsqueda recibido: {termino}')
+    try:
+        ciudades = ciudadesModel.query.filter(ciudadesModel.nombre.ilike(f'%{termino}%')).all()
+        ciudades_serialized = [ciudad.data_selectize() for ciudad in ciudades]
+
+        response_data = {
+            'success': True,
+            'data': ciudades_serialized,
+            'mensaje': 'Consulta exitosa'
+        }
+
+        return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
+
+    except Exception as e:
+        error = str(e)
+        current_app.logger.debug(f'Error al buscar ciudades: {error}')
+        return jsonify(success=False, mensaje='Error al buscar ciudades.', errores=error), 500
 
 @ciudades_bp.route('/origen', methods=['GET'])
 def get_ciudad_origen():
