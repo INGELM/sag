@@ -365,7 +365,7 @@ def obtener_pasajeros():
         return jsonify(success=False, data=[], mensaje='ID de empresa no proporcionado o inválido.')
 
     try:
-        pasajeros = pasajerosModel.query.filter_by(empresa=empresa_id).all()
+        pasajeros = pasajerosModel.query.filter_by(empresa=empresa_id).order_by(pasajerosModel.nombres.asc()).all()
         if not pasajeros:
             current_app.logger.debug(f'No se encontraron pasajeros para la empresa con ID {empresa_id}')
             return jsonify(success=False, mensaje='No se encontraron pasajeros para esta empresa.')

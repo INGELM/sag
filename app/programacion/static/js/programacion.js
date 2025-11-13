@@ -157,7 +157,7 @@ $(document).ready(function () {
 
     const config_direccion = {
         create: true,
-        sortField: 'text',
+        // sortField: 'text',
         plugins: ['remove_button'],
         render: {
             option_create: function (data, escape) {

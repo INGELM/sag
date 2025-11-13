@@ -18,7 +18,7 @@ def get_vehiculos():
     return vehiculosModel.query.all()
 
 def get_pasajeros():
-    return pasajerosModel.query.all()
+    return pasajerosModel.query.order_by(pasajerosModel.nombres.asc()).all()
 
 def get_operadores():
     return empleadosModel.query.filter_by(rol='Operador').all()
