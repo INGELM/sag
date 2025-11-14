@@ -8,7 +8,7 @@ from app.clientes.models import clientesModel
 from wtforms.fields import SelectField
 
 def get_ciudades():
-    ciudades = ciudadesModel.query.all()
+    ciudades = ciudadesModel.query.order_by(ciudadesModel.nombre).all()
     if not ciudades:   
         # Si no hay ciudades, mostrar un mensaje en el input
         # Retornar una lista con una opción que muestre el mensaje
@@ -30,8 +30,8 @@ class pasajerosForm(FlaskForm):
     id = StringField('ID', render_kw={"class": "form-control", "type": ""})
     numero = StringField('Número de Trabajador', render_kw={"placeholder": "Número del pasajero", "class": "form-control", "style": "text-transform:uppercase;"})
     nombres = StringField('Nombre', validators=[DataRequired(message='El nombre es obligatorio.')], render_kw={"placeholder": "Nombre del pasajero", "class": "form-control"})
-    empresa = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del pasajero", "class": "form-control"})
-    ciudad = QuerySelectField('Ciudad', query_factory=lambda: ciudadesModel.query.all(), get_label='nombre', allow_blank=True, blank_text='Seleccione una ciudad', render_kw={"placeholder": "Ciudad del pasajero", "class": "form-control"})
+    empresa = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.order_by(clientesModel.empresa).all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del pasajero", "class": "form-control"})
+    ciudad = QuerySelectField('Ciudad', query_factory=get_ciudades, get_label='nombre', allow_blank=True, blank_text='Seleccione una ciudad', render_kw={"placeholder": "Ciudad del pasajero", "class": "form-control"})
     direccion = StringField('Dirección', render_kw={"placeholder": "Dirección del pasajero", "class": "form-control"})
     email = StringField('Email', render_kw={"placeholder": "Email del pasajero", "autocomplete": "off", "class": "form-control", "style": "text-transform:lowercase;"})
     telefono = StringField('Teléfono', render_kw={"id": "telefono-pasajeros", "class": "telefono form-control", "placeholder": "(04XX)-XXX-XXXX"})
@@ -41,28 +41,28 @@ class tarifasForm(FlaskForm):
     id = StringField('ID', render_kw={"placeholder": "ID de la tarifa", "class": "form-control", "type": "hidden"})
     empresa = QuerySelectField(
         'Empresa',
-        query_factory=lambda: clientesModel.query.all(),
+        query_factory=lambda: clientesModel.query.order_by(clientesModel.empresa).all(),
         get_label='empresa',
         allow_blank=True,
         blank_text='Seleccione una empresa',
         validators=[DataRequired(message='La empresa es obligatoria.')],
         render_kw={"placeholder": "Empresa de la tarifa", "class": "form-control"}
     )
-    # origen = QuerySelectField(
-    #     'Origen',
-    #     query_factory=lambda: ciudadesModel.query.all(),
-    #     get_label='nombre',
-    #     allow_blank=True,
-    #     blank_text='Seleccione una ciudad de origen',
-    #     validators=[DataRequired(message='El origen es obligatorio.')],
-    #     render_kw={"placeholder": "Ciudad de origen", "class": "form-control", "id": "pepegrillo"}
-    # )
+    origen = QuerySelectField(
+        'Origen',
+        query_factory=get_ciudades,
+        get_label='nombre',
+        allow_blank=True,
+        blank_text='Seleccione una ciudad de origen',
+        validators=[DataRequired(message='El origen es obligatorio.')],
+        render_kw={"placeholder": "Ciudad de origen", "class": "form-control", "id": "pepegrillo"}
+    )
 
-    origen = StringField('Origen', validators=[DataRequired(message='El origen es obligatorio.')], render_kw={"placeholder": "Ciudad de origen", "class": "form-control", "id": "origenTarSelectize"})
+    # origen = StringField('Origen', validators=[DataRequired(message='El origen es obligatorio.')], render_kw={"placeholder": "Ciudad de origen", "class": "form-control", "id": "origenTarSelectize"})
 
     destino = QuerySelectField(
         'Destino',
-        query_factory=lambda: ciudadesModel.query.all(),
+        query_factory=get_ciudades,
         get_label='nombre',
         allow_blank=True,
         blank_text='Seleccione una ciudad de destino',
@@ -71,7 +71,7 @@ class tarifasForm(FlaskForm):
     )
     vehiculo = QuerySelectField(
         'Vehículo',
-        query_factory=lambda: vehiculosModel.query.all(),
+        query_factory=lambda: vehiculosModel.query.order_by(vehiculosModel.tipo).all(),
         get_label='tipo',
         allow_blank=True,
         blank_text='Seleccione un vehículo',
@@ -100,7 +100,7 @@ class tarifasForm(FlaskForm):
 
 class recargoVehiculosForm(FlaskForm):
     id = StringField('ID', render_kw={"placeholder": "ID del recargo", "class": "form-control", "type": "hidden"})
-    cliente = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del recargo", "class": "form-control"})
-    vehiculo = QuerySelectField('Vehículo', query_factory=lambda: vehiculosModel.query.filter(vehiculosModel.tipo != 'Sedan').all(), get_label='tipo', allow_blank=True, blank_text='Seleccione un vehículo', render_kw={"placeholder": "Vehículo", "class": "form-control"})
+    cliente = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.order_by(clientesModel.empresa).all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del recargo", "class": "form-control"})
+    vehiculo = QuerySelectField('Vehículo', query_factory=lambda: vehiculosModel.query.filter(vehiculosModel.tipo != 'Sedan').order_by(vehiculosModel.tipo).all(), get_label='tipo', allow_blank=True, blank_text='Seleccione un vehículo', render_kw={"placeholder": "Vehículo", "class": "form-control"})
     recargo = DecimalField('Recargo', validators=[DataRequired(message='El recargo es obligatorio.')], render_kw={"placeholder": "Recargo del vehículo", "class": "form-control"})
     submit = SubmitField('Guardar')

@@ -24,7 +24,7 @@ def clientes():
     form = clientesForm()
     
     cliente_data =  {**form.data}
-    current_app.logger.info(f'Datos recibidos del formulario: {cliente_data}')
+    # current_app.logger.info(f'Datos recibidos del formulario: {cliente_data}')
 
     # if 'ciudad' in cliente_data and cliente_data['ciudad']:
     #     cliente_data['ciudad'] = cliente_data['ciudad'].id
@@ -150,15 +150,19 @@ def get_cliente_data(id):
 @clientes_bp.route('clientes/get/<int:id>', methods=['GET'])
 # @login_required
 def handle_clientes(id):
-    current_app.logger.debug(f'ID recibido en handle_clientes: {id}')
+    # current_app.logger.debug(f'ID recibido en handle_clientes: {id}')
     try:
         if not id:
-            clientes = clientesModel.query.all()
+            clientes = clientesModel.query.order_by(clientesModel.empresa).all()
+            # for cliente in clientes:
+                # current_app.logger.debug(f'Cliente encontrado: {cliente.empresa}')
         else:
             clientes = clientesModel.query.get(id)
             
         clientes = clientes if isinstance(clientes, list) else [clientes]
         clientes_serialized = [e.serialize() for e in clientes]
+        # for cliente in clientes_serialized:
+            # current_app.logger.debug(f'Cliente serializado: {cliente}')
        
  
         
@@ -317,7 +321,7 @@ def handle_pasajeros(id):
     current_app.logger.debug(f'ID recibido en handle_pasajeros: {id}')
     try:
         if not id:
-            pasajeros = pasajerosModel.query.all()
+            pasajeros = pasajerosModel.query.order_by(pasajerosModel.nombres).all()
         else:
             pasajeros = pasajerosModel.query.get(id)
 
@@ -515,7 +519,8 @@ def handle_tarifas():
     current_app.logger.debug(f'ID recibido en handle_tarifas: {empresa_id}')
     try:
         if not empresa_id:
-            tarifas = tarifasModel.query.all()
+            # tarifas = tarifasModel.query.join(clientesModel, tarifasModel.empresa == clientesModel.id).order_by(clientesModel.empresa).all()
+            tarifas = tarifasModel.query.join(tarifasModel.cliente).order_by(clientesModel.empresa).all()
         else:
             tarifas = tarifasModel.query.filter_by(empresa=empresa_id).all()
 

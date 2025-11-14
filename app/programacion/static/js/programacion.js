@@ -14,10 +14,11 @@ $(document).ready(function () {
     const VEHICULO_SELECT = $('#programacionForm .vehiculo-select');
     const DIRECCION_ORIGEN = $('#direccion-origen')
     const DIRECCION_DESTINO = $('#direccion-destino')
+    const OPERADOR_SELECT = $('#operador-select');
 
     window.tablaId = `#${lastSegment}Table`;
 
-    cargarTabla2(lastSegment, "", "", [1, 3, 6, 9, 10, 13, 15, 18, 20, 27]);
+    cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
     console.log("Tabla cargada para:", formulario);
     
     // Agregar funcionalidad de doble click para editar registros
@@ -125,7 +126,7 @@ $(document).ready(function () {
                         // Recargar solo la tabla sin refrescar la página
                         var urlSegments = window.location.pathname.split('/').filter(Boolean);
                         var lastSegment = urlSegments[urlSegments.length - 1];
-                        cargarTabla2(lastSegment, "", "", [1, 3, 6, 9, 10, 13, 15, 18, 20, 27]);
+                        cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
                         
                         console.log("Tabla recargada exitosamente");
                     });
@@ -155,6 +156,7 @@ $(document).ready(function () {
     CIUDAD_ORIGEN.selectize(selectizeConfig);
     CIUDAD_DESTINO.selectize(selectizeConfig);
     VEHICULO_SELECT.selectize(selectizeConfig);
+    OPERADOR_SELECT.selectize(selectizeConfig);
 
     const config_direccion = {
         create: true,

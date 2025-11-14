@@ -1071,12 +1071,12 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 timer: 3000,
                 timerProgressBar: true,
             }).then(() => {
-                // $(`#${modelo}Form`)[0].reset();
-                // $(`#${modelo}Form .selectized`).each(function () {
-                //     if (this.selectize) {
-                //         this.selectize.clear();
-                //     }
-                // });
+                $(`#${modelo}Form`)[0].reset();
+                $(`#${modelo}Form .selectized`).each(function () {
+                    if (this.selectize) {
+                        this.selectize.clear();
+                    }
+                });
                 
                 if (metodo === 'PUT') {
                     $(".formulario").addClass("visually-hidden");
@@ -1087,7 +1087,11 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 }
                 
                 // Recargar solo la tabla sin refrescar la página
-                cargarTabla2(window.modelo, window.modulo, "", []);
+                const columnasVisibles = {
+                    programacion: [1, 3, 9, 10, 12, 15, 27]
+                };
+                // console.log("Recargando tabla después de guardar registro", modelo, varModulo);
+                cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
             });
         } else if (data.mensaje === "Factura existente." && !reintentar) {
             // Si es factura existente y no estamos en modo reintento
