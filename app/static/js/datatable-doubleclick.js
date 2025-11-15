@@ -92,6 +92,8 @@ function mostrarModalDetalle(data) {
     //     });
     // };
 
+    console.log(data.Ciudad_Origen)
+
     const formatearHora = (hora) => {
         if (!hora) return '';
         return hora.substring(0, 5); // HH:MM
@@ -106,9 +108,9 @@ function mostrarModalDetalle(data) {
                     <h4 class="fw-bold text-primary mb-2">${data.empresa || 'Empresa'}</h4>
                     <div class="d-flex justify-content-center align-items-center">
                         <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                            ${data.origen || 'Origen'}
+                            ${data.Ciudad_Origen || 'Origen'}
                             ${iconoViaje}
-                            ${data.destino || 'Destino'}
+                            ${data.Ciudad_Destino || 'Destino'}
                         </span>
                     </div>
                 </div>
