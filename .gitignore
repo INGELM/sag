@@ -18,4 +18,5 @@ temp/
 .log
 plantillas de carga/
 migrations
+migrations_mysql/
 bdd/
