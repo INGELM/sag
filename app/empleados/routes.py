@@ -206,7 +206,7 @@ def get_tarifas_operador():
         # if codigo:
         #     tarifas = tarifasOperadoresModel.query.filter_by(codigo=codigo).all()
 
-        current_app.logger.debug(f'Tarifas obtenidas: {tarifas}')
+        # current_app.logger.debug(f'Tarifas obtenidas: {tarifas}')
 
         tarifas_serialized = [t.serialize() for t in tarifas]
         response_data = {

@@ -1090,8 +1090,12 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 const columnasVisibles = {
                     programacion: [1, 3, 9, 10, 12, 15, 27]
                 };
-                // console.log("Recargando tabla después de guardar registro", modelo, varModulo);
-                cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
+                
+                if (modelo === 'programacion') {
+                    cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
+                } else {
+                    window.location.reload();
+                }
             });
         } else if (data.mensaje === "Factura existente." && !reintentar) {
             // Si es factura existente y no estamos en modo reintento

@@ -267,7 +267,7 @@ class tarifasModel(db.Model):
             'destino_rel': self.destino,
             'vehiculo': self.vehiculo_rel.tipo if self.vehiculo_rel else None,
             'vehiculo_rel': self.vehiculo,
-            'desplazamiento': "Ida y Vuelta" if self.desplazamiento == 'idav' else "Ida",
+            'desplazamiento': "Ida y Vuelta" if self.desplazamiento.lower() == 'idav' else "Ida",
             'horario': self.horario.upper() if self.horario else None,
             'espera': self.espera,
             'desvios': self.desvios,
