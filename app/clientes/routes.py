@@ -389,6 +389,7 @@ def tarifas():
     form = tarifasForm()
     tarifa_data = request.get_json() if request.method in ['DELETE'] else form.data
     current_app.logger.debug(f'Datos recibidos del formulario: {tarifa_data}')
+    current_app.logger.debug(f'metodo HTTP: {request.method}')
 
     # if 'ciudad' in pasajero_data and pasajero_data['ciudad']:
     #     pasajero_data['ciudad'] = pasajero_data['ciudad'].id
@@ -464,7 +465,7 @@ def tarifas():
                     'error': str(e)
                 }), 500
 
-    elif form.validate_on_submit():
+    elif form.validate_on_submit(): #METODO POST
         tarifa = {**form.data}
         # Eliminar campos no relacionados con el modelo antes de crear la tarifa
         for field in ['csrf_token',  'submit', 'id']:

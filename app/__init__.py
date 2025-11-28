@@ -2,12 +2,13 @@ import os
 import logging
 from flask import Flask, flash, redirect, url_for
 from flask_login import LoginManager, current_user
+from flask_wtf.csrf import CSRFProtect
 
-
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
-    
+    csrf.init_app(app)
     # Configurar logging
 
         # Asegúrate de que la carpeta donde se guardará app.log sea escribible

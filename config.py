@@ -8,8 +8,10 @@ class Config:
     DEBUG = True
     PROPAGATE_EXCEPTIONS = True
     PYTHONIOENCODING = 'utf-8'
-    
+    CONECTADO_A = os.environ.get('CONECTADO_A', 'produccion')
     #CONFIGURACION WHATSAPP
+    
+    WTF_CSRF_TIME_LIMIT = 3600 * 24   # Deshabilitar el tiempo de expiración del token CSRF
     
     PHONE_ID = os.environ.get('PHONE_ID')
     TOKEN = os.environ.get('TOKEN')

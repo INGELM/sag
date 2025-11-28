@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, SubmitField, SelectField, FloatField, DecimalField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from app.auxiliares.models import ciudadesModel, vehiculosModel
-from wtforms.validators import DataRequired, length
+from wtforms.validators import DataRequired, length, Optional
 
 from app.clientes.models import clientesModel
 from wtforms.fields import SelectField
@@ -90,11 +90,11 @@ class tarifasForm(FlaskForm):
         validators=[DataRequired(message='El horario es obligatorio.')],
         render_kw={"placeholder": "Horario", "class": "form-control"}
     )
-    espera = DecimalField('Tarifa de Espera', render_kw={"placeholder": "Tarifa de espera", "class": "form-control"}, default=0.0)
-    desvios = DecimalField('Tarifa de Desvíos', render_kw={"placeholder": "Tarifa de desvíos", "class": "form-control"}, default=0.0)
+    espera = DecimalField('Tarifa de Espera', render_kw={"placeholder": "Tarifa de espera", "class": "form-control"}, validators=[Optional()])
+    desvios = DecimalField('Tarifa de Desvíos', render_kw={"placeholder": "Tarifa de desvíos", "class": "form-control"}, validators=[Optional()])
     # especial = DecimalField('Tarifa Especial', render_kw={"placeholder": "Tarifa especial", "class": "form-control"}, default=0.0)
-    tarifa_km = DecimalField('Tarifa por KM', render_kw={"placeholder": "Tarifa por KM", "class": "form-control"}, default=0.0)
-    base = DecimalField('Tarifa Base', render_kw={"placeholder": "Tarifa base", "class": "form-control"}, default=0.0)
+    tarifa_km = DecimalField('Tarifa por KM', render_kw={"placeholder": "Tarifa por KM", "class": "form-control"}, validators=[Optional()])
+    base = DecimalField('Tarifa Base', render_kw={"placeholder": "Tarifa base", "class": "form-control"}, validators=[Optional()])
     submit = SubmitField('Guardar')
 
 

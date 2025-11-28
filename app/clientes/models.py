@@ -1,6 +1,7 @@
 from flask import current_app
 from app.empleados.models import tarifasOperadoresModel
 from app.extensions import db
+from sqlalchemy import or_
 
 
 
@@ -196,14 +197,23 @@ class tarifasModel(db.Model):
         self.tarifa_km = tarifa_km
 
     def generate_code(self, empresa_codigo):
-        length = tarifasModel.query.filter(
-            tarifasModel.empresa == self.empresa
-        ).count() + 1
-        return f"{empresa_codigo}{length:04d}".upper() if empresa_codigo else None
+        if not empresa_codigo:
+            return None
+        max_code = tarifasModel.query.filter(tarifasModel.empresa == self.empresa).with_entities(tarifasModel.codigo).order_by(tarifasModel.codigo.desc()).first()
+        print(f'Empresa código: {self.empresa} - {empresa_codigo}')
+        print(max_code)
+        if max_code:
+            length = int(max_code[0][len(empresa_codigo):])
+            next_code = length + 1
+        else:
+            next_code = 1
+        return f"{empresa_codigo}{next_code:04d}".upper() if empresa_codigo else None
         
         
     def save(self):
-        existing = tarifasModel.query.filter_by(codigo_desc=self.codigo_desc).first()
+        existing= tarifasModel.query.filter(or_(tarifasModel.codigo_desc==self.codigo_desc, tarifasModel.codigo==self.codigo)).first()
+        print(existing)
+        
         if existing:
             raise ValueError("Esta tarifa ya existe.")
         try:
