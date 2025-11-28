@@ -30,7 +30,7 @@ class pasajerosForm(FlaskForm):
     id = StringField('ID', render_kw={"class": "form-control", "type": ""})
     numero = StringField('Número de Trabajador', render_kw={"placeholder": "Número del pasajero", "class": "form-control", "style": "text-transform:uppercase;"})
     nombres = StringField('Nombre', validators=[DataRequired(message='El nombre es obligatorio.')], render_kw={"placeholder": "Nombre del pasajero", "class": "form-control"})
-    empresa = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.order_by(clientesModel.empresa).all(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del pasajero", "class": "form-control"})
+    empresa = QuerySelectField('Empresa', query_factory=lambda: clientesModel.query.order_by(clientesModel.empresa).all(), get_label='empresa_normalized', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa del pasajero", "class": "form-control"})
     ciudad = QuerySelectField('Ciudad', query_factory=get_ciudades, get_label='nombre', allow_blank=True, blank_text='Seleccione una ciudad', render_kw={"placeholder": "Ciudad del pasajero", "class": "form-control"})
     direccion = StringField('Dirección', render_kw={"placeholder": "Dirección del pasajero", "class": "form-control"})
     email = StringField('Email', render_kw={"placeholder": "Email del pasajero", "autocomplete": "off", "class": "form-control", "style": "text-transform:lowercase;"})

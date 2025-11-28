@@ -35,6 +35,23 @@ class clientesModel(db.Model):
         self.email = email.lower() if email else None
         self.telefono = telefono if telefono else None
 
+    @property
+    def empresa_normalized(self):
+        # empresa = self.empresa.split() if self.empresa else ''
+        # empresa_titulo = []
+        # for palabra in empresa:
+        #     if palabra.isupper() and len(palabra) < 4:
+        #         empresa_titulo.append(palabra.upper())
+        #     elif palabra.lower() in ['de', 'la', 'del', 'y', 'el', 'los', 'las', 'a', 'en', 'al']:
+        #         empresa_titulo.append(palabra.lower())
+        #     else:
+        #         empresa_titulo.append(palabra.capitalize())
+        # print(empresa_titulo)
+        # return ' '.join(empresa_titulo)
+        return self.empresa.title() if self.empresa else ''
+
+    
+    
     def save(self):
         existing = clientesModel.query.filter_by(codigo=self.codigo).first()
         if existing:
@@ -67,11 +84,11 @@ class clientesModel(db.Model):
         return {
             'id': self.id,
             'codigo': self.codigo.upper() if self.codigo else None,
-            'empresa': self.empresa,
-            'direccion': self.direccion,
-            'ciudad': self.ciudad_rel.nombre if self.ciudad_rel else None,
+            'empresa': self.empresa.title() if self.empresa else None,
+            'direccion': self.direccion.title() if self.direccion else None,
+            'ciudad': self.ciudad_rel.nombre.title() if self.ciudad_rel else None,
             'ciudad_rel': self.ciudad,
-            'email': self.email,
+            'email': self.email.lower() if self.email else None,
             'telefono': self.telefono
         }
 
@@ -128,14 +145,14 @@ class pasajerosModel(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'empresa': self.cliente.empresa if self.cliente else None,
+            'empresa': self.cliente.empresa.title() if self.cliente else None,
             'empresa_rel': self.empresa,
             'numero': self.numero,
-            'nombres': self.nombres,
-            'ciudad': self.ciudad_rel.nombre if self.ciudad_rel else None,
+            'nombres': self.nombres.title() if self.nombres else None,
+            'ciudad': self.ciudad_rel.nombre.title() if self.ciudad_rel else None,
             'ciudad_rel': self.ciudad,
-            'direccion': self.direccion,
-            'email': self.email,
+            'direccion': self.direccion.title() if self.direccion else None,
+            'email': self.email.lower() if self.email else None,
             'telefono': self.telefono
         }
 
@@ -269,13 +286,13 @@ class tarifasModel(db.Model):
             'id': self.id,
             # 'codigo': self.codigo_desc,
             'codigo': self.codigo,
-            'empresa': self.cliente.empresa if self.cliente else None,
+            'empresa': self.cliente.empresa.title() if self.cliente else None,
             'empresa_rel': self.empresa,
-            'origen': self.origen_rel.nombre if self.origen_rel else None,
+            'origen': self.origen_rel.nombre.title() if self.origen_rel else None,
             'origen_rel': self.origen,
-            'destino': self.destino_rel.nombre if self.destino_rel else None,
+            'destino': self.destino_rel.nombre.title() if self.destino_rel else None,
             'destino_rel': self.destino,
-            'vehiculo': self.vehiculo_rel.tipo if self.vehiculo_rel else None,
+            'vehiculo': self.vehiculo_rel.tipo.title() if self.vehiculo_rel else None,
             'vehiculo_rel': self.vehiculo,
             'desplazamiento': "Ida y Vuelta" if self.desplazamiento.lower() == 'idav' else "Ida",
             'horario': self.horario.upper() if self.horario else None,
