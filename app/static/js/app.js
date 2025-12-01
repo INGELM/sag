@@ -1,4 +1,18 @@
 $(document).ready(function () {
+    // ✅ SOLUCIÓN: Configurar jQuery para enviar el token CSRF en todas las peticiones AJAX
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            // Solo agregar el token para métodos que lo requieren
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+                const csrfToken = $('input[name="csrf_token"]').val();
+                if (csrfToken) {
+                    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+                    console.log("🔍 DEBUG CSRF - Token agregado al header:", csrfToken);
+                }
+            }
+        }
+    });
+
     $('#agregarFacturaModal').on('click', function (e) {
         e.stopPropagation(); // Evita que el clic se propague y afecte la selección
     });
@@ -1018,14 +1032,21 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     let formData;
     let isFormData = false;
 
+    // 🔍 LOG: Verificar método HTTP
+    console.log("🔍 DEBUG CSRF - Método HTTP:", metodo);
+
     if (metodo === 'POST') {
         formData = new FormData(FORMULARIO[0]);
         isFormData = true;
+        // 🔍 LOG: Verificar si el token CSRF está en FormData
+        console.log("🔍 DEBUG CSRF - Token en FormData POST:", formData.get('csrf_token'));
     } else if (metodo === 'PUT') {
         console.log("PETICION PUT");
         formData = new FormData(FORMULARIO[0]);
         isFormData = false;
         console.log("Formdata: " + formData);
+        // 🔍 LOG: Verificar si el token CSRF está en FormData PUT
+        console.log("🔍 DEBUG CSRF - Token en FormData PUT:", formData.get('csrf_token'));
 
         if (!formData.get('costo_total')) {
             formData.delete('costo_total');
@@ -1037,14 +1058,21 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     const modulo = varModulo || window.modulo;
     const url = modulo !== "" ? `/${modulo}/${modelo}` : `/${modelo}`;
 
+    // Obtener el token CSRF del formulario
+    const csrfToken = FORMULARIO.find('input[name="csrf_token"]').val();
+
     const fetchOptions = {
         method: metodo,
-        headers: {},
+        headers: {
+            'X-CSRFToken': csrfToken  // ✅ SOLUCIÓN: Agregar token en headers
+        },
     };
 
     if (isFormData) {
         console.log("es formData");
         fetchOptions.body = formData;
+        // 🔍 LOG: Verificar headers cuando se usa FormData
+        console.log("🔍 DEBUG CSRF - Headers con FormData:", fetchOptions.headers);
     } else {
         fetchOptions.headers['Content-Type'] = 'application/json';
         const params = new URLSearchParams(formData);
@@ -1056,8 +1084,16 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 formDataObject[cleanKey] = values;
             }
         }
+        // 🔍 LOG: Verificar si csrf_token está en el objeto JSON
+        console.log("🔍 DEBUG CSRF - Token en JSON:", formDataObject.csrf_token);
+        console.log("🔍 DEBUG CSRF - Objeto completo a enviar:", formDataObject);
+        console.log("🔍 DEBUG CSRF - Token en Header X-CSRFToken:", csrfToken);
         fetchOptions.body = JSON.stringify(formDataObject);
     }
+
+    // 🔍 LOG: Verificar configuración final de fetch
+    console.log("🔍 DEBUG CSRF - URL:", url);
+    console.log("🔍 DEBUG CSRF - Fetch Options:", fetchOptions);
 
     try {
         const response = await fetch(url, fetchOptions);
