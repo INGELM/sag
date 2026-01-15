@@ -7,7 +7,7 @@ $(document).ready(function () {
                 const csrfToken = $('input[name="csrf_token"]').val();
                 if (csrfToken) {
                     xhr.setRequestHeader("X-CSRFToken", csrfToken);
-                    console.log("🔍 DEBUG CSRF - Token agregado al header:", csrfToken);
+                    // //console.log("🔍 DEBUG CSRF - Token agregado al header:", csrfToken);
                 }
             }
         }
@@ -23,16 +23,16 @@ $(document).ready(function () {
         const dt = $('#facturasClientesTable').DataTable();
         const selectedRows = dt.rows({ selected: true });
         const selectedIds = selectedRows.data().toArray().map(row => row.id);
-        console.log("IDs seleccionados:", selectedIds);
-        console.log("Datos del formulario:", form.serializeArray());
-        console.log("Numero de factura", $('#numero-factura').val());
+        //console.log("IDs seleccionados:", selectedIds);
+        //console.log("Datos del formulario:", form.serializeArray());
+        //console.log("Numero de factura", $('#numero-factura').val());
 
         const data = {
             factura: $('#numero-factura').val(),
             ids: selectedIds
         };
 
-        console.log("Datos a enviar:", data);
+        //console.log("Datos a enviar:", data);
         
         $.ajax({
             url: '/facturacion/facturasClientes/agregar-factura',
@@ -103,17 +103,17 @@ const selectizeConfig = {
 
 function cargarSelectize(url, empresaId, selectize) {
     if (empresaId && empresaId !== "__None" && empresaId !== null && empresaId !== undefined) {
-        console.log("Consultando para la empresa:", empresaId);
+        //console.log("Consultando para la empresa:", empresaId);
         fetch(url)
             .then(response => response.json())
             .then(response => {
-                console.log("Datos consultados:", response);
+                //console.log("Datos consultados:", response);
                 selectize.clear();
                 selectize.clearOptions();
                 if (response.success) {
                     response.data.forEach(function (item) {
                         item.nombres = item.nombres || item.nombre || item.tipo || item.codigo;
-                       // console.log(`Agregando opción: ${item.nombres}`);
+                       // //console.log(`Agregando opción: ${item.nombres}`);
                         selectize.addOption({
                             id: item.id,
                             text: item.nombres,
@@ -128,7 +128,7 @@ function cargarSelectize(url, empresaId, selectize) {
                 selectize.refreshOptions(false);
             })
     } else {
-        console.log("No se ha seleccionado una empresa válida.");
+        //console.log("No se ha seleccionado una empresa válida.");
         selectize.clear();
         selectize.clearOptions();
         // selectize.addOption({
@@ -238,8 +238,8 @@ $.fn.dataTable.ext.search.push(
 
 $('#f-filtrar').on('click', function () {
     $(window.tablaId).DataTable().draw();
-    console.log("Tabla filtrada: ", window.tablaId);
-    console.log("Filtro aplicado: desde", $('#f-desde').val(), "hasta", $('#f-hasta').val());
+    //console.log("Tabla filtrada: ", window.tablaId);
+    //console.log("Filtro aplicado: desde", $('#f-desde').val(), "hasta", $('#f-hasta').val());
 });
 
 $('#f-limpiar').on('click', function () {
@@ -252,16 +252,16 @@ let tablaInstancia = null;
 let tasaGlobal = 1;
 
 async function baseTablas(modelo, modulo = "", empresa_id = "") {
-    console.log("Cargando tabla para el modelo:", modelo);
-    console.log("Módulo:", modulo);
-    console.log("Empresa ID:", empresa_id);
+    //console.log("Cargando tabla para el modelo:", modelo);
+    //console.log("Módulo:", modulo);
+    //console.log("Empresa ID:", empresa_id);
 
     var url = modulo !== "" ? `/${modulo}/${modelo}/all` : `/${modelo}/all`;
     if (empresa_id) {
         url = `${modelo}?cliente=${empresa_id}`;
     }
 
-    console.log("URL de la tabla:", url);
+    //console.log("URL de la tabla:", url);
 
     window.modulo = modulo;
     window.modelo = modelo;
@@ -323,7 +323,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
 
     // Validar si hay datos antes de procesar columnas
     if (!json.data || json.data.length === 0) {
-        console.log("No hay datos disponibles para mostrar en la tabla");
+        //console.log("No hay datos disponibles para mostrar en la tabla");
         
         // Crear tabla vacía con mensaje
         if ($(tabla).hasClass('dataTable')) {
@@ -353,7 +353,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
             title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', ' '),
             render: function(data) {
                 // Debug opcional (solo si necesitas)
-                // console.log(`Columna: ${campo}, Datos:`, data);
+                // //console.log(`Columna: ${campo}, Datos:`, data);
                 
                 // Manejo específico para pasajeros
                 if (campo === 'pasajeros') {
@@ -422,7 +422,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
             searchable: false
         });
     }
-    console.log("JsonData:", json.data);
+    //console.log("JsonData:", json.data);
     return {
         tabla,
         columnas,
@@ -438,7 +438,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
         // Si se especifican columnas visibles, actualiza columnDefs
         let mobileColumnDefs = Array.isArray(columnDefs) ? [...columnDefs] : [];
         if (Array.isArray(VisibleColumns) && VisibleColumns.length > 0) {
-            console.log("Columnas visibles:", VisibleColumns);
+            //console.log("Columnas visibles:", VisibleColumns);
             // Si columnDefs está vacío, agregamos un objeto por cada índice a ocultar
             if (mobileColumnDefs.length === 0) {
             mobileColumnDefs = [{
@@ -511,14 +511,14 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
 
 
 function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = []) {
-    console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
+    //console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
         // Configuración base de DataTable
 
          // Si se especifican columnas visibles, actualiza columnDefs
         let mobileColumnDefs = Array.isArray(columnDefs) ? [...columnDefs] : [];
         if (Array.isArray(VisibleColumns) && VisibleColumns.length > 0) {
-            console.log("Columnas visibles:", VisibleColumns);
+            //console.log("Columnas visibles:", VisibleColumns);
             // Si columnDefs está vacío, agregamos un objeto por cada índice a ocultar
             if (mobileColumnDefs.length === 0) {
             mobileColumnDefs = [{
@@ -615,7 +615,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
         if (modelo === 'facturasClientes' || modelo === 'pagosOperadores') {
             // Encontrar la columna que contiene el total
             const totalColumnIndex = columnas.findIndex(col => col.data === 'total_');
-            console.log("Total Column Index:", totalColumnIndex);
+            //console.log("Total Column Index:", totalColumnIndex);
 
             if (totalColumnIndex !== -1) {
                 config.footerCallback = function (row, data, start, end, display) {
@@ -644,7 +644,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
         // Destruir tabla existente si ya está creada
         if ($(tabla).hasClass('dataTable')) {
             $(tabla).DataTable().clear().destroy();
-            console.log("Tabla destruida y reiniciada");
+            //console.log("Tabla destruida y reiniciada");
         }
 
         // Crear tabla DataTable
@@ -677,7 +677,7 @@ function botonBs() {
 }
 
 function crearTabla(url, tablaId, columnas) {
-    console.log("Creando tabla en:", tablaId, "y URL:", url);
+    //console.log("Creando tabla en:", tablaId, "y URL:", url);
 
     if ($(tablaId).hasClass('dataTable')) {
         $(tablaId).DataTable().clear().destroy();
@@ -752,7 +752,7 @@ function botonesAcciones(){
             action: function (e, dt, node, config) {
                 const selectedRows = dt.rows({ selected: true });
                 const selectedIds = selectedRows.data().toArray().map(row => row.id);
-                console.log("Filas seleccionadas:", selectedIds);
+                //console.log("Filas seleccionadas:", selectedIds);
                 if (selectedRows.count() === 0) {
                     Swal.fire({
                         icon: 'warning',
@@ -761,7 +761,7 @@ function botonesAcciones(){
                         timer: 2000
                     });
                 } else {
-                    // console.log(`Cambiar el estado de la fila con ID: ${selectedIds.join(", ")} a "Por Facturar"`);
+                    // //console.log(`Cambiar el estado de la fila con ID: ${selectedIds.join(", ")} a "Por Facturar"`);
                     const url = '/facturacion/facturasClientes/cambio-status';
                     $.ajax({
                         url: url,
@@ -1033,20 +1033,20 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     let isFormData = false;
 
     // 🔍 LOG: Verificar método HTTP
-    console.log("🔍 DEBUG CSRF - Método HTTP:", metodo);
+    // //console.log("🔍 DEBUG CSRF - Método HTTP:", metodo);
 
     if (metodo === 'POST') {
         formData = new FormData(FORMULARIO[0]);
         isFormData = true;
         // 🔍 LOG: Verificar si el token CSRF está en FormData
-        console.log("🔍 DEBUG CSRF - Token en FormData POST:", formData.get('csrf_token'));
+        //console.log("🔍 DEBUG CSRF - Token en FormData POST:", formData.get('csrf_token'));
     } else if (metodo === 'PUT') {
-        console.log("PETICION PUT");
+        //console.log("PETICION PUT");
         formData = new FormData(FORMULARIO[0]);
         isFormData = false;
-        console.log("Formdata: " + formData);
+        //console.log("Formdata: " + formData);
         // 🔍 LOG: Verificar si el token CSRF está en FormData PUT
-        console.log("🔍 DEBUG CSRF - Token en FormData PUT:", formData.get('csrf_token'));
+        //console.log("🔍 DEBUG CSRF - Token en FormData PUT:", formData.get('csrf_token'));
 
         if (!formData.get('costo_total')) {
             formData.delete('costo_total');
@@ -1069,10 +1069,10 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     };
 
     if (isFormData) {
-        console.log("es formData");
+        //console.log("es formData");
         fetchOptions.body = formData;
         // 🔍 LOG: Verificar headers cuando se usa FormData
-        console.log("🔍 DEBUG CSRF - Headers con FormData:", fetchOptions.headers);
+        //console.log("🔍 DEBUG CSRF - Headers con FormData:", fetchOptions.headers);
     } else {
         fetchOptions.headers['Content-Type'] = 'application/json';
         const params = new URLSearchParams(formData);
@@ -1085,15 +1085,15 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
             }
         }
         // 🔍 LOG: Verificar si csrf_token está en el objeto JSON
-        console.log("🔍 DEBUG CSRF - Token en JSON:", formDataObject.csrf_token);
-        console.log("🔍 DEBUG CSRF - Objeto completo a enviar:", formDataObject);
-        console.log("🔍 DEBUG CSRF - Token en Header X-CSRFToken:", csrfToken);
+        //console.log("🔍 DEBUG CSRF - Token en JSON:", formDataObject.csrf_token);
+        //console.log("🔍 DEBUG CSRF - Objeto completo a enviar:", formDataObject);
+        //console.log("🔍 DEBUG CSRF - Token en Header X-CSRFToken:", csrfToken);
         fetchOptions.body = JSON.stringify(formDataObject);
     }
 
     // 🔍 LOG: Verificar configuración final de fetch
-    console.log("🔍 DEBUG CSRF - URL:", url);
-    console.log("🔍 DEBUG CSRF - Fetch Options:", fetchOptions);
+    //console.log("🔍 DEBUG CSRF - URL:", url);
+    //console.log("🔍 DEBUG CSRF - Fetch Options:", fetchOptions);
 
     try {
         const response = await fetch(url, fetchOptions);
@@ -1263,7 +1263,7 @@ function eliminarSeleccionados(modelo) {
         registroIds.push(data.id);
     });
 
-    console.log("IDs de registros seleccionados para eliminar:", registroIds);
+    //console.log("IDs de registros seleccionados para eliminar:", registroIds);
 
     // Mensaje especial para programaciones
     const mensajeTexto = modelo === 'programacion'
@@ -1298,7 +1298,12 @@ function eliminarSeleccionados(modelo) {
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
                             // Recargar solo la tabla
-                            cargarTabla2(window.modelo, window.modulo, "", []);
+                            const columnasVisibles = {
+                                programacion: [1, 3, 9, 10, 12, 15, 27]
+                            };
+                            // cargarTabla2(modelo, "", "", columnasVisibles[modelo] || []);
+                            //console.log(" 🔍Modelo:", window.modelo, "Modulo:", window.modulo);
+                            cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
                         });
                     } else {
                         Swal.fire({
@@ -1342,7 +1347,7 @@ function editar(id) {
 function llenarFormulario(id) {
     const URL = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/get_data/${id}` : `/${window.modelo}/get_data/${id}`;
 
-    console.log(`Llenando formulario para el modelo: ${modelo}, ID: ${id}, URL: ${URL}`);
+    //console.log(`Llenando formulario para el modelo: ${modelo}, ID: ${id}, URL: ${URL}`);
 
     $.ajax({
         type: "GET",
@@ -1351,28 +1356,28 @@ function llenarFormulario(id) {
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                console.log("Datos obtenidos:", response.data);
+                //console.log("Datos obtenidos:", response.data);
                 const data = response.data;
                 
                 // Guardar el status original en el formulario para detectar cambios
                 if (data.status) {
                     $(`#${modelo}Form`).data('status-original', data.status);
-                    console.log(`Status original guardado: ${data.status}`);
+                    //console.log(`Status original guardado: ${data.status}`);
                 }
                 
                 Object.keys(data).forEach(key => {
                     const $campo = $(`#${modelo}Form [name="${key}"]`);
-                    console.log(`Procesando campo: ${key}, valor: ${data[key]}`);
+                    //console.log(`Procesando campo: ${key}, valor: ${data[key]}`);
                     
                     if ($campo.length) {
                         // CASO ESPECIAL PARA CHECKBOX
                         if ($campo.attr('type') === 'Checkbox') {
-                            console.log(`🔘 Checkbox detectado: ${key}, valor: ${data[key]}`);
+                            //console.log(`🔘 Checkbox detectado: ${key}, valor: ${data[key]}`);
                             
                             // Convertir el valor a booleano
                             const isChecked = Boolean(data[key]);
                             $campo.prop('checked', isChecked);
-                            console.log(`✓ Checkbox ${key} ${isChecked ? 'marcado' : 'desmarcado'}`);
+                            //console.log(`✓ Checkbox ${key} ${isChecked ? 'marcado' : 'desmarcado'}`);
                         }
                         // CASO PARA SELECTIZE
                         else if ($campo[0].selectize) {
@@ -1387,14 +1392,14 @@ function llenarFormulario(id) {
                             if (key.includes('direccion_destino') || key.includes('direccion_origen')) {
                                 setTimeout(() => {
                                     $campo[0].selectize.setValue(data[key], true);
-                                    console.log(`Selectize timeout actualizado para: ${key} con valor: ${data[key]}`);
+                                    //console.log(`Selectize timeout actualizado para: ${key} con valor: ${data[key]}`);
                                 }, 600);
                             }
                         }
                         // CASO PARA INPUTS NORMALES
                         else {
                             $campo.val(data[key]);
-                            console.log(`Llenando campo: ${key} con valor: ${data[key]}`);
+                            //console.log(`Llenando campo: ${key} con valor: ${data[key]}`);
                         }
                     }
                 });
@@ -1404,7 +1409,7 @@ function llenarFormulario(id) {
 
             if ($("#retorno-form").is(':checked')) {
                 $("#h-retorno").removeClass("visually-hidden");
-                console.log("Hora de retorno visible");
+                //console.log("Hora de retorno visible");
             } else {
                 $("#h-retorno").addClass("visually-hidden");
             }

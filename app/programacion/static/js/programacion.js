@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    console.log("Programacion  initialized");
+    //console.log("Programacion  initialized");
 
 
 
@@ -19,7 +19,7 @@ $(document).ready(function () {
     window.tablaId = `#${lastSegment}Table`;
 
     cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
-    console.log("Tabla cargada para:", formulario);
+    //console.log("Tabla cargada para:", formulario);
     
     // Agregar funcionalidad de doble click para editar registros
     setTimeout(() => {
@@ -28,9 +28,9 @@ $(document).ready(function () {
 
     $(formulario).submit(function (e) {
         e.preventDefault();
-        // console.log("Formulario enviado:", this);
+        // //console.log("Formulario enviado:", this);
         var formData = new FormData(this);
-        // console.log("Datos del formulario:", formData);
+        // //console.log("Datos del formulario:", formData);
         const metodo = formulario.attr('method');
 
         if (metodo === 'PUT') {
@@ -43,26 +43,26 @@ $(document).ready(function () {
     function ActualizarRegistro(formData) {
        
         const id = formData.get('id');
-        console.log("ID para actualizar:", id);
+        //console.log("ID para actualizar:", id);
         const URL_ACTUALIZAR = `programacion/${id}/update`;
         
         // Debug: mostrar todos los datos del FormData
-        console.log("=== DEBUG FORM DATA ===");
+        //console.log("=== DEBUG FORM DATA ===");
         for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
+            //console.log(`${key}: ${value}`);
         }
-        console.log("=== FIN DEBUG ===");
+        //console.log("=== FIN DEBUG ===");
         
         // Especialmente importante: verificar pasajeros
         const pasajerosValues = formulario.find('[name="pasajeros"]').val();
-        console.log("Valores de pasajeros:", pasajerosValues);
+        //console.log("Valores de pasajeros:", pasajerosValues);
 
         // Obtener el status actual del formulario y el status original
         const statusNuevo = formData.get('status');
         const statusOriginal = formulario.data('status-original');
         
-        console.log("Status original:", statusOriginal);
-        console.log("Status nuevo:", statusNuevo);
+        //console.log("Status original:", statusOriginal);
+        //console.log("Status nuevo:", statusNuevo);
 
         // Verificar si se está cambiando de "Finalizado" a otro estado
         if (statusOriginal === 'Finalizado' && statusNuevo !== 'Finalizado') {
@@ -100,7 +100,7 @@ $(document).ready(function () {
             contentType: false,
             success: function (response) {
                 if (response.success) {
-                    console.log("Programación actualizada con éxito:", response);
+                    //console.log("Programación actualizada con éxito:", response);
                     Swal.fire({
                         title: 'Éxito',
                         text: response.mensaje,
@@ -128,7 +128,7 @@ $(document).ready(function () {
                         var lastSegment = urlSegments[urlSegments.length - 1];
                         cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
                         
-                        console.log("Tabla recargada exitosamente");
+                        //console.log("Tabla recargada exitosamente");
                     });
                 } else {
                     console.error("Error al actualizar la programación:", response.mensaje);
@@ -177,7 +177,7 @@ $(document).ready(function () {
 
     PASAJEROS_SELECT.on('change', function () {
         var pasajerosSeleccionados = $(this).val();
-        console.log("Pasajeros seleccionados:", pasajerosSeleccionados);
+        //console.log("Pasajeros seleccionados:", pasajerosSeleccionados);
         if (pasajerosSeleccionados && pasajerosSeleccionados.length > 0) {
 
             cargarDirecciones(pasajerosSeleccionados, DIRECCION_ORIGEN[0].selectize, 'origen');
@@ -201,7 +201,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function (response) {
                 if (response.success) {
-                    console.log("Direcciones cargadas:", response.data);
+                    //console.log("Direcciones cargadas:", response.data);
                     selectize.clearOptions();
                     selectize.addOption(response.data);
                     selectize.refreshOptions(false);
@@ -220,7 +220,7 @@ $(document).ready(function () {
 
     EMPRESA_SELECT.on('change', function () {
         var empresaId = $(this).val();
-        console.log("Empresa ID cac:", empresaId);
+        //console.log("Empresa ID cac:", empresaId);
         var URL_CONSULTA_ORIGEN = `/ciudades/origen?empresa=${empresaId}`;
         var origen_selectize = CIUDAD_ORIGEN[0].selectize;
         var URL_CONSULTA_VEHICULO = `/clientes/vehiculos?empresa=${empresaId}`;
@@ -234,15 +234,15 @@ $(document).ready(function () {
             cargarSelectize(URL_CONSULTA_ORIGEN, empresaId, origen_selectize),
             cargarSelectize(URL_CONSULTA_VEHICULO, empresaId, vehiculo_selectize)
         ]).then(() => {
-            console.log("Todos los selectize dependientes han sido cargados");
+            //console.log("Todos los selectize dependientes han sido cargados");
         });
     });
 
     CIUDAD_ORIGEN.on('change', function () {
         var empresaId = EMPRESA_SELECT.val();
         var origenId = CIUDAD_ORIGEN[0].selectize.getValue();
-        console.log("Empresa ID:", empresaId);
-        console.log("Ciudad Origen ID:", origenId);
+        //console.log("Empresa ID:", empresaId);
+        //console.log("Ciudad Origen ID:", origenId);
         var URL_CONSULTA_DESTINO = `/ciudades/destino?origen=${origenId}&empresa=${empresaId}`;
         var destino_selectize = CIUDAD_DESTINO[0].selectize;
 
@@ -254,7 +254,7 @@ $(document).ready(function () {
         e.preventDefault();
         if ($("#retorno-form").is(':checked')) {
             $("#h-retorno").removeClass("visually-hidden");
-            console.log("Hora de retorno visible");
+            //console.log("Hora de retorno visible");
         }
         else {
             $("#h-retorno").addClass("visually-hidden");
@@ -273,10 +273,10 @@ $(document).ready(function () {
     //     e.preventDefault();
     //     if ($(this).val() === "Finalizado") {
     //         $("#desvios, #t-espera").removeClass("visually-hidden");
-    //         console.log($(this).val());
+    //         //console.log($(this).val());
     //     } else {
     //         $("#desvios, #t-espera").addClass("visually-hidden");
-    //         console.log($(this).val());
+    //         //console.log($(this).val());
     //     }
 
     // });

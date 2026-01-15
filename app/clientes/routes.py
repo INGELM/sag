@@ -396,41 +396,59 @@ def tarifas():
 
     if request.method == 'PUT' and form.validate_on_submit():
     # Obtener datos como dict con listas
-        tarifa_data_lists = request.form.to_dict(flat=False)
+        tarifa_data_lists = form.data #request.form.to_dict(flat=False)
+        # current_app.logger.debug(f'Raw data: {request.get_data()}')
         current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data_lists}')
 
         if not tarifa_data_lists or 'id' not in tarifa_data_lists:
             return jsonify(success=False, mensaje='Datos de tarifa inválidos.')
 
         # Extraer el ID (siempre es una lista, tomamos el primer valor)
-        tarifa_id = tarifa_data_lists.get('id', [None])[0]
+        tarifa_id = form.id.data #tarifa_data_lists.get('id', [None])[0]
+        current_app.logger.debug(f'Id de la tarifa:  {tarifa_id}')
         if not tarifa_id:
             return jsonify(success=False, mensaje='ID de tarifa no proporcionado.')
 
         tarifa = tarifasModel.query.get(tarifa_id)
-        current_app.logger.debug(f'Objeto tarifa obtenido: {tarifa}')
+        current_app.logger.debug(f'Objeto tarifa obtenido: {tarifa} para {tarifa_id}')
 
         if not tarifa:
             return jsonify(success=False, mensaje='Tarifa no encontrada.')
-
-        # Convertir de {'campo': ['valor']} a {'campo': 'valor'}
-        tarifa_data = {key: values[0] for key, values in tarifa_data_lists.items()}
-
-        # Eliminar campos que no pertenecen al modelo
-        campos_a_eliminar = {'csrf_token', 'validar_contrasena', 'submit', 'id'}
-        for campo in campos_a_eliminar:
-            tarifa_data.pop(campo, None)
-
+        
         try:
-            # Actualizar el objeto con los datos planos
-            for key, value in tarifa_data.items():
-                if hasattr(tarifa, key):
-                    setattr(tarifa, key, value)
-                else:
-                    current_app.logger.warning(f"Campo '{key}' no existe en el modelo tarifasModel")
+                      
+            tarifa.empresa = form.empresa.data.id if form.empresa.data else None
+            tarifa.origen = form.origen.data.id if form.origen.data else None
+            tarifa.destino = form.destino.data.id if form.destino.data else None
+            tarifa.vehiculo = form.vehiculo.data.id if form.vehiculo.data else None
+            
+            tarifa.desplazamiento = form.desplazamiento.data
+            tarifa.horario = form.horario.data
+            
+            # Conversión explícita a float para los campos numéricos
+            tarifa.espera = float(form.espera.data or 0.0)
+            tarifa.desvios = float(form.desvios.data or 0.0)
+            tarifa.tarifa_km = float(form.tarifa_km.data or 0.0)
+            tarifa.base = float(form.base.data or 0.0)
 
-            db.session.commit()  # ¡No olvides hacer commit!
+    
+            # tarifa.codigo = form.codigo.data
+            # tarifa.codigo_desc = form.codigo_desc.data
+
+            db.session.commit()
             return jsonify(success=True, mensaje='Tarifa actualizada exitosamente.')
+
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f'Error al actualizar tarifa de forma manual: {e}')
+            return jsonify({
+                'success': False,
+                'mensaje': 'Error interno al procesar la actualización.',
+                'error': str(e)
+            }), 500
+        
+
+     
 
         except Exception as e:
             db.session.rollback()

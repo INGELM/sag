@@ -1,9 +1,9 @@
 $(document).ready(function () {
-    console.log("auxiliares  initialized");
+    //console.log("auxiliares  initialized");
 
     var urlSegments = window.location.pathname.split('/').filter(Boolean);
     var lastSegment = urlSegments[urlSegments.length - 1];
-    console.log("Último segmento de la URL:", lastSegment);
+    //console.log("Último segmento de la URL:", lastSegment);
 
     if (lastSegment !== 'tasa') {
         cargarTabla1(lastSegment);
@@ -19,7 +19,7 @@ $(document).ready(function () {
         var data = table.row(this).data();
         if (data) {
             // Aquí puedes manejar los datos de la fila seleccionada
-            console.log('Datos de la fila seleccionada:', data);
+            //console.log('Datos de la fila seleccionada:', data);
             // Por ejemplo, llenar un formulario con los datos:
 
         }
@@ -38,7 +38,7 @@ $(document).ready(function () {
         var data = table.row(this).data();
         if (data) {
             // Aquí puedes manejar los datos de la fila seleccionada
-            console.log('Datos de la fila seleccionada:', data);
+            //console.log('Datos de la fila seleccionada:', data);
             // Por ejemplo, llenar un formulario con los datos:
 
         }

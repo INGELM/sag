@@ -7,7 +7,7 @@ $(document).ready(function () {
     const modelo = window.location.pathname.split('/').filter(Boolean).pop();
     window.tablaId = `#${modelo}Table`;
 
-    console.log("Modelo actual:", modelo);
+    //console.log("Modelo actual:", modelo);
 
     if (modelo === 'cobro_detalle') {
         $.ajax({
@@ -17,14 +17,14 @@ $(document).ready(function () {
             dataType: "json",
             success: function (response) {
                 if (response.success) {
-                    console.log("Datos de cobro detalle:", response.data);
+                    //console.log("Datos de cobro detalle:", response.data);
                     const keys = Object.keys(response.data[0]);
-                    // console.log("Keys:", keys);
+                    // //console.log("Keys:", keys);
                     var columnas = keys.map(campo => ({
                         data: campo,
                         title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', " "),
                     }));
-                    console.log("Columnas:", columnas);
+                    //console.log("Columnas:", columnas);
                     crearTabla("/facturacion/get/cobro_detalle", "#facturasCobrosDetalle", columnas);
                 }
             },
@@ -57,7 +57,7 @@ $(document).ready(function () {
         e.preventDefault();
         const cliente_id = $(this).data('cliente');
         const cliente_nombre = $(this).text();
-        console.log(cliente_id);
+        //console.log(cliente_id);
 
         $('#titulo-fact').text(cliente_nombre);
 

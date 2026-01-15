@@ -197,7 +197,7 @@ class tarifasModel(db.Model):
     destino_rel = db.relationship('ciudadesModel', foreign_keys=[
                                   destino], back_populates='tarifas_destino')
     tarifas_operadores = db.relationship(
-        'tarifasOperadoresModel', back_populates='codigo_rel', lazy=True)
+        'tarifasOperadoresModel', back_populates='codigo_rel', cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, empresa, origen, destino, espera=0, desvios=0, base=0.0, tarifa_km=0.0, vehiculo=None, desplazamiento=None, horario=None):
         self.empresa = empresa.id if hasattr(empresa, 'id') else empresa

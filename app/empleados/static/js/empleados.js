@@ -43,7 +43,7 @@ $(document).ready(function () {
         var data = table.row(this).data();
         if (data) {
             // Aquí puedes manejar los datos de la fila seleccionada
-            console.log('Datos de la fila seleccionada:', data);
+            //console.log('Datos de la fila seleccionada:', data);
             // Por ejemplo, llenar un formulario con los datos:
     
         }

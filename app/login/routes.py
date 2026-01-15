@@ -53,8 +53,8 @@ def login():
             # flash(f'Conectado correctamente a la Base de datos: \n {Config.SQLALCHEMY_DATABASE_URI}', 'success' )
             flash(f'Conectado correctamente a la Base de datos {Config.CONECTADO_A}', 'success' )
         except Exception as e:
-            # flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador. \n {str(e)} \n []{Config.SQLALCHEMY_DATABASE_URI}', 'danger')
-               flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador', 'danger')
+            flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador. \n {str(e)} \n []{Config.SQLALCHEMY_DATABASE_URI}', 'danger')
+            #    flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador', 'danger')
         return render_template('login.html', form=form, year=datetime.now().year)
 
 @login_bp.route('/logout')

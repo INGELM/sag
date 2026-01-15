@@ -36,7 +36,7 @@ function agregarDobleClick(tablaId, callback) {
                 callback(data, $this);
             } else {
                 // Acción por defecto: abrir formulario de edición
-                console.log('Doble click en fila:', data);
+                //console.log('Doble click en fila:', data);
                 editar(data.id);
             }
         }
@@ -46,7 +46,7 @@ function agregarDobleClick(tablaId, callback) {
 // Función para agregar doble click con acción de editar
 function agregarDobleClickEditar(tablaId) {
     agregarDobleClick(tablaId, function(data, fila) {
-        console.log('Editando registro:', data.id);
+        //console.log('Editando registro:', data.id);
         editar(data.id);
     });
 }
@@ -92,7 +92,7 @@ function mostrarModalDetalle(data) {
     //     });
     // };
 
-    console.log(data.Ciudad_Origen)
+    //console.log(data.Ciudad_Origen)
 
     const formatearHora = (hora) => {
         if (!hora) return '';
@@ -163,12 +163,12 @@ function mostrarModalDetalle(data) {
         
         data.pasajeros.forEach((pasajero, index) => {
             const direccionOrigen = Array.isArray(data.direccion_origen) ? data.direccion_origen[index] || '' : data.direccion_origen || '';
-            console.log(direccionOrigen)
-            console.log(data.direccion_origen)
+            //console.log(direccionOrigen)
+            //console.log(data.direccion_origen)
             
             const direccionDestino = Array.isArray(data.direccion_destino) ? data.direccion_destino[index] || '' : data.direccion_destino || '';
-            console.log(direccionDestino)
-            console.log(data.direccion_destino)
+            //console.log(direccionDestino)
+            //console.log(data.direccion_destino)
 
             contenido += `
                     <div class="border rounded p-3 mb-3 bg-light">
@@ -365,7 +365,7 @@ function mostrarModalDetalle(data) {
                 cancelButtonText: '<i class="bx bx-x me-1"></i>Cancelar'
             }).then((deleteResult) => {
                 if (deleteResult.isConfirmed) {
-                    console.log(`🆔 Registro ID: ${data.id} | Modelo: ${window.modelo}`);
+                    //console.log(`🆔 Registro ID: ${data.id} | Modelo: ${window.modelo}`);
                     eliminarSeleccionados(data.id, window.modelo);
                 }
             });
@@ -382,7 +382,7 @@ function mostrarModalDetalle(data) {
 function enviarWA(data){
     let jsonData = JSON.stringify(data)
     let URL = "/wa/send-programacion"
-    console.log(URL)
+    //console.log(URL)
 
     $.ajax({
         type: "POST",

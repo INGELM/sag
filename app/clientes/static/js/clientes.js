@@ -1,9 +1,9 @@
 $(document).ready(function () {
-    console.log("clientes  initialized");
+    //console.log("clientes  initialized");
 
     var urlSegments = window.location.pathname.split('/').filter(Boolean);
     var lastSegment = urlSegments[urlSegments.length - 1];
-    console.log("Último segmento de la URL:", lastSegment);
+    //console.log("Último segmento de la URL:", lastSegment);
 
     cargarTabla1(lastSegment, 'clientes');
 
@@ -25,7 +25,7 @@ $(document).ready(function () {
 
         guardarRegistro(lastSegment);
 
-        console.log("Formulario enviado para:", lastSegment);
+        //console.log("Formulario enviado para:", lastSegment);
 
     });
 
