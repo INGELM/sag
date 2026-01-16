@@ -570,6 +570,8 @@ def handle_tarifas():
             return jsonify(success=False, mensaje=error)
 
 
+
+
 #RECARGO VEHÍCULOS
 
 @clientes_bp.route('/recargoVehiculos', methods=['GET', 'POST', 'DELETE', 'PUT'])

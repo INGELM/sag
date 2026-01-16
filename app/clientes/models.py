@@ -310,6 +310,8 @@ class tarifasModel(db.Model):
             'empresa': self.empresa,
             'origen': self.origen,
             'destino': self.destino,
+            'origen_nombre': self.origen_rel.nombre.title() if self.origen_rel else None,
+            'destino_nombre': self.destino_rel.nombre.title() if self.destino_rel else None,
             'vehiculo': self.vehiculo,
             'desplazamiento': self.desplazamiento,
             'horario': self.horario,

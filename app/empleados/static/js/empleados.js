@@ -13,8 +13,35 @@ $(document).ready(function () {
 
     EMPRESA_SELECT.on('change', function () {
         var empresaId = $(this).val();
+        console.log(empresaId)
 
         cargarSelectize(URL_TARIFAS + empresaId, empresaId, CODIGO_SELECT[0].selectize);
+    });
+
+    CODIGO_SELECT.on('change', function(){
+        var codigoTo =  CODIGO_SELECT.val();
+        console.log(codigoTo)
+        $.ajax({
+            type: "GET",
+            url: `/clientes/tarifas/get_data/${codigoTo}`,
+            // data: "data",
+            dataType: "json",
+            success: function (response) {
+                if (response.success){
+                    console.log(response.data)
+                    $('#origen-to').val(response.data.origen_nombre);
+                    $('#destino-to').val(response.data.destino_nombre);
+                    $('#desplazamiento-to').val(response.data.desplazamiento);
+                }
+                else{
+                    console.log("error en consulta:", response.error)
+                }
+            },
+            error: function (error) {
+                console.log("error en la llamada ajax")
+            }
+       
+        });
     });
 
 

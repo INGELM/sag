@@ -39,6 +39,9 @@ class tarifasOperadoresForm(FlaskForm):
         render_kw={"class": "form-control", "id": "codigo-tarifa"},
         validators=[DataRequired(message='El código es obligatorio.')]
     )
+    origen = StringField('origen', render_kw={'class':'form-control', 'disabled': True, "id":"origen-to" })
+    destino = StringField('destino', render_kw={'class':'form-control', 'disabled': True, "id":"destino-to" })
+    desplazamiento = StringField('desplazamiento', render_kw={'class':'form-control', 'disabled': True, "id":"desplazamiento-to" })
     tipo = SelectField('Tipo', choices=[('Directo', 'Directo'), ('Afiliado', 'Afiliado')], render_kw={"class": "form-control"})
     espera = StringField('Espera', render_kw={"placeholder": "Tiempo de espera en minutos", "class": "form-control"})
     desvios = StringField('Desvios', render_kw={"placeholder": "Número de desvíos permitidos", "class": "form-control"})

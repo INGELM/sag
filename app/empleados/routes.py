@@ -95,7 +95,7 @@ def empleados():
     elif form.validate_on_submit():
         empleado = {**form.data}
         # Eliminar campos no relacionados con el modelo antes de crear el empleado
-        for field in ['csrf_token', 'validar_contrasena', 'submit', 'id']:
+        for field in ['csrf_token', 'validar_contrasena', 'submit', 'id', 'origen', 'destino', 'desplazamiento']:
             empleado.pop(field, None)
         nuevo_empleado = empleadosModel(**empleado)
         try:
@@ -195,20 +195,28 @@ def get_tarifa_operador_data(id):
 @login_required
 def get_tarifas_operador():
     id = request.args.get('empresa', type=int)
-    codigo = request.args.get('codigo', type=str)
+    codigo = request.args.get('codigo', type=int)
 
     try:
-        if not id:
+        if not id and not codigo:
             tarifas = tarifasOperadoresModel.query.all()
+            tarifas_serialized = [t.serialize() for t in tarifas]
+        elif codigo:
+            tarifas = tarifasOperadoresModel.query.filter(tarifasOperadoresModel.codigo==codigo).first()
+            if not tarifas:
+                raise ValueError("No se encontraron tarifas para el código proporcionado.")
+            tarifas_serialized = [tarifas.serialize()] if tarifas else []
         else:
             tarifas = tarifasOperadoresModel.query.filter_by(id=id).all()
+            tarifas_serialized = [t.serialize() for t in tarifas]
 
         # if codigo:
         #     tarifas = tarifasOperadoresModel.query.filter_by(codigo=codigo).all()
 
         # current_app.logger.debug(f'Tarifas obtenidas: {tarifas}')
 
-        tarifas_serialized = [t.serialize() for t in tarifas]
+        # tarifas_serialized = [t.serialize() for t in tarifas]
+        
         response_data = {
             'success': True,
             'data': tarifas_serialized,
@@ -239,7 +247,7 @@ def tarifas_operadores():
         # Procesar los datos del formulario
         tarifa_data = {**form.data}
         # Eliminar campos no relacionados con el modelo antes de crear la tarifa
-        for field in ['csrf_token', 'submit', 'id', 'empresa']:
+        for field in ['csrf_token', 'submit', 'id', 'empresa', 'origen', 'destino', 'desplazamiento']:
             tarifa_data.pop(field, None)
 
         nueva_tarifa = tarifasOperadoresModel(**tarifa_data)
