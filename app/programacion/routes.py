@@ -182,34 +182,43 @@ def programacion():
         
         # CORREGIDO: Usar f-string para logging
         current_app.logger.debug(f"Datos de la programación DIRECCION ORIGEN: {programacion_data['direccion_origen']}")
-
-        nueva_programacion = programacionModel(**programacion_data)
-        nueva_programacion.pasajeros = form.pasajeros.data if form.pasajeros.data else []
-
-        if form.status.data == 'Finalizado':
-            nueva_factura = crear_factura_cliente(form)
-            
-            programacion = nueva_programacion.save()
-            
-            nueva_factura['programacion'] = programacion.id
         
-            try:
-                crear_factura = facturasClientesModel(**nueva_factura)
-                db.session.add(crear_factura)
-                db.session.commit()
-                crear_pago_operador(form)
-                return jsonify(success=True, mensaje='Programación Finalizada y Factura Generada correctamente.')
+        fecha_string = form.fecha_salida.data
+        
+        lista_fechas = [fecha.strip() for fecha in fecha_string.split(',')]
+        current_app.logger.debug(f"LISTA DE FECHAS: {lista_fechas}")
 
-            except Exception as e:
-                db.session.rollback()
-                return jsonify(success=False, mensaje='Error al crear la factura del cliente.')
-        else:
-            try:
-                nueva_programacion.save()
-                return jsonify(success=True, mensaje='Programación guardada correctamente.')
-            except Exception as e:
-                db.session.rollback()
-                return jsonify(success=False, mensaje='Error al guardar la programación.', errores=str(e))
+        for fecha_str in lista_fechas:
+            fecha_obj = datetime.strptime(fecha_str, '%d-%m-%Y').date()
+            nueva_programacion = programacionModel(**programacion_data)
+            nueva_programacion.fecha_salida = fecha_obj
+            nueva_programacion.pasajeros = form.pasajeros.data if form.pasajeros.data else []
+        
+
+            if form.status.data == 'Finalizado':
+                nueva_factura = crear_factura_cliente(form)
+                
+                programacion = nueva_programacion.save()
+                
+                nueva_factura['programacion'] = programacion.id
+            
+                try:
+                    crear_factura = facturasClientesModel(**nueva_factura)
+                    db.session.add(crear_factura)
+                    db.session.commit()
+                    crear_pago_operador(form)
+                    return jsonify(success=True, mensaje='Programación Finalizada y Factura Generada correctamente.')
+
+                except Exception as e:
+                    db.session.rollback()
+                    return jsonify(success=False, mensaje='Error al crear la factura del cliente.')
+            else:
+                try:
+                    nueva_programacion.save()
+                    return jsonify(success=True, mensaje='Programación guardada correctamente.')
+                except Exception as e:
+                    db.session.rollback()
+                    return jsonify(success=False, mensaje='Error al guardar la programación.', errores=str(e))
         
     elif request.method == 'PUT' and form.validate_on_submit():
         if not current_user.is_admin and current_user.rol not in ['Programador', 'Finanzas']:
@@ -287,48 +296,57 @@ def programacion():
         for key, value in list(programacion_data.items()):
             if hasattr(value, 'id'):
                 programacion_data[key] = value.id
+                
+        
         
         if form.retorno.data is False:
             programacion_data['hora_retorno'] = None
             programacion_data['desplazamiento'] = "ida"
         else:
             programacion_data['desplazamiento'] = "idav"
+        
+        fecha_string = form.fecha_salida.data
+        lista_fechas = [fecha.strip() for fecha in fecha_string.split(',')]
+        
+        for fecha_str in lista_fechas:
+            fecha_obj = datetime.strptime(fecha_str, '%d-%m-%Y').date()
+            programacion_data['fecha_salida'] = fecha_obj
                         
-        try:
-            db.session.query(programacionModel).filter_by(id=id_programacion).update(programacion_data)
-            programacion.pasajeros = []
-            db.session.commit()
-            
-            if form.pasajeros.data:
-                current_app.logger.info(f"Pasajeros a asignar: {[p.id for p in form.pasajeros.data]}")
-                programacion.pasajeros = form.pasajeros.data
-            
-            db.session.add(programacion)
-            db.session.commit()
-            mensaje = 'Programación actualizada correctamente.'
-            
-            # Solo crear factura si el status es Finalizado y no existe una factura previa
-            if form.status.data == 'Finalizado' and not factura_existing:
-                nueva_factura = crear_factura_cliente(form)
-                nueva_factura['programacion'] = programacion.id
+            try:
+                db.session.query(programacionModel).filter_by(id=id_programacion).update(programacion_data)
+                programacion.pasajeros = []
+                db.session.commit()
                 
-                try:
-                    crear_factura = facturasClientesModel(**nueva_factura)
-                    db.session.add(crear_factura)
-                    db.session.commit()
-                    mensaje = 'Programación Finalizada y Factura Generada correctamente.'
-                    crear_pago_operador(form)
-                    mensaje = 'Programación Finalizada, Factura de Cliente y Pago Operador Generados correctamente.'
-                except Exception as e:
-                    db.session.rollback()
-                    current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
-                    raise ValueError('Error al crear la factura del cliente.')
+                if form.pasajeros.data:
+                    current_app.logger.info(f"Pasajeros a asignar: {[p.id for p in form.pasajeros.data]}")
+                    programacion.pasajeros = form.pasajeros.data
+                
+                db.session.add(programacion)
+                db.session.commit()
+                mensaje = 'Programación actualizada correctamente.'
+                
+                # Solo crear factura si el status es Finalizado y no existe una factura previa
+                if form.status.data == 'Finalizado' and not factura_existing:
+                    nueva_factura = crear_factura_cliente(form)
+                    nueva_factura['programacion'] = programacion.id
+                    
+                    try:
+                        crear_factura = facturasClientesModel(**nueva_factura)
+                        db.session.add(crear_factura)
+                        db.session.commit()
+                        mensaje = 'Programación Finalizada y Factura Generada correctamente.'
+                        crear_pago_operador(form)
+                        mensaje = 'Programación Finalizada, Factura de Cliente y Pago Operador Generados correctamente.'
+                    except Exception as e:
+                        db.session.rollback()
+                        current_app.logger.error(f"Error al crear la factura del cliente: {str(e)}")
+                        raise ValueError('Error al crear la factura del cliente.')
 
-            return jsonify(success=True, mensaje=mensaje)
+                return jsonify(success=True, mensaje=mensaje)
 
-        except Exception as e:
-            db.session.rollback()
-            return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
+            except Exception as e:
+                db.session.rollback()
+                return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 
     elif request.method == 'DELETE':
         if not current_user.is_admin and current_user.rol != 'Programador':

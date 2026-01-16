@@ -40,7 +40,7 @@ class programacionForm(FlaskForm):
     retorno = BooleanField('Retorno', render_kw={"placeholder": "Retorno", "class": "form-check-input", "type": "Checkbox", "id": "retorno-form"}, default=False)
     workflow = StringField('Workflow', render_kw={"placeholder": "Workflow", "class": "form-control"}, validators=[Optional()])
     guia = StringField('Guía', render_kw={"placeholder": "Guía", "class": "form-control"})
-    fecha_salida = DateField('Fecha de Salida', validators=[DataRequired(message='La fecha de salida es obligatoria.')], render_kw={"class": "form-control", "id": "fecha_salida", "placeholder": "Fecha de Salida"})
+    fecha_salida = StringField('Fecha de Salida', validators=[DataRequired(message='La fecha de salida es obligatoria.')], render_kw={"class": "form-control", "id": "fecha_salida", "placeholder": "Fecha de Salida"})
     hora_salida = TimeField('Hora de Salida', render_kw={"class": "form-control"})
     hora_retorno = TimeField('Hora de Retorno', validators=[Optional()], render_kw={"class": "form-control", "id": "hora-retorno-form"})
     empresa = QuerySelectField('Empresa', query_factory=get_empresas, get_label='empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"class": "form-control ", "id": "empresa-select"})

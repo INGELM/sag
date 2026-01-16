@@ -1128,7 +1128,8 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 };
                 
                 if (modelo === 'programacion') {
-                    cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
+                    //cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
+                    window.location.reload();
                 } else {
                     window.location.reload();
                 }

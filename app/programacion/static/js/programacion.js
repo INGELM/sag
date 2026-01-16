@@ -264,7 +264,11 @@ $(document).ready(function () {
 
     });
 
-    
+    flatpickr("#fecha_salida", {
+        mode: "multiple",
+        dateFormat: "d-m-Y",
+        conjunction: ", "
+    });
 
   
 
