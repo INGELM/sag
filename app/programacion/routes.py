@@ -400,7 +400,7 @@ def update_programacion(id):
     
     try:
         validar_coherencias(form)
-        print(f'Validación exitosa para la programación ID: {form.workflow.data}')
+        # print(f'Validación exitosa para la programación ID: {form.workflow.data}')
     except ValueError as e:
         return jsonify(success=False, mensaje=str(e), errores=str(e))
     
@@ -609,7 +609,7 @@ def get_direcciones():
     pasajeros_seleccionados = request.args.getlist('pasajeros[]')
     pasajeros_seleccionados = [int(p) for p in pasajeros_seleccionados if p.isdigit()]
     # pasajeros_seleccionados = [1]
-    print("Pasajeros seleccionados:", pasajeros_seleccionados)
+    # print("Pasajeros seleccionados:", pasajeros_seleccionados)
     # Filtrar direcciones para los pasajeros_seleccionados
     
     from app.clientes.models import pasajerosModel

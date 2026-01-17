@@ -217,8 +217,8 @@ class tarifasModel(db.Model):
         if not empresa_codigo:
             return None
         max_code = tarifasModel.query.filter(tarifasModel.empresa == self.empresa).with_entities(tarifasModel.codigo).order_by(tarifasModel.codigo.desc()).first()
-        print(f'Empresa código: {self.empresa} - {empresa_codigo}')
-        print(max_code)
+        # print(f'Empresa código: {self.empresa} - {empresa_codigo}')
+        # print(max_code)
         if max_code:
             length = int(max_code[0][len(empresa_codigo):])
             next_code = length + 1

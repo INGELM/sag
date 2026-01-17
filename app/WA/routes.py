@@ -34,7 +34,7 @@ def wa():
         return jsonify({'success': True, "mensaje":"Mensaje enviado correctamente"})
 
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
+        # print(f"❌ Error inesperado: {e}")
         log.error(f"Error al enviar mensaje: {str(e)}", exc_info=True)
         return jsonify({
             "success": False,
