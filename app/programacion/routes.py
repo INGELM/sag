@@ -130,6 +130,9 @@ def validar_coherencias(form):
     if form.status.data == 'Finalizado' and not form.guia.data:
         raise ValueError('La guía es obligatoria para finalizar un viaje.')
     
+    if not form.fecha_salida.data:
+        raise ValueError('La fecha de salida es obligatoria.')
+    
     # if form.status.data == 'Finalizado' and not tarifa_base:
     #     raise ValueError('No existe una tarifa para la combinación del servicio seleccionado ({}).'.format(codigo_tarifa))
 
@@ -296,7 +299,9 @@ def programacion():
         for key, value in list(programacion_data.items()):
             if hasattr(value, 'id'):
                 programacion_data[key] = value.id
-                
+        
+        programacion_data['turno'] = "D" if 6 <= form.hora_salida.data.hour < 18 else "E"
+        current_app.logger.debug(f"Datos para actualizar la programación: {programacion_data}")
         
         
         if form.retorno.data is False:
@@ -311,6 +316,7 @@ def programacion():
         for fecha_str in lista_fechas:
             fecha_obj = datetime.strptime(fecha_str, '%d-%m-%Y').date()
             programacion_data['fecha_salida'] = fecha_obj
+            current_app.logger.debug(f"Datos para actualizar la programación: {programacion_data}")
                         
             try:
                 db.session.query(programacionModel).filter_by(id=id_programacion).update(programacion_data)
@@ -458,7 +464,18 @@ def update_programacion(id):
         # Procesar los campos del FormData manualmente
         
         if 'fecha_salida' in request.form:
-            programacion.fecha_salida = datetime.strptime(request.form['fecha_salida'], '%Y-%m-%d').date()
+            # programacion.fecha_salida = datetime.strptime(request.form['fecha_salida'], '%Y-%m-%d').date()
+            
+            lista_fechas = [fecha.strip() for fecha in request.form['fecha_salida'].split(',')]
+            if len(lista_fechas) > 1:
+                return jsonify(success=False, mensaje='Para actualización solo se permite una fecha a la vez.')
+            try:
+                fecha_obj = datetime.strptime(request.form['fecha_salida'], '%d-%m-%Y').date()
+                programacion.fecha_salida = fecha_obj
+            except ValueError:
+                return jsonify(success=False, mensaje='Formato de fecha inválido. Use Día-Mes-Año.')
+            
+            
         
         if 'hora_salida' in request.form:
             programacion.hora_salida = datetime.strptime(request.form['hora_salida'], '%H:%M').time()
@@ -534,9 +551,11 @@ def update_programacion(id):
             programacion.desplazamiento = "ida"
             programacion.hora_retorno = None
 
+        programacion.turno = "D" if 6 <= programacion.hora_salida.hour < 18 else "E"
+        
         # Debug antes del commit
-        current_app.logger.info(f"Valor de origen antes de commit: {programacion.origen} (tipo: {type(programacion.origen)})")
-        current_app.logger.info(f"Valor de destino antes de commit: {programacion.destino} (tipo: {type(programacion.destino)})")
+        # current_app.logger.info(f"Valor de origen antes de commit: {programacion.origen} (tipo: {type(programacion.origen)})")
+        # current_app.logger.info(f"Valor de destino antes de commit: {programacion.destino} (tipo: {type(programacion.destino)})")
 
         db.session.commit()
         

@@ -1130,6 +1130,7 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 
                 if (modelo === 'programacion') {
                     //cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
+                    console.log("Recargando tabla de programación después de guardar...");
                     window.location.reload();
                 } else {
                     window.location.reload();

@@ -126,7 +126,9 @@ $(document).ready(function () {
                         // Recargar solo la tabla sin refrescar la página
                         var urlSegments = window.location.pathname.split('/').filter(Boolean);
                         var lastSegment = urlSegments[urlSegments.length - 1];
-                        cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
+                        // cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
+                        window.location.reload();
+                          
                         
                         //console.log("Tabla recargada exitosamente");
                     });
