@@ -1007,7 +1007,8 @@ function aplicarFiltro(dt, node, filtro, textoTabla) {
 $(".agregar").click(function (e, modelo = window.modelo) {
     e.preventDefault();
     $(".formulario").removeClass("visually-hidden");
-    $(".tituloForm").text(`Registrar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
+    // $(".tituloForm").text(`Registrar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
+    $(".tituloForm").text(`Registrar`);
     $(".botonForm").text('Registrar');
     $(`#${modelo}Form`).attr('method', 'POST');
     $(`#${modelo}Form`)[0].reset();
@@ -1304,12 +1305,13 @@ function eliminarSeleccionados(modelo) {
                             };
                             // cargarTabla2(modelo, "", "", columnasVisibles[modelo] || []);
                             //console.log(" 🔍Modelo:", window.modelo, "Modulo:", window.modulo);
-                            cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
+                            // cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
+                            window.location.reload();
                         });
                     } else {
                         Swal.fire({
-                            title: data.mensaje,
-                            text: data.errores,
+                            title: "Error al eliminar",
+                            text: data.mensaje || "Ocurrió un error",
                             icon: 'error',
                             timer: 5500,
                             timerProgressBar: true,

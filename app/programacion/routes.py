@@ -130,8 +130,8 @@ def validar_coherencias(form):
     if form.status.data == 'Finalizado' and not form.guia.data:
         raise ValueError('La guía es obligatoria para finalizar un viaje.')
     
-    if form.status.data == 'Finalizado' and not tarifa_base:
-        raise ValueError('No existe una tarifa para la combinación del servicio seleccionado ({}).'.format(codigo_tarifa))
+    # if form.status.data == 'Finalizado' and not tarifa_base:
+    #     raise ValueError('No existe una tarifa para la combinación del servicio seleccionado ({}).'.format(codigo_tarifa))
 
 @programacion_bp.route('/get_data/<int:id>', methods=['GET'])
 @login_required
@@ -349,6 +349,9 @@ def programacion():
                 return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 
     elif request.method == 'DELETE':
+        if request.json.get('status') == 'Finalizado' and not current_user.is_admin:
+            return jsonify(success=False, mensaje='No se puede eliminar una programación finalizada.')
+        
         if not current_user.is_admin and current_user.rol != 'Programador':
             current_app.logger.warning(f"Usuario sin permiso intentó eliminar programación: {current_user.usuario}")
             current_app.logger.warning("Rol del usuario: %s", current_user.rol)
@@ -578,7 +581,7 @@ def update_programacion(id):
             except Exception as e:
                 db.session.rollback()
                 current_app.logger.error(f"Error al crear factura/pago: {str(e)}")
-                return jsonify(success=False, mensaje='Error al crear la factura del cliente o pago operador.', error=str(e))
+                return jsonify(success=False, mensaje=f'Error al crear la factura del cliente o pago operador.  {str(e)}', error=str(e))
         
         return jsonify(success=True, mensaje=mensaje)
 
