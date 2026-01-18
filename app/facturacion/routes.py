@@ -379,7 +379,12 @@ def crear_pago_operador(form):
     
     tarifas_clientes = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
     tarifa_cliente_id = tarifas_clientes.id if tarifas_clientes else None
-    tarifas_operador = tarifasOperadoresModel.query.filter_by(codigo=tarifa_cliente_id, tipo=tipo_operador).first()
+    
+    try:
+        tarifas_operador = tarifasOperadoresModel.query.filter_by(codigo=tarifa_cliente_id, tipo=tipo_operador).first()
+    except Exception as e:
+        current_app.logger.debug(f"Error al obtener tarifas del operador: {str(e)}")
+        raise ValueError("No se encontró tarifas del operador.")
     
     current_app.logger.debug(f"Tarifas Operador encontradas: {tarifas_operador}")
 

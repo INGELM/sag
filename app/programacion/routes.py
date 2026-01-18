@@ -209,7 +209,14 @@ def programacion():
                     crear_factura = facturasClientesModel(**nueva_factura)
                     db.session.add(crear_factura)
                     db.session.commit()
-                    crear_pago_operador(form)
+                    
+                    try:
+                        crear_pago_operador(form)
+                    except Exception as e:
+                        db.session.rollback()
+                        return jsonify(success=False, mensaje='Error al crear el pago al operador.', error=str(e))
+                    
+                    
                     return jsonify(success=True, mensaje='Programación Finalizada y Factura Generada correctamente.')
 
                 except Exception as e:
