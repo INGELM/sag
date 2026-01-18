@@ -432,6 +432,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
 }
 
 function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
+    // console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo).then(({ tabla, columnas, columnDefs, jsonData }) => {
 
     
@@ -493,6 +494,10 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
                 }
             },
             layout: {
+
+                topStart: {
+                    buttons: modelo == 'tarifas' ? botonesEspeciales() : []
+                },
            
                 topEnd: {
                     buttons: [botonesAuxiliares()[1], botonesAuxiliares()[2]],
@@ -511,7 +516,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
 
 
 function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = []) {
-    //console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
+    console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "empresa_id:", empresa_id, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
         // Configuración base de DataTable
 
@@ -578,7 +583,8 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
             
             layout: {
                 topStart: {
-                    buttons: modelo === 'programacion' ? [getTablaBotones(), ...botonesEspeciales()] : [botonesEspeciales()],
+                    buttons: modelo === 'programacion' ? [getTablaBotones(), ...botonesEspeciales()] : [botonesEspeciales()]
+                    
                 },
                 topEnd: {
                     buttons: botonesAuxiliares(),
