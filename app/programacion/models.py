@@ -143,7 +143,7 @@ class programacionModel(db.Model):
     def serialize_form(self):
         return {
             'id': self.id,
-            'fecha_salida': self.fecha_salida.strftime('%Y-%m-%d') if self.fecha_salida else None,
+            'fecha_salida': self.fecha_salida.strftime('%d-%m-%Y') if self.fecha_salida else None,
             'empresa': self.pasajeros[0].empresa if self.pasajeros else None,
             'pasajeros': [p.id for p in self.pasajeros] if self.pasajeros else [],
             'workflow': self.workflow,
