@@ -40,16 +40,18 @@ def validar_coherencias(form):
     
     tarifa_base = tarifasModel.query.filter_by(codigo_desc=codigo_tarifa).first()
     
-    # if not tarifa_base:
-        # raise ValueError('No existe una tarifa base para la combinación del servicio seleccionado ({}).'.format(codigo_tarifa))
+    if not tarifa_base and form.status.data == 'Finalizado':
+        raise ValueError('No existe una tarifa base para la combinación del servicio seleccionado')
+    
+   
 
-    if form.operador.data and form.status.data == 'finalizado':
+    if form.operador.data and form.status.data == 'Finalizado':
         tipo_operador = form.operador.data.tipo
         tarifa_operador = tarifasOperadoresModel.query.filter_by(
             codigo=tarifa_base.id,  # Relación con tarifa_base
             tipo=tipo_operador
         ).first()
-        
+        current_app.logger.debug("Tarifa operador encontrada:", tarifa_operador)
         if not tarifa_operador:
             raise ValueError(f'No hay tarifas definidas para el tipo de operador: {tipo_operador} en esta ruta.')
 
@@ -60,6 +62,7 @@ def validar_coherencias(form):
         tipo_operador = form.operador.data.tipo
 
         tarifas_operadores_tipo = tarifasOperadoresModel.query.filter_by(tipo=tipo_operador).first()
+        current_app.logger.debug("Tarifas operadores para tipo:", tipo_operador, tarifas_operadores_tipo)
 
         if not tarifas_operadores_tipo and form.status.data == 'Finalizado':
             raise ValueError(f'No hay tarifas definidas en la ruta seleccionada para el operador: {form.operador.data.nombres} ({tipo_operador}).')
@@ -398,6 +401,7 @@ def programacion():
         primer_error = next(iter(form.errors.values()))[0] if form.errors else 'Error desconocido.'
         return jsonify(success=False, mensaje='Error en el formulario.', errores=primer_error)
 
+#RUTINA EN USO ACTUALMENTE
 @programacion_bp.route('/programacion/<int:id>/update', methods=['PUT'])
 @login_required
 def update_programacion(id):
@@ -467,6 +471,7 @@ def update_programacion(id):
             current_app.logger.error(f"Error al eliminar facturas/pagos para regeneración: {str(e)}")
             return jsonify(success=False, mensaje='Error al regenerar facturas y pagos.', errores=str(e))
 
+    
     try:
         # Procesar los campos del FormData manualmente
         

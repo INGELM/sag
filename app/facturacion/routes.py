@@ -56,10 +56,10 @@ def crear_factura_cliente(form):
     
     # calcular recargo por vehiculo
 
-    recargo = recargoVehiculosModel.query.filter_by(vehiculo=form.vehiculo.data.id).first()
-    if recargo:
-        costo_base += costo_base * recargo.recargo
-        current_app.logger.debug(f"Recargo por vehículo aplicado: {recargo.recargo}")
+    # recargo = recargoVehiculosModel.query.filter_by(vehiculo=form.vehiculo.data.id).first()
+    # if recargo:
+    #     costo_base += costo_base * recargo.recargo
+    #     current_app.logger.debug(f"Recargo por vehículo aplicado: {recargo.recargo}")
 
 
     costo_distancia = tarifas.tarifa_km if tarifas.tarifa_km else 0
