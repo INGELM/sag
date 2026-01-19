@@ -158,14 +158,76 @@ def get_data_by_id(id):
 @programacion_bp.route('/get_data', methods=['GET'])
 @login_required
 def get_data():
+    # Parámetros de DataTables para server-side processing
+    draw = int(request.args.get('draw', 1))
+    start = int(request.args.get('start', 0))
+    length = int(request.args.get('length', 10))
+    search_value = request.args.get('search[value]', '')
     filtro = request.args.get('filtro', None)
-    if not filtro:
-        data = programacionModel.query.all()
-    else:
-        data = programacionModel.query.filter_by(status=filtro).all()
+
+    # Construir la consulta base
+    query = programacionModel.query
+
+    # Aplicar filtro de status si existe
+    if filtro:
+        query = query.filter_by(status=filtro)
+
+    # Obtener el total de registros sin filtros
+    total_records = programacionModel.query.count()
+
+    # Aplicar búsqueda global si hay un valor de búsqueda
+    if search_value:
+        # Buscar en campos directos del modelo (simplificado para evitar joins complejos)
+        search_filter = (
+            programacionModel.guia.ilike(f'%{search_value}%') |
+            programacionModel.workflow.ilike(f'%{search_value}%') |
+            programacionModel.status.ilike(f'%{search_value}%')
+        )
+        query = query.filter(search_filter)
+
+    # Obtener el total de registros filtrados
+    total_filtered = query.count()
+
+    # Aplicar ordenamiento si se especifica
+    order_column = request.args.get('order[0][column]')
+    order_dir = request.args.get('order[0][dir]', 'asc')
+
+    if order_column:
+        column_name = request.args.get(f'columns[{order_column}][data]')
+        if column_name:
+            # Solo ordenar por columnas directas del modelo para simplificar
+            column_map = {
+                'id': programacionModel.id,
+                'fecha_salida': programacionModel.fecha_salida,
+                'hora_salida': programacionModel.hora_salida,
+                'status': programacionModel.status,
+                'guia': programacionModel.guia,
+                'workflow': programacionModel.workflow
+            }
+
+            if column_name in column_map:
+                order_attr = column_map[column_name]
+                if order_dir == 'desc':
+                    query = query.order_by(order_attr.desc())
+                else:
+                    query = query.order_by(order_attr.asc())
+
+    # Aplicar paginación
+    query = query.offset(start).limit(length)
+
+    # Ejecutar la consulta y serializar
+    data = query.all()
     data_serializada = [d.serialize() for d in data]
-    # current_app.logger.debug("Datos serializados:", data_serializada)
-    return jsonify(data=data_serializada)
+
+    # Respuesta compatible con DataTables
+    response = {
+        'draw': draw,
+        'recordsTotal': total_records,
+        'recordsFiltered': total_filtered,
+        'data': data_serializada
+    }
+
+    return jsonify(response)
 
 @programacion_bp.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @login_required

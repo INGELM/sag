@@ -250,6 +250,7 @@ $('#f-limpiar').on('click', function () {
 
 let tablaInstancia = null;
 let tasaGlobal = 1;
+window.filtroActual = null; // Variable global para mantener el filtro actual
 
 async function baseTablas(modelo, modulo = "", empresa_id = "") {
     //console.log("Cargando tabla para el modelo:", modelo);
@@ -541,80 +542,159 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
 
         let AllColumnDefs = [columnDefs, ...mobileColumnDefs];
 
-        let config = {
-            data: jsonData,
-            columns: columnas,
-            responsive: true,
-            columnDefs: AllColumnDefs,
-            paging: true,
-            pageLength: 50,
-            select: {
-                style: 'multi',
-                blurable: true,
-                items: 'row',
-                className: 'selected'
-            },
-            
-            language: {
-                search: "",
-                // info: "",
+        let config = {};
+
+        // Configuración diferente para programacion (server-side processing)
+        if (modelo === 'programacion') {
+            config = {
+                serverSide: true,
+                ajax: {
+                    url: '/programacion/get_data',
+                    type: 'GET',
+                    data: function(d) {
+                        // Agregar filtro adicional si existe
+                        if (window.filtroActual) {
+                            d.filtro = window.filtroActual;
+                        }
+                    }
+                },
+                columns: columnas,
+                responsive: true,
+                columnDefs: AllColumnDefs,
+                paging: true,
+                pageLength: 50,
                 select: {
-                    rows: {
-                        _: "Has seleccionado %d filas",
-                        0: "Haz clic en una fila para seleccionarla",
-                        1: "1 fila seleccionada"
+                    style: 'multi',
+                    blurable: true,
+                    items: 'row',
+                    className: 'selected'
+                },
+                language: {
+                    search: "",
+                    select: {
+                        rows: {
+                            _: "Has seleccionado %d filas",
+                            0: "Haz clic en una fila para seleccionarla",
+                            1: "1 fila seleccionada"
+                        },
+                        cells: {
+                            _: "",
+                            0: "",
+                            1: ""
+                        },
+                        columns: {
+                            _: "",
+                            0: "",
+                            1: ""
+                        }
+                    }
+                },
+                order: [[1, 'desc']], // Ordenar por fecha de forma descendente
+                pagingType: "numbers",
+                layout: {
+                    topStart: {
+                        buttons: modelo === 'programacion' ? [getTablaBotones(), ...botonesEspeciales()] : [botonesEspeciales()]
                     },
-                    cells: {
-                        _: "",
-                        0: "",
-                        1: ""
-                    },
-                    columns: {
-                        _: "",
-                        0: "",
-                        1: ""
+                    topEnd: {
+                        buttons: botonesAuxiliares(),
+                        search: true
+                    }
+                },
+                createdRow: function (row, data, dataIndex) {
+                    // Validación temprana y normalización del status
+                    if (!data || typeof data.status !== 'string' || !data.status.trim()) {
+                        return; // Salida temprana si no hay status válido
+                    }
+
+                    const status = data.status.toLowerCase().trim();
+
+                    // Mapeo de estados a clases CSS para mejor mantenibilidad
+                    const statusClassMap = {
+                        'finalizado': 'table-success text-success',
+                        'facturado': 'table-success',
+                        'pendiente': 'table-danger',
+                        'por facturar': 'table-danger',
+                        'programado': 'table-warning'
+                    };
+
+                    // Aplicar clase CSS si existe mapeo para el status
+                    const cssClass = statusClassMap[status];
+                    if (cssClass) {
+                        $(row).addClass(cssClass);
                     }
                 }
-            },
-            // orderable: true,
-            order: [[1, 'desc']], // Ordenar por la primera columna (id) de forma descendente
-
-            pagingType: "numbers",
-            
-            layout: {
-                topStart: {
-                    buttons: modelo === 'programacion' ? [getTablaBotones(), ...botonesEspeciales()] : [botonesEspeciales()]
-                    
+            };
+        } else {
+            // Configuración original para otras tablas
+            config = {
+                data: jsonData,
+                columns: columnas,
+                responsive: true,
+                columnDefs: AllColumnDefs,
+                paging: true,
+                pageLength: 50,
+                select: {
+                    style: 'multi',
+                    blurable: true,
+                    items: 'row',
+                    className: 'selected'
                 },
-                topEnd: {
-                    buttons: botonesAuxiliares(),
-                    search: true
-                }
-            },
-            createdRow: function (row, data, dataIndex) {
-                // Validación temprana y normalización del status
-                if (!data || typeof data.status !== 'string' || !data.status.trim()) {
-                    return; // Salida temprana si no hay status válido
-                }
+                language: {
+                    search: "",
+                    select: {
+                        rows: {
+                            _: "Has seleccionado %d filas",
+                            0: "Haz clic en una fila para seleccionarla",
+                            1: "1 fila seleccionada"
+                        },
+                        cells: {
+                            _: "",
+                            0: "",
+                            1: ""
+                        },
+                        columns: {
+                            _: "",
+                            0: "",
+                            1: ""
+                        }
+                    }
+                },
+                order: [[1, 'desc']],
+                pagingType: "numbers",
+                layout: {
+                    topStart: {
+                        buttons: modelo === 'programacion' ? [getTablaBotones(), ...botonesEspeciales()] : [botonesEspeciales()]
+                    },
+                    topEnd: {
+                        buttons: botonesAuxiliares(),
+                        search: true
+                    }
+                },
+                createdRow: function (row, data, dataIndex) {
+                    // Validación temprana y normalización del status
+                    if (!data || typeof data.status !== 'string' || !data.status.trim()) {
+                        return; // Salida temprana si no hay status válido
+                    }
 
-                const status = data.status.toLowerCase().trim();
-                
-                // Mapeo de estados a clases CSS para mejor mantenibilidad
-                const statusClassMap = {
-                    'finalizado': 'table-success text-success',
-                    'facturado': 'table-success',
-                    'pendiente': 'table-danger',
-                    'por facturar': 'table-danger',
-                    'programado': 'table-warning'
-                };
+                    const status = data.status.toLowerCase().trim();
 
-                // Aplicar clase CSS si existe mapeo para el status
-                const cssClass = statusClassMap[status];
-                if (cssClass) {
-                    $(row).addClass(cssClass);
+                    // Mapeo de estados a clases CSS para mejor mantenibilidad
+                    const statusClassMap = {
+                        'finalizado': 'table-success text-success',
+                        'facturado': 'table-success',
+                        'pendiente': 'table-danger',
+                        'por facturar': 'table-danger',
+                        'programado': 'table-warning'
+                    };
+
+                    // Aplicar clase CSS si existe mapeo para el status
+                    const cssClass = statusClassMap[status];
+                    if (cssClass) {
+                        $(row).addClass(cssClass);
+                    }
                 }
-            },
-        };
+            };
+        }
 
 
         // Agregar footerCallback solo para facturasClientes y pagosOperadores
@@ -1004,7 +1084,10 @@ function botonesAuxiliares() {
             ]
         }
 function aplicarFiltro(dt, node, filtro, textoTabla) {
-    dt.ajax.url(`/programacion/get_data?filtro=${filtro}`).load();
+    // Para server-side processing, actualizar la URL base y recargar
+    window.filtroActual = filtro; // Actualizar el filtro global
+    dt.ajax.url(`/programacion/get_data?filtro=${filtro}`);
+    dt.ajax.reload();
     $("#nombre-tabla").text(textoTabla);
     $(node).parent().find('button').removeClass('btn-primary').addClass('btn-outline-primary');
     $(node).removeClass('btn-outline-primary').addClass('btn-primary');
