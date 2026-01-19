@@ -5,7 +5,9 @@ $(document).ready(function () {
     var lastSegment = urlSegments[urlSegments.length - 1];
     //console.log("Último segmento de la URL:", lastSegment);
 
-    cargarTabla1(lastSegment, 'clientes');
+    if (lastSegment != 'tarifas') {
+        cargarTabla1(lastSegment, 'clientes');
+    }
 
     const formulario = $(`#${lastSegment}Form`);
 

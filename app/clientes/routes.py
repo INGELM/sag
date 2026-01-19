@@ -1,6 +1,7 @@
 from flask import Response, json, jsonify, render_template, request, current_app
 from flask_login import login_required, current_user
 from app.clientes.models import clientesModel, pasajerosModel, recargoVehiculosModel, tarifasModel
+from app.auxiliares.models import ciudadesModel, vehiculosModel
 from . import clientes_bp
 from .form import *
 from datetime import datetime
@@ -530,6 +531,102 @@ def get_tarifa_data(id):
         return jsonify(success=False, mensaje='Error al obtener datos de la tarifa.', errores=str(e))
 
 
+@clientes_bp.route('/tarifas/get_data', methods=['GET'])
+def get_tarifas_server_data():
+    """Endpoint para DataTables (server-side) de Tarifas.
+    Soporta paginación, búsqueda y ordenamiento básico.
+    Filtro opcional por empresa mediante parámetro 'cliente'.
+    """
+    try:
+        draw = int(request.args.get('draw', 1))
+        start = int(request.args.get('start', 0))
+        length = int(request.args.get('length', 10))
+        search_value = request.args.get('search[value]', '')
+        empresa_id = request.args.get('cliente', type=int)
+
+        # Consulta base
+        query = tarifasModel.query
+
+        # Filtro por empresa si se envía
+        if empresa_id:
+            query = query.filter_by(empresa=empresa_id)
+
+        # Total sin filtros (respetando empresa si aplica)
+        total_base_query = tarifasModel.query
+        if empresa_id:
+            total_base_query = total_base_query.filter_by(empresa=empresa_id)
+        records_total = total_base_query.count()
+
+        # Búsqueda ampliada: incluye empresa, ciudades y vehículo
+        if search_value:
+            like = f"%{search_value}%"
+            # Joins a relaciones para permitir búsqueda por nombre
+            query = (
+                query
+                .join(tarifasModel.cliente)
+                .join(tarifasModel.origen_rel)
+                .join(tarifasModel.destino_rel)
+                .join(tarifasModel.vehiculo_rel, isouter=True)
+                .filter(
+                    (tarifasModel.codigo.ilike(like)) |
+                    (tarifasModel.codigo_desc.ilike(like)) |
+                    (tarifasModel.horario.ilike(like)) |
+                    (tarifasModel.desplazamiento.ilike(like)) |
+                    (clientesModel.empresa.ilike(like)) |
+                    (ciudadesModel.nombre.ilike(like)) |  # Origen
+                    (vehiculosModel.tipo.ilike(like))
+                )
+            )
+
+        records_filtered = query.count()
+
+        # Ordenamiento
+        order_column = request.args.get('order[0][column]')
+        order_dir = request.args.get('order[0][dir]', 'asc')
+        if order_column is not None:
+            col_name = request.args.get(f'columns[{order_column}][data]')
+            # Mapear a columnas apropiadas (incluye relaciones para ordenar por nombres)
+            column_map = {
+                'id': tarifasModel.id,
+                'codigo': tarifasModel.codigo,
+                'empresa': clientesModel.empresa,
+                'origen': ciudadesModel.nombre,
+                'destino': ciudadesModel.nombre,
+                'vehiculo': vehiculosModel.tipo,
+                'desplazamiento': tarifasModel.desplazamiento,
+                'horario': tarifasModel.horario,
+                'espera': tarifasModel.espera,
+                'desvios': tarifasModel.desvios,
+                'base': tarifasModel.base,
+                'tarifa_km': tarifasModel.tarifa_km,
+            }
+            if col_name in column_map:
+                sort_attr = column_map[col_name]
+                # Asegurar joins necesarios cuando se ordena por relaciones
+                if col_name in ['empresa']:
+                    query = query.join(tarifasModel.cliente)
+                elif col_name in ['origen']:
+                    query = query.join(tarifasModel.origen_rel)
+                elif col_name in ['destino']:
+                    query = query.join(tarifasModel.destino_rel)
+                elif col_name in ['vehiculo']:
+                    query = query.join(tarifasModel.vehiculo_rel, isouter=True)
+                query = query.order_by(sort_attr.desc() if order_dir == 'desc' else sort_attr.asc())
+
+        # Paginación
+        data_page = query.offset(start).limit(length).all()
+        data_serialized = [t.serialize() for t in data_page]
+
+        return jsonify({
+            'draw': draw,
+            'recordsTotal': records_total,
+            'recordsFiltered': records_filtered,
+            'data': data_serialized
+        })
+
+    except Exception as e:
+        current_app.logger.error(f'Error en server-side tarifas: {e}')
+        return jsonify(success=False, mensaje='Error al obtener tarifas.', errores=str(e))
 
 @clientes_bp.route('tarifas/all',  methods=['GET'])
 @clientes_bp.route('/get/tarifas', methods=['GET'])
