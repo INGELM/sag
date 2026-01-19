@@ -2,6 +2,7 @@ from flask import Response, json, jsonify, render_template, request, current_app
 from flask_login import login_required, current_user
 from app.clientes.models import clientesModel, pasajerosModel, recargoVehiculosModel, tarifasModel
 from app.auxiliares.models import ciudadesModel, vehiculosModel
+from sqlalchemy.orm import aliased
 from . import clientes_bp
 from .form import *
 from datetime import datetime
@@ -389,8 +390,8 @@ def tarifas():
     
     form = tarifasForm()
     tarifa_data = request.get_json() if request.method in ['DELETE'] else form.data
-    current_app.logger.debug(f'Datos recibidos del formulario: {tarifa_data}')
-    current_app.logger.debug(f'metodo HTTP: {request.method}')
+    # current_app.logger.debug(f'Datos recibidos del formulario: {tarifa_data}')
+    # current_app.logger.debug(f'metodo HTTP: {request.method}')
 
     # if 'ciudad' in pasajero_data and pasajero_data['ciudad']:
     #     pasajero_data['ciudad'] = pasajero_data['ciudad'].id
@@ -544,38 +545,42 @@ def get_tarifas_server_data():
         search_value = request.args.get('search[value]', '')
         empresa_id = request.args.get('cliente', type=int)
 
-        # Consulta base
-        query = tarifasModel.query
+        # Alias para evitar conflictos al unir la misma tabla ciudades dos veces
+        origen_alias = aliased(ciudadesModel)
+        destino_alias = aliased(ciudadesModel)
+
+        # Consulta base con joins necesarios para búsquedas y ordenamientos
+        base_query = (
+            tarifasModel.query
+            .join(tarifasModel.cliente)
+            .join(origen_alias, tarifasModel.origen_rel.of_type(origen_alias))
+            .join(destino_alias, tarifasModel.destino_rel.of_type(destino_alias))
+            .join(tarifasModel.vehiculo_rel, isouter=True)
+        )
 
         # Filtro por empresa si se envía
+        query = base_query
         if empresa_id:
-            query = query.filter_by(empresa=empresa_id)
+            query = query.filter(tarifasModel.empresa == empresa_id)
 
         # Total sin filtros (respetando empresa si aplica)
-        total_base_query = tarifasModel.query
+        total_base_query = base_query
         if empresa_id:
-            total_base_query = total_base_query.filter_by(empresa=empresa_id)
+            total_base_query = total_base_query.filter(tarifasModel.empresa == empresa_id)
         records_total = total_base_query.count()
 
         # Búsqueda ampliada: incluye empresa, ciudades y vehículo
         if search_value:
             like = f"%{search_value}%"
-            # Joins a relaciones para permitir búsqueda por nombre
-            query = (
-                query
-                .join(tarifasModel.cliente)
-                .join(tarifasModel.origen_rel)
-                .join(tarifasModel.destino_rel)
-                .join(tarifasModel.vehiculo_rel, isouter=True)
-                .filter(
-                    (tarifasModel.codigo.ilike(like)) |
-                    (tarifasModel.codigo_desc.ilike(like)) |
-                    (tarifasModel.horario.ilike(like)) |
-                    (tarifasModel.desplazamiento.ilike(like)) |
-                    (clientesModel.empresa.ilike(like)) |
-                    (ciudadesModel.nombre.ilike(like)) |  # Origen
-                    (vehiculosModel.tipo.ilike(like))
-                )
+            query = query.filter(
+                (tarifasModel.codigo.ilike(like)) |
+                (tarifasModel.codigo_desc.ilike(like)) |
+                (tarifasModel.horario.ilike(like)) |
+                (tarifasModel.desplazamiento.ilike(like)) |
+                (clientesModel.empresa.ilike(like)) |
+                (origen_alias.nombre.ilike(like)) |
+                (destino_alias.nombre.ilike(like)) |
+                (vehiculosModel.tipo.ilike(like))
             )
 
         records_filtered = query.count()
@@ -590,8 +595,8 @@ def get_tarifas_server_data():
                 'id': tarifasModel.id,
                 'codigo': tarifasModel.codigo,
                 'empresa': clientesModel.empresa,
-                'origen': ciudadesModel.nombre,
-                'destino': ciudadesModel.nombre,
+                'origen': origen_alias.nombre,
+                'destino': destino_alias.nombre,
                 'vehiculo': vehiculosModel.tipo,
                 'desplazamiento': tarifasModel.desplazamiento,
                 'horario': tarifasModel.horario,
@@ -602,15 +607,6 @@ def get_tarifas_server_data():
             }
             if col_name in column_map:
                 sort_attr = column_map[col_name]
-                # Asegurar joins necesarios cuando se ordena por relaciones
-                if col_name in ['empresa']:
-                    query = query.join(tarifasModel.cliente)
-                elif col_name in ['origen']:
-                    query = query.join(tarifasModel.origen_rel)
-                elif col_name in ['destino']:
-                    query = query.join(tarifasModel.destino_rel)
-                elif col_name in ['vehiculo']:
-                    query = query.join(tarifasModel.vehiculo_rel, isouter=True)
                 query = query.order_by(sort_attr.desc() if order_dir == 'desc' else sort_attr.asc())
 
         # Paginación
@@ -675,7 +671,7 @@ def handle_tarifas():
 def recargo_vehiculos():
     form = recargoVehiculosForm()
     formData = form.data
-    current_app.logger.debug(f'Datos recibidos del formulario: {formData}')
+    # current_app.logger.debug(f'Datos recibidos del formulario: {formData}')
     
     if request.method == 'GET':
         

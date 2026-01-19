@@ -164,13 +164,35 @@ def get_data():
     length = int(request.args.get('length', 10))
     search_value = request.args.get('search[value]', '')
     filtro = request.args.get('filtro', None)
+    fecha_desde = request.args.get('fecha_desde')
+    fecha_hasta = request.args.get('fecha_hasta')
 
     # Construir la consulta base
     query = programacionModel.query
 
-    # Aplicar filtro de status si existe
+    # Aplicar filtro de status (case-insensitive) si existe
     if filtro:
-        query = query.filter_by(status=filtro)
+        query = query.filter(programacionModel.status.ilike(filtro))
+
+    # Filtro por rango de fechas (fecha_salida)
+    def parse_fecha(valor):
+        if not valor:
+            return None
+        try:
+            return datetime.strptime(valor, '%d-%m-%Y').date()
+        except ValueError:
+            try:
+                return datetime.strptime(valor, '%Y-%m-%d').date()
+            except ValueError:
+                return None
+
+    desde = parse_fecha(fecha_desde)
+    hasta = parse_fecha(fecha_hasta)
+
+    if desde:
+        query = query.filter(programacionModel.fecha_salida >= desde)
+    if hasta:
+        query = query.filter(programacionModel.fecha_salida <= hasta)
 
     # Obtener el total de registros sin filtros
     total_records = programacionModel.query.count()

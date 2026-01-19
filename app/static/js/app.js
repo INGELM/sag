@@ -188,6 +188,12 @@ $.fn.dataTable.ext.search.push(
 
         if (!fecha) return true;
 
+        // Si la celda no luce como fecha (ej: códigos de tarifas), no aplicar este filtro
+        var fechaParts = fecha.split('-');
+        if (fechaParts.length < 3) {
+            return true;
+        }
+
         // Función auxiliar para parsear fechas en formatos DD-MM-YYYY o YYYY-MM-DD y establecer inicio/fin del día
         function parseDateInput(value, endOfDay) {
             if (!value) return null;
@@ -219,8 +225,10 @@ $.fn.dataTable.ext.search.push(
             return d;
         }
 
-        var fechaParts = fecha.split('-');
         var fechaData = new Date(fechaParts[2], fechaParts[1] - 1, fechaParts[0]);
+        if (isNaN(fechaData.getTime())) {
+            return true;
+        }
         fechaData.setHours(12, 0, 0, 0); // Evitar problemas por zona horaria usando hora intermedia
 
         var minDate = parseDateInput(min, false);
@@ -556,6 +564,9 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                         if (window.filtroActual) {
                             d.filtro = window.filtroActual;
                         }
+                        // Enviar rango de fechas al servidor para habilitar el filtrado server-side
+                        d.fecha_desde = $('#f-desde').val();
+                        d.fecha_hasta = $('#f-hasta').val();
                     }
                 },
                 columns: columnas,

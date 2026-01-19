@@ -18,7 +18,11 @@ $(document).ready(function () {
 
     window.tablaId = `#${lastSegment}Table`;
 
-    cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
+    if (lastSegment != 'programacion') {
+        cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
+    }
+
+    
     //console.log("Tabla cargada para:", formulario);
     
     // Agregar funcionalidad de doble click para editar registros
