@@ -112,8 +112,8 @@ function cargarSelectize(url, empresaId, selectize) {
                 selectize.clearOptions();
                 if (response.success) {
                     response.data.forEach(function (item) {
-                        item.nombres = item.nombres || item.nombre || item.tipo || item.codigo;
-                       // //console.log(`Agregando opción: ${item.nombres}`);
+                        item.nombres = item.nombres.title || item.nombre || item.tipo || item.codigo;
+                       // console.log(`Agregando opción: ${item.nombres}`);
                         selectize.addOption({
                             id: item.id,
                             text: item.nombres,
