@@ -248,7 +248,17 @@ def get_data():
         'recordsFiltered': total_filtered,
         'data': data_serializada
     }
-
+   
+    try:
+        preview_response = {
+            'draw': draw,
+            'recordsTotal': total_records,
+            'recordsFiltered': total_filtered,
+            'data': response['data'][:1] if response.get('data') else []
+        }
+        current_app.logger.debug(f"Respuesta DataTables (preview 1 registro): {preview_response}")
+    except Exception as e:
+        current_app.logger.debug(f"Error generando preview de respuesta: {e}")
     return jsonify(response)
 
 @programacion_bp.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])

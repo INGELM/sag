@@ -32,10 +32,12 @@ function initProgramacionTable() {
 		},
 		{ data: 'hora_salida', title: 'Hora salida' },
 		{ data: 'hora_retorno', title: 'Hora retorno' },
+		{ data: 'direccion_origen', title: 'Dir. Origen' },
 		{ data: 'Ciudad_Origen', title: 'Origen' },
+		{ data: 'direccion_destino', title: 'Dir. Destino' },
 		{ data: 'Ciudad_Destino', title: 'Destino' },
 		{ data: 'operador', title: 'Operador' },
-		{ data: 'vehiculo', title: 'Vehículo' },
+		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
 		{ data: 'desplazamiento', title: 'Desplaz.' },
 		{ data: 'distancia', title: 'Km' },
@@ -61,17 +63,19 @@ function initProgramacionTable() {
 				if (window.filtroActual) {
 					d.filtro = window.filtroActual;
 				}
+				// console.log('Enviando datos AJAX:', d);
+				// return d;
 			}
 		},
 		columns: columnas,
 		// Prioridad de visualización para columnas clave
 		columnDefs: (function () {
-			const visibleColumns = [1, 3, 9, 10, 12, 15, 27];
+			const visibleColumns = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 20];
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
 		})(),
 		responsive: true,
-		pageLength: 50,
+		pageLength: 40,
 		pagingType: 'numbers',
 		order: [[1, 'desc']],
 		select: {
