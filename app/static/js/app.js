@@ -265,7 +265,8 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     //console.log("Módulo:", modulo);
     //console.log("Empresa ID:", empresa_id);
 
-    var url = modulo !== "" ? `/${modulo}/${modelo}/all` : `/${modelo}/all`;
+    const basePath = (modulo && modulo !== modelo) ? `/${modulo}/${modelo}` : `/${modelo}`;
+    var url = `${basePath}/all`;
     if (empresa_id) {
         url = `${modelo}?cliente=${empresa_id}`;
     }
@@ -1383,7 +1384,8 @@ function eliminarSeleccionados(modelo) {
         confirmButtonText: 'Sí, eliminarlos'
     }).then((result) => {
         if (result.isConfirmed) {
-            const url = window.modulo !== "" ? `/${window.modulo}/${modelo}` : `/${modelo}`;
+            const basePath = (window.modulo && window.modulo !== modelo) ? `/${window.modulo}/${modelo}` : `/${modelo}`;
+            const url = basePath;
             
             $.ajax({
                 url: url,
@@ -1449,7 +1451,8 @@ function editar(id) {
 
 
 function llenarFormulario(id) {
-    const URL = window.modulo !== "" ? `/${window.modulo}/${window.modelo}/get_data/${id}` : `/${window.modelo}/get_data/${id}`;
+    const basePath = (window.modulo && window.modulo !== window.modelo) ? `/${window.modulo}/${window.modelo}` : `/${window.modelo}`;
+    const URL = `${basePath}/get_data/${id}`;
 
     //console.log(`Llenando formulario para el modelo: ${modelo}, ID: ${id}, URL: ${URL}`);
 

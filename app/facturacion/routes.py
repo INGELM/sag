@@ -11,6 +11,9 @@ from app.programacion.models import programacionModel
 @facturacion_bp.before_request
 def before_request():
     if not current_user.is_authenticated:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes.best == 'application/json':
+            return jsonify(success=False, mensaje='No autenticado', redirect=url_for('login.login')), 401
+
         flash('Por favor, inicia sesión para acceder a esta página.', 'warning')
         return redirect(url_for('login.login'))
 
