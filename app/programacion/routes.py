@@ -62,7 +62,7 @@ def validar_coherencias(form):
         tipo_operador = form.operador.data.tipo
 
         tarifas_operadores_tipo = tarifasOperadoresModel.query.filter_by(tipo=tipo_operador).first()
-        current_app.logger.debug("Tarifas operadores para tipo:", tipo_operador, tarifas_operadores_tipo)
+        # current_app.logger.debug("Tarifas operadores para tipo:", tipo_operador)
 
         if not tarifas_operadores_tipo and form.status.data == 'Finalizado':
             raise ValueError(f'No hay tarifas definidas en la ruta seleccionada para el operador: {form.operador.data.nombres} ({tipo_operador}).')
@@ -289,8 +289,9 @@ def programacion():
         current_app.logger.debug(f"LISTA DE FECHASSS: {lista_fechas}")
 
         for fecha_str in lista_fechas:
-            current_app.logger.debug(f"Procesando fecha: {fecha_str}")
+            
             current_app.logger.debug(f"Cantidad de fechas: {len(lista_fechas)}")
+            current_app.logger.debug(f"Procesando fecha: {fecha_str}")
             fecha_obj = datetime.strptime(fecha_str, '%d-%m-%Y').date()
             nueva_programacion = programacionModel(**programacion_data)
             nueva_programacion.fecha_salida = fecha_obj
@@ -332,7 +333,7 @@ def programacion():
                     success=False
                     mensaje='Error al guardar la programación.'
                     errores=str(e)
-            return jsonify(success=success, mensaje=mensaje)
+        return jsonify(success=success, mensaje=mensaje)
         
     elif request.method == 'PUT' and form.validate_on_submit():
         if not current_user.is_admin and current_user.rol not in ['Programador', 'Finanzas']:
