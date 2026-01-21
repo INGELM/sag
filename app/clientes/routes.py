@@ -16,7 +16,7 @@ from app.extensions import db
         
 
 
-@clientes_bp.route('/clientes', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@clientes_bp.route('/', methods=['GET', 'POST', 'DELETE', 'PUT'])
 # @login_required
 def clientes():
     
@@ -128,7 +128,7 @@ def clientes():
 
     return render_template('clientes.html', year=datetime.now().year, form=clientesForm(), User=current_user)
 
-@clientes_bp.route('/clientes/get_data/<int:id>', methods=['GET'])
+@clientes_bp.route('/get_data/<int:id>', methods=['GET'])
 def get_cliente_data(id):
     current_app.logger.debug(f'Recibiendo solicitud para obtener datos del cliente con ID: {id}')
     try:
@@ -148,8 +148,8 @@ def get_cliente_data(id):
     
     
 
-@clientes_bp.route('clientes/all', defaults={'id': None}, methods=['GET'])
-@clientes_bp.route('clientes/get/<int:id>', methods=['GET'])
+@clientes_bp.route('/all', defaults={'id': None}, methods=['GET'])
+@clientes_bp.route('/get/<int:id>', methods=['GET'])
 # @login_required
 def handle_clientes(id):
     # current_app.logger.debug(f'ID recibido en handle_clientes: {id}')

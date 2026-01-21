@@ -5,7 +5,8 @@ $(document).ready(function () {
     var lastSegment = urlSegments[urlSegments.length - 1];
     //console.log("Último segmento de la URL:", lastSegment);
 
-    if (lastSegment != 'tarifas') {
+    // Tabla principal se inicializa aparte en clientesTable.js cuando lastSegment === 'clientes'
+    if (lastSegment && lastSegment !== 'clientes' && lastSegment !== 'tarifas') {
         cargarTabla1(lastSegment, 'clientes');
     }
 

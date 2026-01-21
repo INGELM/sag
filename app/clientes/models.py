@@ -66,9 +66,24 @@ class clientesModel(db.Model):
 
     def update(self, **kwargs):
         for key, value in kwargs.items():
-            if hasattr(self, key) and value is not None:
-                setattr(self, key, value.strip() if isinstance(
-                    value, str) and key != 'email' else value)
+            if not hasattr(self, key):
+                continue
+
+            # Normalizar strings vacíos a None para no violar unique (ej. email="")
+            if isinstance(value, str):
+                value = value.strip()
+                if value == "":
+                    value = None
+
+            if key == 'email' and value is not None:
+                value = value.lower()
+
+            # Asignar ID si viene un objeto con id
+            if hasattr(value, 'id'):
+                value = value.id
+
+            setattr(self, key, value)
+
         try:
             db.session.commit()
         except Exception as e:

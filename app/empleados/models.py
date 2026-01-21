@@ -197,8 +197,9 @@ class tarifasOperadoresModel(db.Model):
     def serialize_form(self):
         return {
             'id': self.id,
-            'empresa_rel': self.codigo_rel.cliente.id if self.codigo_rel else None,
+            'empresa': self.codigo_rel.cliente.id if self.codigo_rel else None,
             'codigo': self.codigo_rel.codigo if self.codigo_rel else None,
+            'codigo_rel': self.codigo if self.codigo else None,
             'origen': self.codigo_rel.origen_rel.nombre if self.codigo_rel else None,
             'destino': self.codigo_rel.destino_rel.nombre if self.codigo_rel else None, 
             'desplazamiento': self.codigo_rel.desplazamiento if self.codigo_rel else None,

@@ -16,7 +16,7 @@ def before_request():
         flash('Por favor, inicie sesión para acceder a esa página.', 'warning')
         return redirect(url_for('login.login'))
 
-@empleados_bp.route('/empleados', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@empleados_bp.route('/', methods=['GET', 'POST', 'DELETE', 'PUT'])
 @login_required
 def empleados():
     form = empleadosForm()
@@ -114,7 +114,7 @@ def empleados():
 
     return render_template('empleados.html', year=datetime.now().year, form=empleadosForm(), User=current_user)
 
-@empleados_bp.route('/empleados/get_data/<int:id>', methods=['GET'])
+@empleados_bp.route('/get_data/<int:id>', methods=['GET'])
 @login_required
 def get_empleado_data(id):
     try:
@@ -131,7 +131,7 @@ def get_empleado_data(id):
 
 
 
-@empleados_bp.route('empleados/all', methods=['GET'])
+@empleados_bp.route('/all', methods=['GET'])
 @login_required
 # @login_required
 def all_empleados():

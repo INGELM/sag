@@ -1,12 +1,15 @@
 $(document).ready(function () {
 
-    var lastSegment = window.location.pathname.split('/').pop();
+    var lastSegment = window.location.pathname.split('/').filter(Boolean).pop();
     var FORMULARIO = $(`#${lastSegment}Form`);
     var EMPRESA_SELECT = $('#empresa-tarifa');
     var CODIGO_SELECT = $('#codigo-tarifa');
     var URL_TARIFAS = `/clientes/get/tarifas?empresa=`;
 
-    cargarTabla1(lastSegment, 'empleados', [1]);
+    // La tabla de usuarios se inicializa ahora en usuariosTable.js cuando lastSegment === 'empleados'
+    if (lastSegment && lastSegment !== 'empleados') {
+        cargarTabla1(lastSegment, 'empleados', [1]);
+    }
 
     EMPRESA_SELECT.selectize(selectizeConfig);
     CODIGO_SELECT.selectize(selectizeConfig);

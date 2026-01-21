@@ -101,41 +101,48 @@ const selectizeConfig = {
     }
 };
 
-function cargarSelectize(url, empresaId, selectize) {
+async function cargarSelectize(url, empresaId, selectize) {
     if (empresaId && empresaId !== "__None" && empresaId !== null && empresaId !== undefined) {
-        //console.log("Consultando para la empresa:", empresaId);
-        fetch(url)
-            .then(response => response.json())
-            .then(response => {
-                // console.log("Datos consultados ",url,":", response);
-                selectize.clear();
-                selectize.clearOptions();
-                if (response.success) {
-                    response.data.forEach(function (item) {
-                        item.nombres = item.nombre || item.tipo || item.codigo || item.nombres || 'Sin Nombre';
-                       // console.log(`Agregando opción: ${item.nombres}`);
-                        selectize.addOption({
-                            id: item.id,
-                            text: item.nombres,
-                        });
-                    });
-                } else {
+        try {
+            const resp = await fetch(url);
+            if (!resp.ok) {
+                const t = await resp.text();
+                throw new Error(`HTTP ${resp.status} en ${url}: ${t.slice(0, 200)}`);
+            }
+            const ct = resp.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) {
+                const t = await resp.text();
+                throw new Error(`Respuesta no JSON desde ${url}: ${t.slice(0, 200)}`);
+            }
+            const response = await resp.json();
+
+            selectize.clear();
+            selectize.clearOptions();
+            if (response.success) {
+                response.data.forEach(function (item) {
+                    item.nombres = item.nombre || item.tipo || item.codigo || item.nombres || 'Sin Nombre';
                     selectize.addOption({
-                        id: 0,
-                        text: response.mensaje || 'No se encontraron resultados'
+                        id: item.id,
+                        text: item.nombres,
                     });
-                }
-                selectize.refreshOptions(false);
-            })
-    } else {
-        //console.log("No se ha seleccionado una empresa válida.");
-        selectize.clear();
-        selectize.clearOptions();
-        // selectize.addOption({
-        //     id: 0,
-        //     text: 'Seleccione una empresa'
-        // });
+                });
+            } else {
+                selectize.addOption({ id: 0, text: response.mensaje || 'No se encontraron resultados' });
+            }
+            selectize.refreshOptions(false);
+        } catch (err) {
+            console.error('Error cargando selectize:', err);
+            selectize.clear();
+            selectize.clearOptions();
+            selectize.addOption({ id: 0, text: 'Error cargando opciones' });
+            selectize.refreshOptions(false);
+        }
+        return;
     }
+    // Sin empresa válida: limpiar
+    selectize.clear();
+    selectize.clearOptions();
+    selectize.refreshOptions(false);
 }
 
 // Función de ordenamiento personalizada para fechas en formato DD-MM-YYYY
@@ -268,7 +275,8 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     const basePath = (modulo && modulo !== modelo) ? `/${modulo}/${modelo}` : `/${modelo}`;
     var url = `${basePath}/all`;
     if (empresa_id) {
-        url = `${modelo}?cliente=${empresa_id}`;
+        // Mantener ruta consistente usando basePath
+        url = `${basePath}?cliente=${empresa_id}`;
     }
 
     //console.log("URL de la tabla:", url);
@@ -291,9 +299,17 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     });
 
     if (modelo === 'facturasClientes' || modelo === 'pagosOperadores') {
-
         try {
             const responseTasa = await fetch("/tasa/all");
+            if (!responseTasa.ok) {
+                const t = await responseTasa.text();
+                throw new Error(`HTTP ${responseTasa.status} en /tasa/all: ${t.slice(0, 200)}`);
+            }
+            const ctTasa = responseTasa.headers.get('content-type') || '';
+            if (!ctTasa.includes('application/json')) {
+                const t = await responseTasa.text();
+                throw new Error(`Respuesta no JSON desde /tasa/all: ${t.slice(0, 200)}`);
+            }
             const jsonTasa = await responseTasa.json();
 
             if (jsonTasa.success && jsonTasa.data.length > 0) {
@@ -315,9 +331,19 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     const response = await fetch(url);
     Swal.close();
 
-    if (!response.ok) throw new Error("Error en la respuesta del servidor");
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`HTTP ${response.status} en ${url}: ${text.slice(0, 200)}`);
+    }
 
-    const json = await response.json();
+    const ct = response.headers.get('content-type') || '';
+    let json;
+    if (ct.includes('application/json')) {
+        json = await response.json();
+    } else {
+        const text = await response.text();
+        throw new Error(`Respuesta no JSON desde ${url}: ${text.slice(0, 200)}`);
+    }
 
     if (!json.success) {
         Swal.fire({
@@ -1463,9 +1489,8 @@ function editar(id) {
     $(".botonForm").text('Actualizar');
     $(`#${window.modelo}Form`).attr('method', 'PUT');
 
-    modoFlatPickr();
+    modelo === 'programacion' ?   modoFlatPickr(): null;
 }
-
 
 
 function llenarFormulario(id) {
@@ -1481,7 +1506,7 @@ function llenarFormulario(id) {
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                //console.log("Datos obtenidos:", response.data);
+                console.log("Datos obtenidos:", response.data);
                 const data = response.data;
                 
                 // Guardar el status original en el formulario para detectar cambios
@@ -1492,7 +1517,12 @@ function llenarFormulario(id) {
                 
                 Object.keys(data).forEach(key => {
                     const $campo = $(`#${modelo}Form [name="${key}"]`);
-                    //console.log(`Procesando campo: ${key}, valor: ${data[key]}`);
+                    // console.log(`Procesando campo: ${$campo[0].name} para la clave: ${key} con valor: ${data[key]}`);
+
+                    if (!$campo.length) {
+                        console.warn(`⚠️ Campo no encontrado en el formulario para la clave: ${key}`);
+                    }
+
                     
                     if ($campo.length) {
                         // CASO ESPECIAL PARA CHECKBOX
@@ -1506,17 +1536,34 @@ function llenarFormulario(id) {
                         }
                         // CASO PARA SELECTIZE
                         else if ($campo[0].selectize) {
-                            if (key === "pasajeros") {
-                                $campo[0].selectize.setValue(data[key], true);
-                                $campo[0].selectize.trigger('change');
+                            const sel = $campo[0].selectize;
+                            let value = data[key];
+
+                            // Caso tarifasOperadores: usar el id (codigo_rel) si existe, ya que el select espera el PK
+                            if (key === 'codigo' && data.codigo_rel) {
+                                value = data.codigo_rel;
+                                // Asegurar texto amigable si vino el código legible
+                                const text = data.codigo || value;
+                                if (!sel.options[value]) {
+                                    sel.addOption({ id: value, text: text });
+                                }
                             }
-                            else {
-                                $campo[0].selectize.setValue(data[key], true);
+
+                            if (key === "pasajeros") {
+                                sel.setValue(value, true);
+                                sel.trigger('change');
+                            } else {
+                                // Si la opción aún no existe (p.ej., código), agregarla para que setValue funcione
+                                if (value !== undefined && value !== null && !sel.options[value]) {
+                                    sel.addOption({ id: value, text: value });
+                                }
+                                sel.setValue(value, true);
+                                console.log(`Selectize actualizado para: ${key} con valor: ${value}`);
                             }
 
                             if (key.includes('direccion_destino') || key.includes('direccion_origen')) {
                                 setTimeout(() => {
-                                    $campo[0].selectize.setValue(data[key], true);
+                                    sel.setValue(value, true);
                                     //console.log(`Selectize timeout actualizado para: ${key} con valor: ${data[key]}`);
                                 }, 600);
                             }
@@ -1524,7 +1571,7 @@ function llenarFormulario(id) {
                         // CASO PARA INPUTS NORMALES
                         else {
                             $campo.val(data[key]);
-                            //console.log(`Llenando campo: ${key} con valor: ${data[key]}`);
+                            // console.log(`Llenando campo: ${key} con valor: ${data[key]}`);
                         }
                     }
                 });
