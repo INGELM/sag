@@ -5,7 +5,7 @@ $(document).ready(function () {
 
     var urlSegments = window.location.pathname.split('/').filter(Boolean);
     var lastSegment = urlSegments[urlSegments.length - 1];
-    const formulario = $(`#${lastSegment}Form`);
+    var formulario = $(`#${lastSegment}Form`);
     window.ruta = `${lastSegment}/`;
     const PASAJEROS_SELECT = $('#pasajeros-select');
     const EMPRESA_SELECT = $('#empresa-select');
@@ -234,6 +234,8 @@ $(document).ready(function () {
 
         var URL_CONSULTA_PASAJEROS = `/clientes/empresas/pasajeros?empresa=${empresaId}`;
         var PASAJEROS_selectize = PASAJEROS_SELECT[0].selectize;
+        console.log("Empresa seleccionada, cargando datos dependientes...");
+        console.log("Cargando pasajeros desde:", URL_CONSULTA_PASAJEROS);
 
         Promise.all([
             cargarSelectize(URL_CONSULTA_PASAJEROS, empresaId, PASAJEROS_selectize),
@@ -270,28 +272,26 @@ $(document).ready(function () {
 
     });
 
+
+        
+
+   
+
+});
+
+function modoFlatPickr() {
+    var $submitBtn = $(".formulario").find('button[type="submit"], input[type="submit"]');
+    var submitText = $submitBtn.is('input') ? $submitBtn.val() : $submitBtn.text();
+    var flatMode = (submitText && submitText.trim().toLowerCase() === 'actualizar') ? 'single' : 'multiple';
+
+    console.log("Flatpickr mode:", flatMode);
+
     flatpickr("#fecha_salida", {
-        mode: "multiple",
+        mode: flatMode,
         dateFormat: "d-m-Y",
         conjunction: ", "
     });
-
-  
-
-
-    // $("#status").change(function (e) {
-    //     e.preventDefault();
-    //     if ($(this).val() === "Finalizado") {
-    //         $("#desvios, #t-espera").removeClass("visually-hidden");
-    //         //console.log($(this).val());
-    //     } else {
-    //         $("#desvios, #t-espera").addClass("visually-hidden");
-    //         //console.log($(this).val());
-    //     }
-
-    // });
-
-});
+};
 
 
 

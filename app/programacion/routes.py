@@ -256,7 +256,7 @@ def get_data():
             'recordsFiltered': total_filtered,
             'data': response['data'][:1] if response.get('data') else []
         }
-        current_app.logger.debug(f"Respuesta DataTables (preview 1 registro): {preview_response}")
+        # current_app.logger.debug(f"Respuesta DataTables (preview 1 registro): {preview_response}")
     except Exception as e:
         current_app.logger.debug(f"Error generando preview de respuesta: {e}")
     return jsonify(response)
@@ -281,14 +281,16 @@ def programacion():
             programacion_data.pop(field, None)
         
         # CORREGIDO: Usar f-string para logging
-        current_app.logger.debug(f"Datos de la programación DIRECCION ORIGEN: {programacion_data['direccion_origen']}")
+        # current_app.logger.debug(f"Datos de la programación DIRECCION ORIGEN: {programacion_data['direccion_origen']}")
         
         fecha_string = form.fecha_salida.data
         
         lista_fechas = [fecha.strip() for fecha in fecha_string.split(',')]
-        current_app.logger.debug(f"LISTA DE FECHAS: {lista_fechas}")
+        current_app.logger.debug(f"LISTA DE FECHASSS: {lista_fechas}")
 
         for fecha_str in lista_fechas:
+            current_app.logger.debug(f"Procesando fecha: {fecha_str}")
+            current_app.logger.debug(f"Cantidad de fechas: {len(lista_fechas)}")
             fecha_obj = datetime.strptime(fecha_str, '%d-%m-%Y').date()
             nueva_programacion = programacionModel(**programacion_data)
             nueva_programacion.fecha_salida = fecha_obj
@@ -322,10 +324,15 @@ def programacion():
             else:
                 try:
                     nueva_programacion.save()
-                    return jsonify(success=True, mensaje='Programación guardada correctamente.')
+                    current_app.logger.info(f"Nueva programación creada con ID: {nueva_programacion.id} por cuenta de {current_user.usuario}")
+                    success=True
+                    mensaje='Programación guardada correctamente.'
                 except Exception as e:
                     db.session.rollback()
-                    return jsonify(success=False, mensaje='Error al guardar la programación.', errores=str(e))
+                    success=False
+                    mensaje='Error al guardar la programación.'
+                    errores=str(e)
+            return jsonify(success=success, mensaje=mensaje)
         
     elif request.method == 'PUT' and form.validate_on_submit():
         if not current_user.is_admin and current_user.rol not in ['Programador', 'Finanzas']:

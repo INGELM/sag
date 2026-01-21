@@ -376,7 +376,9 @@ def obtener_pasajeros():
             current_app.logger.debug(f'No se encontraron pasajeros para la empresa con ID {empresa_id}')
             return jsonify(success=False, mensaje='No se encontraron pasajeros para esta empresa.')
         current_app.logger.debug(f'Pasajeros encontrados para la empresa con ID {empresa_id}: {len(pasajeros)}')
-        return jsonify(success=True, data=[p.serialize() for p in pasajeros])
+        data = [p.serialize() for p in pasajeros]
+        # current_app.logger.debug(f'Datos de pasajeros serializados: {data}')
+        return jsonify(success=True, data=data)
     
     except Exception as e:
         current_app.logger.debug(f'Error al obtener pasajeros por empresa: {e}')
@@ -794,15 +796,18 @@ def vehiculos_empresa():
         return jsonify(success=False, data=[], mensaje='ID de empresa no proporcionado o inválido.')
 
     try:
-        vehiculos_empresa = recargoVehiculosModel.query.filter_by(cliente=empresa_id).all()
-        current_app.logger.debug(f'Número de vehículos asociados a la empresa {empresa_id}: {len(vehiculos_empresa)}')
-        vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
-        vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
-        if 1 not in vehiculos_ids:
-            vehiculos_ids.append(1)
-        current_app.logger.debug(f'IDs de vehículos para la empresa {empresa_id}: {vehiculos_ids}')
+        # vehiculos_empresa = recargoVehiculosModel.query.filter_by(cliente=empresa_id).all()
+        # current_app.logger.debug(f' {empresa_id}: {len(vehiculos_empresa)}')
+        # vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
+        # vehiculos_empresa = vehiculosModel.query.all()
+        # vehiculos_ids = [v.vehiculo for v in vehiculos_empresa]
+        # if 1 not in vehiculos_ids:
+            # vehiculos_ids.append(1)
+        # current_app.logger.debug(f'IDs de vehículos para la empresa {empresa_id}: {vehiculos_ids}')
 
-        vehiculos = vehiculosModel.query.filter(vehiculosModel.id.in_(vehiculos_ids)).all()
+        # vehiculos = vehiculosModel.query.filter(vehiculosModel.id.in_(vehiculos_ids)).all()
+        vehiculos = vehiculosModel.query.all()
+        
         current_app.logger.debug(f'Vehículos encontrados: {len(vehiculos)}')
         
         if not vehiculos:

@@ -70,7 +70,7 @@ function initProgramacionTable() {
 		columns: columnas,
 		// Prioridad de visualización para columnas clave
 		columnDefs: (function () {
-			const visibleColumns = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 20];
+			const visibleColumns = [2, 9,  11, 6, 7, 12];
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
 		})(),

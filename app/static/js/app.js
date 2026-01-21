@@ -107,12 +107,12 @@ function cargarSelectize(url, empresaId, selectize) {
         fetch(url)
             .then(response => response.json())
             .then(response => {
-                //console.log("Datos consultados:", response);
+                // console.log("Datos consultados ",url,":", response);
                 selectize.clear();
                 selectize.clearOptions();
                 if (response.success) {
                     response.data.forEach(function (item) {
-                        item.nombres = item.nombres.title || item.nombre || item.tipo || item.codigo;
+                        item.nombres = item.nombre || item.tipo || item.codigo || item.nombres || 'Sin Nombre';
                        // console.log(`Agregando opción: ${item.nombres}`);
                         selectize.addOption({
                             id: item.id,
@@ -1119,6 +1119,7 @@ $(".agregar").click(function (e, modelo = window.modelo) {
             // this.selectize.clearOptions();
         }
     });
+    modoFlatPickr();
 });
 
 $(".cerrar-form").click(function (e) {
@@ -1158,7 +1159,8 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
     }
 
     const modulo = varModulo || window.modulo;
-    const url = modulo !== "" ? `/${modulo}/${modelo}` : `/${modelo}`;
+    // Evitar duplicar el segmento cuando modulo === modelo (p.ej., /programacion/programacion)
+    const url = (modulo && modulo !== modelo) ? `/${modulo}/${modelo}` : `/${modelo}`;
 
     // Obtener el token CSRF del formulario
     const csrfToken = FORMULARIO.find('input[name="csrf_token"]').val();
@@ -1199,7 +1201,21 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
 
     try {
         const response = await fetch(url, fetchOptions);
-        const data = await response.json();
+        const contentType = response.headers.get('content-type') || '';
+
+        // Manejo robusto de errores HTTP y respuestas no-JSON
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`HTTP ${response.status} en ${url}: ${text.slice(0, 200)}`);
+        }
+
+        let data;
+        if (contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            throw new Error(`Respuesta no JSON para ${url}: ${text.slice(0, 200)}`);
+        }
 
         if (data.success) {
             Swal.fire({
@@ -1446,6 +1462,8 @@ function editar(id) {
     $(".tituloForm").text(`Editar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
     $(".botonForm").text('Actualizar');
     $(`#${window.modelo}Form`).attr('method', 'PUT');
+
+    modoFlatPickr();
 }
 
 
