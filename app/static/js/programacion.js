@@ -40,7 +40,7 @@ function initProgramacionTable() {
 		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
 		{ data: 'desplazamiento', title: 'Desplaz.' },
-		{ data: 'distancia', title: 'Km' },
+		// { data: 'distancia', title: 'Km' },
 		{ data: 'tiempo_espera', title: 'T. Espera' },
 		{ data: 'desvios', title: 'Desvíos' },
 		{ data: 'status', title: 'Status' },
