@@ -39,11 +39,11 @@ function initProgramacionTable() {
 		{ data: 'operador', title: 'Operador' },
 		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
-		{ data: 'desplazamiento', title: 'Desplaz.' },
+		{ data: 'desplazamiento', title: 'Desplaz.', visible: false, searchable: false },
 		// { data: 'distancia', title: 'Km' },
 		{ data: 'tiempo_espera', title: 'T. Espera' },
 		{ data: 'desvios', title: 'Desvíos' },
-		{ data: 'status', title: 'Status' },
+		{ data: 'status', title: 'Status', visible: false, searchable: false },
 		{ data: 'observaciones', title: 'Observaciones' },
 		// Ocultas para mantener datos base
 		{ data: 'empresa_rel', visible: false, searchable: false },
@@ -70,7 +70,7 @@ function initProgramacionTable() {
 		columns: columnas,
 		// Prioridad de visualización para columnas clave
 		columnDefs: (function () {
-			const visibleColumns = [2, 9,  11, 6, 7, 12];
+			const visibleColumns = [2, 9,  11, 6, 7, 12, 19]; // Índices de columnas importantes
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
 		})(),
