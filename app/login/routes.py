@@ -59,7 +59,7 @@ def login():
         except Exception as e:
             flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador.', 'danger')
             #    flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador', 'danger')
-        return render_template('login.html', form=form, year=datetime.now().year, mostrar=mostrar)
+        return render_template('login.html', form=form, year=datetime.now().year)
 
 @login_bp.route('/logout')
 def logout():
