@@ -33,7 +33,7 @@ def clientes():
 
     if request.method == 'PUT' and form.validate_on_submit():
         
-        current_app.logger.debug(f'Recibido datos de cliente para actualizar: {cliente_data}')
+        # current_app.logger.debug(f'Recibido datos de cliente para actualizar: {cliente_data}')
         
         if not cliente_data or 'id' not in cliente_data:
             return jsonify(success=False, mensaje='Datos de cliente inválidos.')
@@ -46,7 +46,7 @@ def clientes():
         # Eliminar campos no relacionados con el modelo antes de actualizar
         
         for field in ['csrf_token', 'validar_contrasena', 'submit', 'id']:
-            current_app.logger.debug(f'Campos eliminados: {field}')
+            # current_app.logger.debug(f'Campos eliminados: {field}')
             cliente_data.pop(field, None)
         
          # Convertir campos tipo <empleadosModel ...> a su id
@@ -56,7 +56,7 @@ def clientes():
 
         try:
             cliente.update(**cliente_data)
-            current_app.logger.debug(f'Datos de cliente después de eliminar campos no relacionados: {cliente_data}')
+            # current_app.logger.debug(f'Datos de cliente después de eliminar campos no relacionados: {cliente_data}')
             return jsonify(success=True, mensaje='cliente actualizado exitosamente.')
         
         except Exception as e:
@@ -70,7 +70,7 @@ def clientes():
             
     elif request.method == 'DELETE':
         cliente_id = request.get_json().get('id')
-        current_app.logger.debug(f'Recibido ID de cliente para eliminar: {cliente_id}')
+        # current_app.logger.debug(f'Recibido ID de cliente para eliminar: {cliente_id}')
         
         if not cliente_id:
             return jsonify(success=False, mensaje='ID de cliente inválido.')
@@ -82,11 +82,19 @@ def clientes():
         
         try:
             cliente.delete()
+            current_app.logger.debug(f'Cliente eliminado: ID {cliente_id} - usuario: {current_user.usuario}')
             return jsonify(success=True, mensaje='cliente eliminado exitosamente.')
-        
-       
 
-      
+        except Exception as e:
+            current_app.logger.debug(f'Error al eliminar cliente: {e}')
+
+            if '1452' in str(e).lower():
+                mensaje='No se puede eliminar el cliente porque tiene registros relacionados.'
+
+            return jsonify({
+                'success': False,
+                'mensaje': mensaje,
+            })
         
         except Exception as e:
             current_app.logger.debug(f'Error al eliminar cliente: {e}')
@@ -402,8 +410,8 @@ def tarifas():
     # Obtener datos como dict con listas
         tarifa_data_lists = form.data #request.form.to_dict(flat=False)
         # current_app.logger.debug(f'Raw data: {request.get_data()}')
-        current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data_lists}')
-
+        # current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {tarifa_data_lists}')
+# 
         if not tarifa_data_lists or 'id' not in tarifa_data_lists:
             return jsonify(success=False, mensaje='Datos de tarifa inválidos.')
 

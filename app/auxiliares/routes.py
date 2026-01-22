@@ -28,7 +28,7 @@ def ciudades():
             'nombre': ciudad_json.get('nombre', '').title()
         }
         
-        current_app.logger.debug(f'Recibido datos de ciudad para actualizar: {ciudad_data}')
+        # current_app.logger.debug(f'Recibido datos de ciudad para actualizar: {ciudad_data}')
         if not ciudad_data or 'id' not in ciudad_data:
             return jsonify(success=False, mensaje='Datos de ciudad inválidos.')
 
@@ -62,7 +62,7 @@ def ciudades():
                 return jsonify(success=False, mensaje='Se requiere un ID o lista de IDs de ciudad.'), 400
 
             ciudad_id = data['id']
-            current_app.logger.debug(f'Recibido ID de ciudad para eliminar: {ciudad_id}')
+            # current_app.logger.debug(f'Recibido ID de ciudad para eliminar: {ciudad_id}')
 
             # Convert single ID to list for uniform handling
             ids_to_delete = [ciudad_id] if not isinstance(ciudad_id, list) else ciudad_id
@@ -214,7 +214,7 @@ def get_ciudad_destino():
     try:
         tarifas = tarifasModel.query.filter_by(empresa=empresa_id, origen=origen_id).all()
         
-        current_app.logger.debug(f'Tarifas encontradas: {tarifas}')
+        # current_app.logger.debug(f'Tarifas encontradas: {tarifas}')
 
         ciudades = ciudadesModel.query.filter(ciudadesModel.id.in_([tarifa.destino for tarifa in tarifas if tarifa.destino])).all()
 
@@ -242,14 +242,14 @@ def vehiculos():
 
     if request.method == 'PUT' and form.validate_on_submit():
         vehiculo_data = request.get_json()
-        current_app.logger.debug(f'Recibido datos de vehiculo para actualizar: {vehiculo_data}')
+        # current_app.logger.debug(f'Recibido datos de vehiculo para actualizar: {vehiculo_data}')
        
         if not vehiculo_data or 'id' not in vehiculo_data:
             return jsonify(success=False, mensaje='Datos de vehiculo inválidos.')
 
         vehiculo_id = vehiculo_data.get('id')
         vehiculo = vehiculosModel.query.get(vehiculo_id)
-        current_app.logger.debug(f'Vehiculo encontrado: {vehiculo.tipo}')
+        # current_app.logger.debug(f'Vehiculo encontrado: {vehiculo.tipo}')
 
         if vehiculo.tipo == 'Sedan':
             return jsonify(success=False, errores='', mensaje="No se puede modificar vehiculo Sedan")

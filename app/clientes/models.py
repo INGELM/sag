@@ -2,6 +2,7 @@ from flask import current_app
 from app.empleados.models import tarifasOperadoresModel
 from app.extensions import db
 from sqlalchemy import or_
+from flask_login import current_user
 
 
 
@@ -59,6 +60,7 @@ class clientesModel(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
+            current_app.logger.debug(f'Cliente guardado: {self.serialize()} - usuario: {current_user.usuario}')
         except Exception as e:
             db.session.rollback()
             current_app.logger.debug(f'Error al guardar cliente: {e}')
@@ -86,6 +88,7 @@ class clientesModel(db.Model):
 
         try:
             db.session.commit()
+            current_app.logger.debug(f'Cliente actualizado: {self.serialize()} - usuario: {current_user.usuario}')
         except Exception as e:
             db.session.rollback()
             current_app.logger.debug(f'Error al actualizar cliente: {e}')
@@ -94,6 +97,7 @@ class clientesModel(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+        current_app.logger.debug(f'Cliente eliminado: {self.serialize()} - usuario: {current_user.usuario}')
 
     def serialize(self):
         return {
@@ -251,6 +255,7 @@ class tarifasModel(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
+            current_app.logger.debug(f'Tarifa guardada: {self.serialize()} - usuario: {current_user.usuario}')
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"Error al guardar tarifa: {e}")
@@ -269,6 +274,7 @@ class tarifasModel(db.Model):
         if empresa_obj and origen_obj and destino_obj:
             self.codigo = f"{empresa_obj.codigo}{origen_obj.codigo}{destino_obj.codigo}".upper()
         db.session.commit()
+        current_app.logger.debug(f'Tarifa actualizada: {self.serialize()} - usuario: {current_user.usuario}')
 
     def delete(self):
         db.session.delete(self)
