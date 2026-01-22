@@ -414,7 +414,7 @@ def tarifas():
             return jsonify(success=False, mensaje='ID de tarifa no proporcionado.')
 
         tarifa = tarifasModel.query.get(tarifa_id)
-        current_app.logger.debug(f'Objeto tarifa obtenido: {tarifa} para {tarifa_id}')
+        # current_app.logger.debug(f'Objeto tarifa obtenido: {tarifa} para {tarifa_id}')
 
         if not tarifa:
             return jsonify(success=False, mensaje='Tarifa no encontrada.')
@@ -430,6 +430,10 @@ def tarifas():
             tarifa.horario = form.horario.data
             
             # Conversión explícita a float para los campos numéricos
+            
+            
+            
+            
             tarifa.espera = float(form.espera.data or 0.0)
             tarifa.desvios = float(form.desvios.data or 0.0)
             tarifa.tarifa_km = float(form.tarifa_km.data or 0.0)

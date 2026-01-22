@@ -1,3 +1,13 @@
+def _normalize_decimal(value):
+    """Permite ingresar 8,5 o 8.5 y lo convierte a float."""
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    cleaned = str(value).replace(',', '.').strip()
+    return float(cleaned) if cleaned else None
+
+
 from flask import Response, current_app, flash, json, jsonify, redirect, render_template, request, session, url_for
 from flask_login import login_required, current_user
 from app.empleados.models import empleadosModel, tarifasOperadoresModel
@@ -250,6 +260,10 @@ def tarifas_operadores():
         for field in ['csrf_token', 'submit', 'id', 'empresa', 'origen', 'destino', 'desplazamiento']:
             tarifa_data.pop(field, None)
 
+        # Normalizar decimales para que acepten coma o punto
+        for field in ['desvios', 'espera', 'base']:
+            tarifa_data[field] = _normalize_decimal(tarifa_data.get(field))
+
         nueva_tarifa = tarifasOperadoresModel(**tarifa_data)
         try:
             nueva_tarifa.save()
@@ -295,6 +309,11 @@ def tarifas_operadores():
         # Eliminar campos no relacionados con el modelo antes de actualizar
         for field in ['csrf_token', 'submit', 'id']:
             request_data.pop(field, None)
+
+        # Normalizar decimales para que acepten coma o punto
+        for field in ['desvios', 'espera', 'base']:
+            if field in request_data:
+                request_data[field] = _normalize_decimal(request_data.get(field))
 
         # Actualizar los campos de la tarifa con los nuevos datos
         for key, value in request_data.items():
