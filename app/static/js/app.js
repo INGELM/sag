@@ -254,7 +254,7 @@ $.fn.dataTable.ext.search.push(
 $('#f-filtrar').on('click', function () {
     $(window.tablaId).DataTable().draw();
     //console.log("Tabla filtrada: ", window.tablaId);
-    //console.log("Filtro aplicado: desde", $('#f-desde').val(), "hasta", $('#f-hasta').val());
+    console.log("Filtro aplicado: desde", $('#f-desde').val(), "hasta", $('#f-hasta').val());
 });
 
 $('#f-limpiar').on('click', function () {

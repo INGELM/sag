@@ -63,6 +63,8 @@ function initProgramacionTable() {
 				if (window.filtroActual) {
 					d.filtro = window.filtroActual;
 				}
+				d.fecha_desde = $('#f-desde').val();
+                d.fecha_hasta = $('#f-hasta').val();
 				// console.log('Enviando datos AJAX:', d);
 				// return d;
 			}
@@ -86,11 +88,20 @@ function initProgramacionTable() {
 		},
 		language: {
 			search: '',
+			info: '_START_ a _END_ de _TOTAL_ entradas',
+			infoEmpty: '0 entradas',
+			infoFiltered: '(filtrado de _MAX_ entradas totales)',
 			select: {
 				rows: {
-					_: 'Has seleccionado %d filas',
-					0: 'Haz clic en una fila para seleccionarla',
+					_: '%d filas seleccionadas',
+					// 0: 'Haz clic en una fila para seleccionarla',
 					1: '1 fila seleccionada'
+				},
+				columns: {
+					0: ""
+				},
+				cells: {
+					0: ""
 				}
 			}
 		},

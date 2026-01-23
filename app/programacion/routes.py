@@ -1,3 +1,4 @@
+from time import strftime
 from flask import Response, json, redirect, request, url_for, render_template, jsonify, flash, current_app
 from flask_login import current_user, login_required
 from app.auxiliares.models import ciudadesModel, vehiculosModel
@@ -9,6 +10,8 @@ from app.programacion import programacion_bp
 from app.programacion.form import programacionForm
 from datetime import datetime
 from app.extensions import db
+from sqlalchemy import and_, or_
+from sqlalchemy.orm import aliased
 
 from app.programacion.models import programacionModel
 
@@ -165,7 +168,14 @@ def get_data():
     search_value = request.args.get('search[value]', '')
     filtro = request.args.get('filtro', None)
     fecha_desde = request.args.get('fecha_desde')
+    # fecha_desde = strftime('%d-%m-%Y', fecha_desde) if fecha_desde else None
     fecha_hasta = request.args.get('fecha_hasta')
+    # fecha_hasta = strftime('%d-%m-%Y', fecha_hasta) if fecha_hasta else None
+    
+    current_app.logger.debug(f"Parámetros recibidos - draw: {draw}, start: {start}, length: {length}, search_value: '{search_value}', filtro: '{filtro}', fecha_desde: '{fecha_desde}', fecha_hasta: '{fecha_hasta}'")
+
+    origen_alias = aliased(ciudadesModel)
+    destino_alias = aliased(ciudadesModel)
 
     # Construir la consulta base
     query = programacionModel.query
@@ -199,14 +209,36 @@ def get_data():
 
     # Aplicar búsqueda global si hay un valor de búsqueda
     if search_value:
-        # Buscar en campos directos del modelo (simplificado para evitar joins complejos)
-        search_filter = (
-            programacionModel.guia.ilike(f'%{search_value}%') |
-            programacionModel.workflow.ilike(f'%{search_value}%') |
-            programacionModel.status.ilike(f'%{search_value}%')
+        query = (
+            query
+            .outerjoin(programacionModel.pasajeros)
+            .outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+            .outerjoin(origen_alias, programacionModel.origen == origen_alias.id)
+            .outerjoin(destino_alias, programacionModel.destino == destino_alias.id)
+            .outerjoin(empleadosModel, programacionModel.operador == empleadosModel.id)
+            .outerjoin(vehiculosModel, programacionModel.vehiculo == vehiculosModel.id)
         )
-        query = query.filter(search_filter)
+        
+        search_terms = search_value.split()
+        final_filters = []
+        
+        for term in search_terms:
+            term_filter = f'%{term}%'
+            # Para CADA palabra, buscamos en todas las columnas (OR)
+            final_filters.append(or_(
+                programacionModel.guia.ilike(term_filter),
+                programacionModel.workflow.ilike(term_filter),
+                programacionModel.status.ilike(term_filter),
+                clientesModel.codigo.ilike(term_filter),
+                clientesModel.empresa.ilike(term_filter),
+                pasajerosModel.nombres.ilike(term_filter),
+                origen_alias.nombre.ilike(term_filter),
+                destino_alias.nombre.ilike(term_filter),
+                empleadosModel.nombres.ilike(term_filter),
+                vehiculosModel.tipo.ilike(term_filter)
+            ))
 
+        query = query.filter(and_(*final_filters)).distinct()
     # Obtener el total de registros filtrados
     total_filtered = query.count()
 
