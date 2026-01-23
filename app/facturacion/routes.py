@@ -673,8 +673,7 @@ def pagosOperadores_update():
 @facturacion_bp.route('/cobro_detalle', methods=['GET'])
 def cobro_detalle():
     user = current_user
-    current_app.logger.debug("Accediendo a la vista de cobro detalle por:", user, "rol:", user.is_admin)
-    
+    # current_app.logger.debug(f"Accediendo a la vista de cobro detalle por: {user} rol: {user.is_admin}")
     return render_template('cobro-detalle.html', User=user)
 
 @facturacion_bp.route("/get/cobro_detalle", methods=['GET'])
@@ -696,5 +695,95 @@ def get_cobro_detalle():
     }
 
     return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
+
+
+@facturacion_bp.route('/cobro_detalle/data', methods=['GET'])
+def cobro_detalle_data():
+    draw = int(request.args.get('draw', 1))
+    start = int(request.args.get('start', 0))
+    length = int(request.args.get('length', 10))
+    search_value = request.args.get('search[value]', '').strip()
+    fecha_desde = request.args.get('fecha_desde')
+    fecha_hasta = request.args.get('fecha_hasta')
+
+    def parse_fecha(valor):
+        if not valor:
+            return None
+        try:
+            return datetime.strptime(valor, '%Y-%m-%d').date()
+        except ValueError:
+            try:
+                return datetime.strptime(valor, '%d-%m-%Y').date()
+            except ValueError:
+                return None
+
+    desde = parse_fecha(fecha_desde)
+    hasta = parse_fecha(fecha_hasta)
+
+    base_query = facturasClientesModel.query.join(programacionModel)
+    base_query = (base_query
+                  .outerjoin(programacionModel.pasajeros)
+                  .outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id))
+
+    if desde:
+        base_query = base_query.filter(programacionModel.fecha_salida >= desde)
+    if hasta:
+        base_query = base_query.filter(programacionModel.fecha_salida <= hasta)
+
+    facturas = base_query.all()
+
+    rows = []
+    for factura in facturas:
+        pasajeros = factura.programacion_rel.pasajeros if factura.programacion_rel and factura.programacion_rel.pasajeros else []
+        total_pasajeros = len(pasajeros)
+        if total_pasajeros == 0:
+            continue
+        for idx, _ in enumerate(pasajeros):
+            rows.append(factura.serialize_detalle(idx, total_pasajeros))
+
+    records_total = len(rows)
+
+    if search_value:
+        terms = search_value.lower().split()
+
+        def coincide(row):
+            campos = ['cliente', 'pasajero', 'factura', 'guia', 'origen', 'destino', 'horario', '#_Pasajero']
+
+            def match_term(term):
+                for campo in campos:
+                    valor = row.get(campo)
+                    if valor and term in str(valor).lower():
+                        return True
+                return False
+
+            return all(match_term(term) for term in terms)
+
+        filtered_rows = list(filter(coincide, rows))
+    else:
+        filtered_rows = rows
+
+    order_column = request.args.get('order[0][column]')
+    order_dir = request.args.get('order[0][dir]', 'desc')
+    column_name = request.args.get(f'columns[{order_column}][data]') if order_column else None
+
+    def sort_value(valor):
+        try:
+            return float(valor)
+        except (TypeError, ValueError):
+            return str('' if valor is None else valor).lower()
+
+    if column_name:
+        filtered_rows.sort(key=lambda row: sort_value(row.get(column_name)), reverse=(order_dir == 'desc'))
+
+    data = filtered_rows[start:start + length]
+
+    response = {
+        'draw': draw,
+        'recordsTotal': records_total,
+        'recordsFiltered': len(filtered_rows),
+        'data': data
+    }
+
+    return jsonify(response)
 
      

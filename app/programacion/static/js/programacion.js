@@ -234,8 +234,8 @@ $(document).ready(function () {
 
         var URL_CONSULTA_PASAJEROS = `/clientes/empresas/pasajeros?empresa=${empresaId}`;
         var PASAJEROS_selectize = PASAJEROS_SELECT[0].selectize;
-        console.log("Empresa seleccionada, cargando datos dependientes...");
-        console.log("Cargando pasajeros desde:", URL_CONSULTA_PASAJEROS);
+        // console.log("Empresa seleccionada, cargando datos dependientes...");
+        // console.log("Cargando pasajeros desde:", URL_CONSULTA_PASAJEROS);
 
         Promise.all([
             cargarSelectize(URL_CONSULTA_PASAJEROS, empresaId, PASAJEROS_selectize),
