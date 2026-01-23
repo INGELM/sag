@@ -55,7 +55,7 @@ $(document).ready(function () {
                         // Deseleccionar las filas
                         dt.rows({ selected: true }).deselect();
                         // Recargar solo la tabla
-                        cargarTabla2(window.modelo, window.modulo, "", []);
+                        dt.ajax ? dt.ajax.reload(null, false) : cargarTabla2(window.modelo, window.modulo, "", []);
                     });
                 } else {
                     Swal.fire({

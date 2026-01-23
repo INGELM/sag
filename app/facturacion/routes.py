@@ -1,5 +1,6 @@
 from flask import Response, current_app, json, jsonify, render_template, flash, redirect, url_for, request
-from app.clientes.models import clientesModel, tarifasModel, recargoVehiculosModel
+from sqlalchemy import or_
+from app.clientes.models import clientesModel, pasajerosModel, tarifasModel, recargoVehiculosModel
 from app.empleados.models import tarifasOperadoresModel
 from app.facturacion import facturacion_bp
 from app.extensions import db
@@ -7,6 +8,7 @@ from flask_login import login_required, current_user
 from app.facturacion.form import facturasClientesForm, pagosOperadoresForm
 from app.facturacion.models import pagosOperadoresModel, facturasClientesModel
 from app.programacion.models import programacionModel
+from datetime import datetime
 
 @facturacion_bp.before_request
 def before_request():
@@ -281,6 +283,82 @@ def facturasClientes_delete():
     
     
     
+@facturacion_bp.route('/facturasClientes/data', methods=['GET'])
+def facturas_clientes_data():
+    draw = int(request.args.get('draw', 1))
+    start = int(request.args.get('start', 0))
+    length = int(request.args.get('length', 10))
+    search_value = request.args.get('search[value]', '').strip()
+    fecha_desde = request.args.get('fecha_desde')
+    fecha_hasta = request.args.get('fecha_hasta')
+
+    def parse_fecha(valor):
+        if not valor:
+            return None
+        try:
+            return datetime.strptime(valor, '%Y-%m-%d').date()
+        except ValueError:
+            try:
+                return datetime.strptime(valor, '%d-%m-%Y').date()
+            except ValueError:
+                return None
+
+    desde = parse_fecha(fecha_desde)
+    hasta = parse_fecha(fecha_hasta)
+
+    base_query = facturasClientesModel.query.join(programacionModel)
+    base_query = base_query.outerjoin(programacionModel.pasajeros).outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+
+    total_records = facturasClientesModel.query.count()
+
+    if desde:
+        base_query = base_query.filter(programacionModel.fecha_salida >= desde)
+    if hasta:
+        base_query = base_query.filter(programacionModel.fecha_salida <= hasta)
+
+    if search_value:
+        term = f"%{search_value}%"
+        base_query = base_query.filter(
+            or_(
+                facturasClientesModel.factura.ilike(term),
+                facturasClientesModel.status.ilike(term),
+                programacionModel.guia.ilike(term),
+                programacionModel.workflow.ilike(term),
+                clientesModel.codigo.ilike(term),
+                clientesModel.empresa.ilike(term)
+            )
+        )
+
+    total_filtered = base_query.distinct().count()
+
+    order_column = request.args.get('order[0][column]')
+    order_dir = request.args.get('order[0][dir]', 'desc')
+    column_name = request.args.get(f'columns[{order_column}][data]') if order_column else None
+
+    column_map = {
+        'fecha': programacionModel.fecha_salida,
+        'cliente': clientesModel.codigo,
+        'factura': facturasClientesModel.factura,
+        'guia': programacionModel.guia,
+        'status': facturasClientesModel.status,
+    }
+
+    if column_name in column_map:
+        sort_col = column_map[column_name]
+        base_query = base_query.order_by(sort_col.desc() if order_dir == 'desc' else sort_col.asc())
+    else:
+        base_query = base_query.order_by(programacionModel.fecha_salida.desc())
+
+    data = base_query.distinct().offset(start).limit(length).all()
+
+    return jsonify({
+        'draw': draw,
+        'recordsTotal': total_records,
+        'recordsFiltered': total_filtered,
+        'data': [factura.serialize() for factura in data]
+    })
+
+
 
 @facturacion_bp.route('/facturasClientes/all', methods=['GET'])
 def facturas_clientes_all():
@@ -356,6 +434,78 @@ def get_pago_operador(id):
     pago_data = pago.serialize_form()
 
     return jsonify(success=True, mensaje='Pago obtenido exitosamente.', data=pago_data)
+
+
+@facturacion_bp.route('/pagosOperadores/data', methods=['GET'])
+def pagos_operadores_data():
+    draw = int(request.args.get('draw', 1))
+    start = int(request.args.get('start', 0))
+    length = int(request.args.get('length', 10))
+    search_value = request.args.get('search[value]', '').strip()
+    fecha_desde = request.args.get('fecha_desde')
+    fecha_hasta = request.args.get('fecha_hasta')
+
+    def parse_fecha(valor):
+        if not valor:
+            return None
+        try:
+            return datetime.strptime(valor, '%Y-%m-%d').date()
+        except ValueError:
+            try:
+                return datetime.strptime(valor, '%d-%m-%Y').date()
+            except ValueError:
+                return None
+
+    desde = parse_fecha(fecha_desde)
+    hasta = parse_fecha(fecha_hasta)
+
+    base_query = pagosOperadoresModel.query.join(programacionModel)
+    base_query = base_query.outerjoin(programacionModel.pasajeros).outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+
+    total_records = pagosOperadoresModel.query.count()
+
+    if desde:
+        base_query = base_query.filter(programacionModel.fecha_salida >= desde)
+    if hasta:
+        base_query = base_query.filter(programacionModel.fecha_salida <= hasta)
+
+    if search_value:
+        term = f"%{search_value}%"
+        base_query = base_query.filter(
+            or_(
+                programacionModel.guia.ilike(term),
+                clientesModel.codigo.ilike(term),
+                clientesModel.empresa.ilike(term)
+            )
+        )
+
+    total_filtered = base_query.distinct().count()
+
+    order_column = request.args.get('order[0][column]')
+    order_dir = request.args.get('order[0][dir]', 'desc')
+    column_name = request.args.get(f'columns[{order_column}][data]') if order_column else None
+
+    column_map = {
+        'fecha': programacionModel.fecha_salida,
+        'cliente': clientesModel.codigo,
+        'guia': programacionModel.guia,
+        'total_': pagosOperadoresModel.costo_total,
+    }
+
+    if column_name in column_map:
+        sort_col = column_map[column_name]
+        base_query = base_query.order_by(sort_col.desc() if order_dir == 'desc' else sort_col.asc())
+    else:
+        base_query = base_query.order_by(programacionModel.fecha_salida.desc())
+
+    data = base_query.distinct().offset(start).limit(length).all()
+
+    return jsonify({
+        'draw': draw,
+        'recordsTotal': total_records,
+        'recordsFiltered': total_filtered,
+        'data': [pago.serialize() for pago in data]
+    })
 
 @facturacion_bp.route('/pagosOperadores/all', methods=['GET'])
 def pagos_operadores_all():
