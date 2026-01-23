@@ -1,6 +1,8 @@
 from flask import Response, current_app, json, jsonify, render_template, flash, redirect, url_for, request
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
+from sqlalchemy.orm import aliased
 from app.clientes.models import clientesModel, pasajerosModel, tarifasModel, recargoVehiculosModel
+from app.auxiliares.models import ciudadesModel
 from app.empleados.models import tarifasOperadoresModel
 from app.facturacion import facturacion_bp
 from app.extensions import db
@@ -306,8 +308,15 @@ def facturas_clientes_data():
     desde = parse_fecha(fecha_desde)
     hasta = parse_fecha(fecha_hasta)
 
+    origen_alias = aliased(ciudadesModel)
+    destino_alias = aliased(ciudadesModel)
+
     base_query = facturasClientesModel.query.join(programacionModel)
-    base_query = base_query.outerjoin(programacionModel.pasajeros).outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+    base_query = (base_query
+                  .outerjoin(programacionModel.pasajeros)
+                  .outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+                  .outerjoin(origen_alias, programacionModel.origen == origen_alias.id)
+                  .outerjoin(destino_alias, programacionModel.destino == destino_alias.id))
 
     total_records = facturasClientesModel.query.count()
 
@@ -317,17 +326,24 @@ def facturas_clientes_data():
         base_query = base_query.filter(programacionModel.fecha_salida <= hasta)
 
     if search_value:
-        term = f"%{search_value}%"
-        base_query = base_query.filter(
-            or_(
-                facturasClientesModel.factura.ilike(term),
-                facturasClientesModel.status.ilike(term),
-                programacionModel.guia.ilike(term),
-                programacionModel.workflow.ilike(term),
-                clientesModel.codigo.ilike(term),
-                clientesModel.empresa.ilike(term)
-            )
-        )
+        terms = search_value.split()
+        term_filters = []
+        for t in terms:
+            like_term = f"%{t}%"
+            term_filters.append(or_(
+                facturasClientesModel.factura.ilike(like_term),
+                facturasClientesModel.status.ilike(like_term),
+                programacionModel.guia.ilike(like_term),
+                programacionModel.workflow.ilike(like_term),
+                clientesModel.codigo.ilike(like_term),
+                clientesModel.empresa.ilike(like_term),
+                pasajerosModel.nombres.ilike(like_term),
+                origen_alias.nombre.ilike(like_term),
+                destino_alias.nombre.ilike(like_term)
+            ))
+
+        if term_filters:
+            base_query = base_query.filter(and_(*term_filters))
 
     total_filtered = base_query.distinct().count()
 
@@ -459,8 +475,15 @@ def pagos_operadores_data():
     desde = parse_fecha(fecha_desde)
     hasta = parse_fecha(fecha_hasta)
 
+    origen_alias = aliased(ciudadesModel)
+    destino_alias = aliased(ciudadesModel)
+
     base_query = pagosOperadoresModel.query.join(programacionModel)
-    base_query = base_query.outerjoin(programacionModel.pasajeros).outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+    base_query = (base_query
+                  .outerjoin(programacionModel.pasajeros)
+                  .outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+                  .outerjoin(origen_alias, programacionModel.origen == origen_alias.id)
+                  .outerjoin(destino_alias, programacionModel.destino == destino_alias.id))
 
     total_records = pagosOperadoresModel.query.count()
 
@@ -470,14 +493,21 @@ def pagos_operadores_data():
         base_query = base_query.filter(programacionModel.fecha_salida <= hasta)
 
     if search_value:
-        term = f"%{search_value}%"
-        base_query = base_query.filter(
-            or_(
-                programacionModel.guia.ilike(term),
-                clientesModel.codigo.ilike(term),
-                clientesModel.empresa.ilike(term)
-            )
-        )
+        terms = search_value.split()
+        term_filters = []
+        for t in terms:
+            like_term = f"%{t}%"
+            term_filters.append(or_(
+                programacionModel.guia.ilike(like_term),
+                clientesModel.codigo.ilike(like_term),
+                clientesModel.empresa.ilike(like_term),
+                pasajerosModel.nombres.ilike(like_term),
+                origen_alias.nombre.ilike(like_term),
+                destino_alias.nombre.ilike(like_term)
+            ))
+
+        if term_filters:
+            base_query = base_query.filter(and_(*term_filters))
 
     total_filtered = base_query.distinct().count()
 

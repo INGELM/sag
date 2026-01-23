@@ -20,3 +20,4 @@ plantillas de carga/
 migrations
 migrations_mysql
 bdd/
+.env
