@@ -583,19 +583,22 @@ def get_tarifas_server_data():
             total_base_query = total_base_query.filter(tarifasModel.empresa == empresa_id)
         records_total = total_base_query.count()
 
-        # Búsqueda ampliada: incluye empresa, ciudades y vehículo
+        # Búsqueda por múltiples palabras en todos los campos relevantes
         if search_value:
-            like = f"%{search_value}%"
-            query = query.filter(
-                (tarifasModel.codigo.ilike(like)) |
-                (tarifasModel.codigo_desc.ilike(like)) |
-                (tarifasModel.horario.ilike(like)) |
-                (tarifasModel.desplazamiento.ilike(like)) |
-                (clientesModel.empresa.ilike(like)) |
-                (origen_alias.nombre.ilike(like)) |
-                (destino_alias.nombre.ilike(like)) |
-                (vehiculosModel.tipo.ilike(like))
-            )
+            words = [w.strip() for w in search_value.split() if w.strip()]
+            if words:
+                for word in words:
+                    like = f"%{word}%"
+                    query = query.filter(
+                        (tarifasModel.codigo.ilike(like)) |
+                        (tarifasModel.codigo_desc.ilike(like)) |
+                        (tarifasModel.horario.ilike(like)) |
+                        (tarifasModel.desplazamiento.ilike(like)) |
+                        (clientesModel.empresa.ilike(like)) |
+                        (origen_alias.nombre.ilike(like)) |
+                        (destino_alias.nombre.ilike(like)) |
+                        (vehiculosModel.tipo.ilike(like))
+                    )
 
         records_filtered = query.count()
 
