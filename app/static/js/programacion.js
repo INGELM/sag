@@ -55,6 +55,7 @@ function initProgramacionTable() {
 	];
 
 	const dt = tablaSel.DataTable({
+		processing: true,
 		serverSide: true,
 		ajax: {
 			url: '/programacion/get_data',
@@ -87,6 +88,7 @@ function initProgramacionTable() {
 			className: 'selected'
 		},
 		language: {
+			processing: '',
 			search: '',
 			info: '_START_ a _END_ de _TOTAL_ entradas',
 			infoEmpty: '0 entradas',

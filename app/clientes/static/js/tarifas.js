@@ -47,6 +47,7 @@ $(document).ready(function () {
 	}
 
 	const dt = tablaSel.DataTable({
+		processing: true,
 		serverSide: true,
 		ajax: {
 			url: '/clientes/tarifas/get_data',
@@ -70,6 +71,7 @@ $(document).ready(function () {
 			className: 'selected'
 		},
 		language: {
+			processing: '',
 			search: '',
 			select: {
 				rows: {
