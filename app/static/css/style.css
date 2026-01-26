@@ -45,6 +45,60 @@ th {
     font-size: 0.8rem; /* Cambia el tamaño de fuente según tus necesidades */
 }
 
+#programacionTable_wrapper {
+  position: relative;
+}
+
+#programacionTable_processing,
+#programacionTable_wrapper .dataTables_processing {
+  position: absolute !important;
+  top: 0.25rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  margin: 0 auto !important;
+  width: auto !important;
+  text-align: center !important;
+  padding: 0.35rem 0.8rem;
+  z-index: 10;
+}
+
+#tarifasTable_wrapper {
+  position: relative;
+}
+
+#tarifasTable_processing,
+#tarifasTable_wrapper .dataTables_processing {
+  position: absolute !important;
+  top: 0.25rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  margin: 0 auto !important;
+  width: auto !important;
+  text-align: center !important;
+  padding: 0.35rem 0.8rem;
+  z-index: 10;
+}
+
+#tarifasOperadoresTable_wrapper {
+  position: relative;
+}
+
+#tarifasOperadoresTable_processing,
+#tarifasOperadoresTable_wrapper .dataTables_processing {
+  position: absolute !important;
+  top: 0.25rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  margin: 0 auto !important;
+  width: auto !important;
+  text-align: center !important;
+  padding: 0.35rem 0.8rem;
+  z-index: 10;
+}
+
 .dropdown-menu {
   background-color: #f8f9fa; 
 }

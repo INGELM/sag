@@ -62,14 +62,20 @@
             <table class="table" id="tarifasOperadoresTable">
               <thead>
                 <tr>
-                  <th></th>
+                  <th>ID</th>
+                  <th>Código</th>
+                  <th>Empresa</th>
+                  <th>Origen</th>
+                  <th>Destino</th>
+                  <th>Vehículo</th>
+                  <th>Desplazamiento</th>
+                  <th>Tipo</th>
+                  <th>Espera</th>
+                  <th>Desvíos</th>
+                  <th>Base</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                </tr>
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
         </div>
@@ -84,4 +90,5 @@
 {% block JS %}
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   <script src="{{ url_for('empleados.static', filename='js/empleados.js') }}"></script>
+  <script src="{{ url_for('empleados.static', filename='js/TarifasOP.js') }}"></script>
 {% endblock %}

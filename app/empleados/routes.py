@@ -11,12 +11,15 @@ def _normalize_decimal(value):
 from flask import Response, current_app, flash, json, jsonify, redirect, render_template, request, session, url_for
 from flask_login import login_required, current_user
 from app.empleados.models import empleadosModel, tarifasOperadoresModel
+from app.clientes.models import tarifasModel, clientesModel
+from app.auxiliares.models import ciudadesModel, vehiculosModel
 from . import empleados_bp
 from .form import *
 from app.login.form import LoginForm
 from datetime import datetime
 from app.extensions import db
 from functools import wraps
+from sqlalchemy.orm import aliased
 
 
 
@@ -198,6 +201,90 @@ def get_tarifa_operador_data(id):
         return jsonify(success=False, mensaje='Error al obtener datos de la tarifa.', error=str(e))
 
     
+
+@empleados_bp.route('/tarifasOperadores/get_data', methods=['GET'])
+@login_required
+def get_tarifas_operador_server_data():
+    """Endpoint server-side para DataTables de tarifas de operadores."""
+    try:
+        draw = int(request.args.get('draw', 1))
+        start = int(request.args.get('start', 0))
+        length = int(request.args.get('length', 10))
+        search_value = request.args.get('search[value]', '')
+        empresa_id = request.args.get('empresa', type=int)
+
+        origen_alias = aliased(ciudadesModel)
+        destino_alias = aliased(ciudadesModel)
+
+        base_query = (
+            tarifasOperadoresModel.query
+            .join(tarifasOperadoresModel.codigo_rel)
+            .join(clientesModel, tarifasModel.empresa == clientesModel.id)
+            .join(origen_alias, tarifasModel.origen_rel.of_type(origen_alias))
+            .join(destino_alias, tarifasModel.destino_rel.of_type(destino_alias))
+            .join(vehiculosModel, tarifasModel.vehiculo == vehiculosModel.id, isouter=True)
+        )
+
+        query = base_query
+        if empresa_id:
+            query = query.filter(tarifasModel.empresa == empresa_id)
+
+        total_base_query = base_query
+        if empresa_id:
+            total_base_query = total_base_query.filter(tarifasModel.empresa == empresa_id)
+        records_total = total_base_query.count()
+
+        if search_value:
+            words = [w.strip() for w in search_value.split() if w.strip()]
+            for word in words:
+                like = f"%{word}%"
+                query = query.filter(
+                    (tarifasModel.codigo.ilike(like)) |
+                    (clientesModel.empresa.ilike(like)) |
+                    (origen_alias.nombre.ilike(like)) |
+                    (destino_alias.nombre.ilike(like)) |
+                    (vehiculosModel.tipo.ilike(like)) |
+                    (tarifasModel.desplazamiento.ilike(like)) |
+                    (tarifasOperadoresModel.tipo.ilike(like))
+                )
+
+        records_filtered = query.count()
+
+        order_column = request.args.get('order[0][column]')
+        order_dir = request.args.get('order[0][dir]', 'asc')
+        if order_column is not None:
+            col_name = request.args.get(f'columns[{order_column}][data]')
+            column_map = {
+                'id': tarifasOperadoresModel.id,
+                'codigo': tarifasModel.codigo,
+                'empresa': clientesModel.empresa,
+                'origen': origen_alias.nombre,
+                'destino': destino_alias.nombre,
+                'vehiculo': vehiculosModel.tipo,
+                'desplazamiento': tarifasModel.desplazamiento,
+                'tipo': tarifasOperadoresModel.tipo,
+                'espera': tarifasOperadoresModel.espera,
+                'desvios': tarifasOperadoresModel.desvios,
+                'base': tarifasOperadoresModel.base,
+            }
+            if col_name in column_map:
+                sort_attr = column_map[col_name]
+                query = query.order_by(sort_attr.desc() if order_dir == 'desc' else sort_attr.asc())
+
+        data_page = query.offset(start).limit(length).all()
+        data_serialized = [t.serialize() for t in data_page]
+
+        return jsonify({
+            'draw': draw,
+            'recordsTotal': records_total,
+            'recordsFiltered': records_filtered,
+            'data': data_serialized
+        })
+
+    except Exception as e:
+        current_app.logger.error(f'Error en server-side tarifas operadores: {e}')
+        return jsonify(success=False, mensaje='Error al obtener tarifas de operadores.', errores=str(e))
+
 
 
 @empleados_bp.route('/tarifasOperadores/all', methods=['GET'])

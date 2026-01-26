@@ -14,6 +14,11 @@ function initProgramacionTable() {
 		tablaSel.DataTable().clear().destroy();
 	}
 
+	// Oculta la tabla y su wrapper hasta que termine el primer render
+	const wrapperId = '#programacionTable_wrapper';
+	tablaSel.hide();
+	$(wrapperId).hide();
+
 	const columnas = [
 		{ data: 'id', visible: false },
 		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy' },
@@ -128,6 +133,12 @@ function initProgramacionTable() {
 			};
 			const cssClass = statusClassMap[status];
 			if (cssClass) $(row).addClass(cssClass);
+		},
+		initComplete: function () {
+			// Ajusta anchos y muestra la tabla una vez cargados los datos iniciales
+			this.api().columns.adjust().responsive.recalc();
+			tablaSel.show();
+			$(wrapperId).show();
 		}
 	});
 

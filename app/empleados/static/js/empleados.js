@@ -6,8 +6,8 @@ $(document).ready(function () {
     var CODIGO_SELECT = $('#codigo-tarifa');
     var URL_TARIFAS = `/clientes/get/tarifas?empresa=`;
 
-    // La tabla de usuarios se inicializa ahora en usuariosTable.js cuando lastSegment === 'empleados'
-    if (lastSegment && lastSegment !== 'empleados') {
+    // Evita doble inicialización: tarifasOperadores usa TarifsOP.js (server-side)
+    if (lastSegment && lastSegment !== 'empleados' && lastSegment !== 'tarifasOperadores') {
         cargarTabla1(lastSegment, 'empleados', [1]);
     }
 
