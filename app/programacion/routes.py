@@ -84,10 +84,14 @@ def validar_coherencias(form):
             print ('Workflow existente:', workflow_existente.id, 'Formulario ID:', form.id.data)
             raise ValueError('El WorkFlow ingresado ya está registrado en otra programación.')
     
+    if form.retorno.data and not form.hora_retorno.data:
+        raise ValueError('La hora de retorno es obligatoria cuando se selecciona retorno.')
+    
     # Validar hora de retorno mayor a hora de salida
-    if form.hora_retorno.data and form.hora_retorno.data <= form.hora_salida.data:
-        raise ValueError(
-            'La hora de retorno debe ser mayor a la hora de salida.')
+    if form.retorno.data:
+        if form.hora_retorno.data  <= form.hora_salida.data:
+            raise ValueError(
+                'La hora de retorno debe ser mayor a la hora de salida.')
 
     if form.retorno.data:
         if not form.hora_retorno.data:
