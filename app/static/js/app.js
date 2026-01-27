@@ -1063,64 +1063,75 @@ function botonesEspeciales() {
 }
 
 function botonesAuxiliares() {
-    return [
-            {
-                init: function (dt, node, config) {
-                    const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
-                    $(node).attr('class', clase);
-                },
-                text: 'Bolivares',
-                action: function (e, dt, node, config) {
-                    const current = localStorage.getItem('Bs') === 'true';
-                    localStorage.setItem('Bs', !current);
-                    $(node)
-                        .toggleClass('btn-success', !current)
-                        .toggleClass('btn-outline-secondary', current);
-                    if (tablaInstancia) {
-                        tablaInstancia.rows().invalidate().draw(false);
-                    }
-                }
+    const permiteBs = ['facturasClientes', 'cobro_detalle', 'pagosOperadores'].includes(window.modelo);
+    const mostrarBs = (window.mostrarBolivares === true) && permiteBs;
+
+    const botones = [];
+
+    // Botón Bolívares: aplica conversión en vivo al redibujar la tabla
+    if (mostrarBs) {
+        botones.push({
+            init: function (dt, node, config) {
+                const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
+                $(node).attr('class', clase);
             },
-            {
-                init: function (dt, node, config) {
-                    $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+            text: 'Bolivares',
+            action: function (e, dt, node, config) {
+                const current = localStorage.getItem('Bs') === 'true';
+                localStorage.setItem('Bs', !current);
+                $(node)
+                    .toggleClass('btn-success', !current)
+                    .toggleClass('btn-outline-secondary', current);
+                if (typeof tablaInstancia !== 'undefined' && tablaInstancia) {
+                    tablaInstancia.rows().invalidate().draw(false); // Redibuja con conversión sin recargar página
+                }
+                // Notificar a otras tablas que dependan del toggle
+                $(document).trigger('bolivares:toggled');
+            }
+        });
+    }
+
+    botones.push({
+        init: function (dt, node, config) {
+            $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+            $(node).removeClass('btn-primary').addClass('btn-outline-primary');
+            $(node).text('Seleccionar todos');
+        },
+        text: 'Seleccionar todos',
+        action: function(e, dt, node, config) {
+            if (dt.rows({ search: 'applied' }).count() > 0) {
+                if ($(node).text() === 'Seleccionar todos') {
+                    dt.rows({ search: 'applied' }).select();
+                    $(node).removeClass('btn-outline-primary').addClass('btn-primary');
+                    $(node).text('Deseleccionar todos');
+                } else {
+                    dt.rows({ search: 'applied' }).deselect();
                     $(node).removeClass('btn-primary').addClass('btn-outline-primary');
                     $(node).text('Seleccionar todos');
-                },
-                text: 'Seleccionar todos',
-                action: function(e, dt, node, config) {
-                    if (dt.rows({ search: 'applied' }).count() > 0) {
-                        if ($(node).text() === 'Seleccionar todos') {
-                            dt.rows({ search: 'applied' }).select();
-                            $(node).removeClass('btn-outline-primary').addClass('btn-primary');
-                            $(node).text('Deseleccionar todos');
-                        } else {
-                            dt.rows({ search: 'applied' }).deselect();
-                            $(node).removeClass('btn-primary').addClass('btn-outline-primary');
-                            $(node).text('Seleccionar todos');
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Aviso',
-                            text: 'No hay filas disponibles para seleccionar.',
-                            timer: 2000
-                        });
-                    }
                 }
-            },
-            {
-                init: function (dt, node, config) {
-                    $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
-                },
-                extend: 'collection',
-                text: 'Acciones',
-                // className: 'btn btn-outline-primary btn-sm mb-1 dropdown-toggle',
-                autoClose: true,
-                buttons: modelo === 'facturasClientes' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]],
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Aviso',
+                    text: 'No hay filas disponibles para seleccionar.',
+                    timer: 2000
+                });
             }
-            ]
         }
+    });
+
+    botones.push({
+        init: function (dt, node, config) {
+            $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
+        },
+        extend: 'collection',
+        text: 'Acciones',
+        autoClose: true,
+        buttons: window.modelo === 'facturasClientes' ? botonesAcciones() : [botonesAcciones()[0], botonesAcciones()[1]]
+    });
+
+    return botones;
+}
 function aplicarFiltro(dt, node, filtro, textoTabla) {
     // Para server-side processing, actualizar la URL base y recargar
     window.filtroActual = filtro; // Actualizar el filtro global

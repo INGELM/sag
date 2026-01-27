@@ -2,6 +2,8 @@ $(document).ready(async function () {
 	const modelo = window.location.pathname.split('/').filter(Boolean).pop();
 	window.modulo = 'facturacion';
 	window.modelo = modelo;
+	// Habilitar botón Bolívares en vistas de facturación
+	window.mostrarBolivares = true;
 
 	if (modelo === 'cobro_detalle') {
 		window.tablaId = '#facturasCobrosDetalle';
@@ -33,6 +35,16 @@ async function cargarTasaGlobal() {
 	}
 }
 
+function formatearMonto(valor) {
+	const numero = parseFloat(valor) || 0;
+	const usarBs = localStorage.getItem('Bs') === 'true';
+	const tasa = typeof tasaGlobal !== 'undefined' && tasaGlobal ? tasaGlobal : 1;
+	const convertido = usarBs ? numero * tasa : numero;
+	// console.log('Formateando monto:', valor, '->', convertido, usarBs ? '(Bs)' : '(USD)');
+	return convertido.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+}
+
 function columnasFacturasClientes() {
 	return [
 		{ data: 'id', visible: false },
@@ -57,13 +69,13 @@ function columnasFacturasClientes() {
 		{ data: 'origen', title: 'Origen' },
 		{ data: 'destino', title: 'Destino' },
 		{ data: 'distancia', title: 'Distancia' },
-		{ data: 'total_distancia', title: 'Total distancia' },
+		{ data: 'total_distancia', title: 'Total distancia', render: formatearMonto },
 		{ data: 'tiempo_espera', title: 'T. espera' },
-		{ data: 'total_espera', title: 'Total espera' },
+		{ data: 'total_espera', title: 'Total espera', render: formatearMonto },
 		{ data: 'desvíos', title: 'Desvíos' },
-		{ data: 'total_desvios', title: 'Total desvíos' },
-		{ data: 'costo_base', title: 'Costo base' },
-		{ data: 'total_', title: 'Total' },
+		{ data: 'total_desvios', title: 'Total desvíos', render: formatearMonto },
+		{ data: 'costo_base', title: 'Costo base', render: formatearMonto },
+		{ data: 'total_', title: 'Total', render: formatearMonto },
 		{ data: 'status', title: 'Status' },
 	];
 }
@@ -92,12 +104,12 @@ function columnasPagosOperadores() {
 		{ data: 'origen', title: 'Origen' },
 		{ data: 'destino', title: 'Destino' },
 		{ data: 'distancia', title: 'Distancia' },
-		{ data: 'tiempo_espera', title: 'T. espera' },
-		{ data: 'total_espera', title: 'Total espera' },
 		{ data: 'desvíos', title: 'Desvíos' },
-		{ data: 'total_desvios', title: 'Total desvíos' },
-		{ data: 'costo_base', title: 'Costo base' },
-		{ data: 'total_', title: 'Total' },
+		{ data: 'total_desvios', title: 'Total desvíos', render: formatearMonto },
+		{ data: 'tiempo_espera', title: 'T. espera' },
+		{ data: 'total_espera', title: 'Total espera', render: formatearMonto },
+		{ data: 'costo_base', title: 'Costo base', render: formatearMonto },
+		{ data: 'total_', title: 'Total', render: formatearMonto },
 	];
 }
 
@@ -116,9 +128,9 @@ function columnasCobroDetalle() {
 		{ data: 'desplazamiento', title: 'Desplaz.' },
 		{ data: 'origen', title: 'Origen' },
 		{ data: 'destino', title: 'Destino' },
-		{ data: 'total_espera', title: 'Total espera' },
-		{ data: 'total_desvios', title: 'Total desvíos' },
-		{ data: 'total_', title: 'Total' },
+		{ data: 'total_espera', title: 'Total espera', render: formatearMonto },
+		{ data: 'total_desvios', title: 'Total desvíos', render: formatearMonto },
+		{ data: 'total_', title: 'Total', render: formatearMonto },
 	];
 }
 
@@ -162,7 +174,7 @@ function inicializarTablaServerSide(modelo) {
 			}
 		},
 		columnDefs: (function () {
-			const priorityTargets = [1, 2, 5, 6, 7, 9, 10, 11, 18].filter(idx => idx < columnas.length);
+			const priorityTargets = [1, 2, 5, 9, 10, 11, 18, 19].filter(idx => idx < columnas.length);
 			const defs = [{ targets: [0], visible: false, searchable: false }];
 			if (priorityTargets.length) {
 				defs.push({ targets: priorityTargets, responsivePriority: 1 });
@@ -208,6 +220,13 @@ function inicializarTablaServerSide(modelo) {
 	});
 
 	window.tablaInstancia = dt;
+
+	// Redibujar en vivo al alternar Bs sin recargar página
+	$(document).off('bolivares:toggled').on('bolivares:toggled', function () {
+		dt.rows().invalidate().draw(false);
+		// Si tiene footer de totales, recalcula al redibujar
+		dt.columns.adjust();
+	});
 	agregarDobleClickPersonalizado(window.tablaId, 'abrir_modal');
 }
 
@@ -283,6 +302,11 @@ function inicializarTablaCobroDetalle() {
 	});
 
 	window.tablaInstancia = dt;
+
+	$(document).off('bolivares:toggled').on('bolivares:toggled', function () {
+		dt.rows().invalidate().draw(false);
+		dt.columns.adjust();
+	});
 }
 
 function agregarFiltros(modelo) {
