@@ -1,7 +1,11 @@
 // Inicialización de DataTable server-side para Tarifas de Operadores
 $(document).ready(function () {
+	// Contexto global para utilidades compartidas
+	window.modulo = 'empleados';
+	window.modelo = 'tarifasOperadores';
 	const tablaId = '#tarifasOperadoresTable';
 	const tablaSel = $(tablaId);
+	window.tablaId = tablaId;
 
 	// Limpiar instancia previa
 	if (tablaSel.hasClass('dataTable')) {
@@ -40,6 +44,12 @@ $(document).ready(function () {
 		autoWidth: false,
 		scrollX: true,
 		responsive: true,
+		select: {
+			style: 'multi',
+			blurable: true,
+			items: 'row',
+			className: 'selected'
+		},
 		pageLength: 50,
 		pagingType: 'numbers',
 		order: [[1, 'asc']],
@@ -50,10 +60,22 @@ $(document).ready(function () {
 			infoEmpty: '0 entradas',
 			infoFiltered: '(filtrado de _MAX_ entradas totales)'
 		},
+		layout: {
+			topStart: {
+				// Botones especiales: Excel / Imprimir
+				buttons: typeof botonesEspeciales === 'function' ? botonesEspeciales() : []
+			},
+			topEnd: {
+				// Botones auxiliares: seleccionar todos, acciones
+				buttons: typeof botonesAuxiliares === 'function' ? botonesAuxiliares() : [],
+				search: true
+			}
+		},
 		// initComplete: function () {
 		// 	this.api().columns.adjust().responsive.recalc();
 		// }
 	});
 
 	window.tarifasOperadoresDT = dt;
+	window.tablaInstancia = dt;
 });
