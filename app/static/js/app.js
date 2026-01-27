@@ -1017,18 +1017,29 @@ function botonesEspeciales() {
             exportOptions: {
                 columns: ':visible:not(.no-export)',
                 format: {
-                    body: function (data) {
-                        if (typeof data === 'string') {
-                            return data.replace(/<[^>]+>/g, '');
-                        }
-                        if (Array.isArray(data)) {
-                            return data.join(', ');
-                        }
-                        if (typeof data === 'object' && data !== null) {
-                            return Object.values(data).join(', ');
-                        }
-                        return data;
-                    }
+                    body: function (data, row, column, node) {
+               
+                if (data === null || data === undefined) return '';
+
+                // 2. Limpiar etiquetas HTML (como los <br> de pasajeros)
+                if (typeof data === 'string') {
+                    data = data.replace(/<[^>]+>/g, '');
+                }
+
+                /* 3. Lógica para montos (Costo base, Total, etc.)
+                   Detectamos si la columna usa 'formatearMonto'.
+                */
+                if (typeof data === 'string' && /^-?\d{1,3}(\.\d{3})*,\d{2}$/.test(data)) {
+                    return data.replace(/\./g, '').replace(',', '.');
+                }
+
+                // 4. Manejo de Arrays (Pasajeros)
+                if (Array.isArray(data)) {
+                    return data.map(p => p.nombre || p).join(', ');
+                }
+
+                return data;
+            }
                 }
             }
         },
