@@ -15,7 +15,6 @@ migrations/
 app_org.js
 # Ignore Jupyter Notebook 
 temp/
-.log
 plantillas de carga/
 migrations
 migrations_mysql
