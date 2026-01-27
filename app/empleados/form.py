@@ -28,7 +28,8 @@ class empleadosForm(FlaskForm):
     
 class tarifasOperadoresForm(FlaskForm):
     id = StringField('ID', render_kw={"placeholder": "ID de la tarifa", "class": "form-control", "type": ""})
-    empresa = QuerySelectField('Empresa', query_factory=lambda: get_empresas(), get_label='empresa', allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa de la tarifa", "class": "form-control", "id": "empresa-tarifa"})
+    empresa = QuerySelectField('Empresa', query_factory=lambda: get_empresas(), 
+                               get_label=lambda obj: obj.empresa.title(), allow_blank=True, blank_text='Seleccione una empresa', render_kw={"placeholder": "Empresa de la tarifa", "class": "form-control", "id": "empresa-tarifa"})
     codigo = QuerySelectField(
         'Código',
         query_factory=lambda: tarifasModel.query.all(),

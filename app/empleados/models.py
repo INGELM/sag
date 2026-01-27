@@ -100,12 +100,12 @@ class empleadosModel(db.Model, UserMixin):
     def serialize(self):
         return {
             'id': self.id,
-            'nombres': self.nombres,
-            'usuario': self.usuario,
-            'email': self.email,
+            'nombres': self.nombres.title() if self.nombres else "",
+            'usuario': self.usuario.lower(),
+            'email': self.email.lower() if self.email else "",
             'telefono': self.telefono,
-            'rol': self.rol,
-            'tipo': self.tipo
+            'rol': self.rol.title(),
+            'tipo': self.tipo.title()
         }
     
     def serialize_form(self):
@@ -181,17 +181,18 @@ class tarifasOperadoresModel(db.Model):
             'id': self.id,
             'codigo': self.codigo_rel.codigo if self.codigo_rel else None,
             'codigo_rel': self.codigo,
-            'empresa': self.codigo_rel.cliente.empresa if self.codigo_rel else None,
+            'empresa': self.codigo_rel.cliente.empresa.title() if self.codigo_rel else None,
             'empresa_rel': self.codigo_rel.cliente.id if self.codigo_rel else None,
             # 'codigo': self.codigo_rel.codigo_desc if self.codigo_rel else None,
-            'origen': self.codigo_rel.origen_rel.nombre if self.codigo_rel else None,
-            'destino': self.codigo_rel.destino_rel.nombre if self.codigo_rel else None,
-            'vehiculo': self.codigo_rel.vehiculo_rel.tipo if self.codigo_rel else None,
-            'desplazamiento': self.codigo_rel.desplazamiento if self.codigo_rel else None,
-            'tipo': self.tipo,
+            'origen': self.codigo_rel.origen_rel.nombre.title() if self.codigo_rel else None,
+            'destino': self.codigo_rel.destino_rel.nombre.title() if self.codigo_rel else None,
+            'vehiculo': self.codigo_rel.vehiculo_rel.tipo.title() if self.codigo_rel else None,
+            'desplazamiento': "Ida y Vuelta" if self.codigo_rel.desplazamiento.lower()== 'idav' else "Ida",
+            'tipo': self.tipo.title(),
             'desvios': self.desvios,
             'espera': self.espera,
             'base': self.base
+  
         }
     
     def serialize_form(self):
