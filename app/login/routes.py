@@ -28,7 +28,7 @@ def login():
             return render_template('login.html', form=form, year=datetime.now().year)
 
         if empleado and empleado.contrasena and empleado.check_password(password):
-            current_app.logger.debug(f'Empleado encontrado: {empleado.usuario}')
+            # current_app.logger.debug(f'Empleado encontrado: {empleado.usuario}')
             login_user(empleado, remember=form.remember.data)
             
             if hasattr(empleado, 'rol') and empleado.rol == 'admin':

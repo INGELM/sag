@@ -18,6 +18,17 @@ class ciudadesModel(db.Model):
         self.codigo = codigo.upper()
         self.nombre = nombre.title()
 
+    @property
+    def nombre_(self):
+        nombre = self.nombre.split() if self.nombre else ''
+        nombre_titulo = []
+        for palabra in nombre:
+            if palabra.lower() in ['de', 'la', 'del', 'y', 'el', 'los', 'las', 'a', 'en', 'al']:
+                nombre_titulo.append(palabra.lower())
+            else:
+                nombre_titulo.append(palabra.capitalize())
+        return " ".join(nombre_titulo) if self.nombre else ""
+    
     def save(self):
         existing = ciudadesModel.query.filter_by(codigo=self.codigo).first()
         if existing:
@@ -39,7 +50,7 @@ class ciudadesModel(db.Model):
         return {
             'id': self.id,
             'codigo': self.codigo,
-            'nombre': self.nombre
+            'nombre': self.nombre_
         }
     
     def data_selectize(self):

@@ -165,6 +165,7 @@ function inicializarTablaServerSide(modelo) {
 		},
 		language: {
 			search: '',
+			processing: "",
 			select: {
 				rows: {
 					_: 'Has seleccionado %d filas',
