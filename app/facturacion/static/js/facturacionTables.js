@@ -168,9 +168,15 @@ function inicializarTablaServerSide(modelo) {
 			processing: "",
 			select: {
 				rows: {
-					_: 'Has seleccionado %d filas',
-					0: 'Haz clic en una fila para seleccionarla',
+					_: '%d filas seleccionadas',
+					// 0: 'Haz clic en una fila para seleccionarla',
 					1: '1 fila seleccionada'
+				},
+				cells: {
+					0: ""
+				},				
+				columns: {
+					0: ""
 				}
 			}
 		},
@@ -264,9 +270,15 @@ function inicializarTablaCobroDetalle() {
 			search: '',
 			select: {
 				rows: {
-					_: 'Has seleccionado %d filas',
-					0: 'Haz clic en una fila para seleccionarla',
+					_: 'Seleccionada %d filas',
+					// 0: 'Haz clic en una fila para seleccionarla',
 					1: '1 fila seleccionada'
+				},
+				columns: {
+					0: ""
+				},
+				cells: {
+					0: ""
 				}
 			}
 		},
