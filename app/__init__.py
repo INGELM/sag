@@ -3,8 +3,11 @@ import logging
 from flask import Flask, flash, redirect, url_for
 from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.exceptions import HTTPException
 
 csrf = CSRFProtect()
+
+
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -25,6 +28,8 @@ def create_app():
     # Registrar errores no capturados
     @app.errorhandler(Exception)
     def handle_exception(e):
+        if isinstance(e, HTTPException) and e.code == 404:
+            return e
         app.logger.error(f'Unhandled exception: {str(e)}', exc_info=True)
         return f'{"Error Interno del Servidor:"} {str(e)}, 500'
 
@@ -81,8 +86,10 @@ def create_app():
     from .auxiliares import tasa_bp
     app.register_blueprint(tasa_bp, url_prefix='/tasa')
     
-    # from .WA import wa_bp
-    # app.register_blueprint(wa_bp, url_prefix = '/wa' )
+    from .WA import wa_bp
+    app.register_blueprint(wa_bp, url_prefix = '/wa' )
+    csrf.exempt(wa_bp)
+    
     
 
     return app
