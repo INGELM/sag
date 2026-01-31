@@ -524,7 +524,7 @@ def programacion():
         try:
             # La eliminación en cascada se encargará de eliminar facturas y pagos asociados
             for programacion in programaciones:
-                current_app.logger.info(f"Eliminando programación ID: {programacion.id}")
+                current_app.logger.info(f"Eliminando programación ID: {programacion.id} por cuenta de {current_user.usuario}")
                 db.session.delete(programacion)
             
             db.session.commit()

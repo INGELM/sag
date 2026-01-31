@@ -22,7 +22,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{db_user}:{encoded_password}@{db_host}/{db_name}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
-    DEBUG = True
+    DEBUG = False
+    TESTING = False
     PROPAGATE_EXCEPTIONS = True
     PYTHONIOENCODING = 'utf-8'
     CONECTADO_A = os.environ.get('CONECTADO_A', 'produccion')
