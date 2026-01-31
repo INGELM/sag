@@ -503,13 +503,13 @@ def programacion():
                 return jsonify(success=False, errores=str(e), mensaje='Error al actualizar la programación.')
 
     elif request.method == 'DELETE':
-        if request.json.get('status') == 'Finalizado' and not current_user.is_admin:
-            return jsonify(success=False, mensaje='No se puede eliminar una programación finalizada.')
+        # if request.json.get('status') == 'Finalizado' and not current_user.is_admin:
+        #     return jsonify(success=False, mensaje='No se puede eliminar una programación finalizada.')
         
-        if not current_user.is_admin and current_user.rol != 'Programador':
-            current_app.logger.warning(f"Usuario sin permiso intentó eliminar programación: {current_user.usuario}")
-            current_app.logger.warning("Rol del usuario: %s", current_user.rol)
-            return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.')
+        # if not current_user.is_admin and current_user.rol != 'Programador':
+        #     current_app.logger.warning(f"Usuario sin permiso intentó eliminar programación: {current_user.usuario}")
+        #     current_app.logger.warning("Rol del usuario: %s", current_user.rol)
+        #     return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.')
 
         id_programacion = request.json.get('id')
         current_app.logger.info(f"ID de programación a eliminar: {id_programacion}")
