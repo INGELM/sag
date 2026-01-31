@@ -20,6 +20,15 @@ function initProgramacionTable() {
 	$(wrapperId).hide();
 
 	const columnas = [
+		{
+			data: null,
+			title: '#',
+			orderable: false,
+			searchable: false,
+			render: function (_, __, ___, meta) {
+				return meta.row + 1 + meta.settings._iDisplayStart;
+			}
+		},
 		{ data: 'id', visible: false },
 		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy' },
 		{ data: 'empresa', title: 'Empresa' },
