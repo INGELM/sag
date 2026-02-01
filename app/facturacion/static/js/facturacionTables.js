@@ -68,7 +68,7 @@ function columnasFacturasClientes() {
 			title: 'Pasajeros',
 			render: function (data) {
 				if (Array.isArray(data)) {
-					return data.map(p => p.nombre).join('<br>');
+					return data.map(p => p.nombre).join('|<br>');
 				}
 				return '';
 			}

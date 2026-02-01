@@ -53,7 +53,7 @@ function columnasPagosOperadores() {
 			title: 'Pasajeros',
 			render: function (data) {
 				if (Array.isArray(data)) {
-					return data.map(p => p.nombre).join('<br>');
+					return data.map(p => p.nombre).join('|<br>');
 				}
 				return '';
 			}
@@ -97,7 +97,9 @@ function inicializarTablaPagosOperadores(modelo) {
 		},
 		columns: columnas,
 		order: orderBy,
-		pageLength: 40,
+		pageLength: 50,
+		lengthMenu: [50, 100, 150, 200],
+		lengthChange: true,
 		pagingType: 'numbers',
 		responsive: true,
 		select: {
@@ -141,6 +143,10 @@ function inicializarTablaPagosOperadores(modelo) {
 			topEnd: {
 				buttons: botonesAuxiliares(),
 				search: true
+			},
+			bottomStart: {
+				pageLength: true,
+				info: true
 			}
 		},
 		footerCallback: function (row, data) {

@@ -39,7 +39,7 @@ function initProgramacionTable() {
 			title: 'Pasajeros',
 			render: function (data) {
 				if (Array.isArray(data)) {
-					return data.map(p => p.nombre).join('<br>');
+					return data.map(p => p.nombre).join('|<br>');
 				}
 				return data || '';
 			}
@@ -87,7 +87,7 @@ function initProgramacionTable() {
 		columns: columnas,
 		// Prioridad de visualización para columnas clave
 		columnDefs: (function () {
-			const visibleColumns = [2, 9,  11, 6, 7, 12, 19]; // Índices de columnas importantes
+			const visibleColumns = [3, 10,  12, 7, 8, 13, 20]; // Índices de columnas importantes
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
 		})(),
