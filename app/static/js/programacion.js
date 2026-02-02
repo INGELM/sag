@@ -20,6 +20,15 @@ function initProgramacionTable() {
 	$(wrapperId).hide();
 
 	const columnas = [
+		{
+			data: null,
+			title: '#',
+			orderable: false,
+			searchable: false,
+			render: function (_, __, ___, meta) {
+				return meta.row + 1 + meta.settings._iDisplayStart;
+			}
+		},
 		{ data: 'id', visible: false },
 		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy' },
 		{ data: 'empresa', title: 'Empresa' },
@@ -30,7 +39,7 @@ function initProgramacionTable() {
 			title: 'Pasajeros',
 			render: function (data) {
 				if (Array.isArray(data)) {
-					return data.map(p => p.nombre).join('<br>');
+					return data.map(p => p.nombre).join('|<br>');
 				}
 				return data || '';
 			}
@@ -78,7 +87,7 @@ function initProgramacionTable() {
 		columns: columnas,
 		// Prioridad de visualización para columnas clave
 		columnDefs: (function () {
-			const visibleColumns = [2, 9,  11, 6, 7, 12, 19]; // Índices de columnas importantes
+			const visibleColumns = [3, 10,  12, 7, 8, 13, 20]; // Índices de columnas importantes
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
 		})(),
@@ -114,7 +123,9 @@ function initProgramacionTable() {
 		},
 		layout: {
 			topStart: {
-				buttons: typeof getTablaBotones === 'function' ? getTablaBotones() : []
+				buttons: [typeof getTablaBotones === 'function' ? getTablaBotones() : [],
+				botonesEspeciales()
+			]
 			},
 			topEnd: {
 				buttons: typeof botonesAuxiliares === 'function' ? botonesAuxiliares() : [],

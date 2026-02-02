@@ -51,16 +51,15 @@ th {
 
 #programacionTable_processing,
 #programacionTable_wrapper .dataTables_processing {
-  position: absolute !important;
-  top: 0.25rem !important;
-  left: 0 !important;
-  right: 0 !important;
-  transform: none !important;
-  margin: 0 auto !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
   width: auto !important;
   text-align: center !important;
   padding: 0.35rem 0.8rem;
-  z-index: 10;
+  z-index: 2000;
 }
 
 #tarifasTable_wrapper {
@@ -69,16 +68,15 @@ th {
 
 #tarifasTable_processing,
 #tarifasTable_wrapper .dataTables_processing {
-  position: absolute !important;
-  top: 0.25rem !important;
-  left: 0 !important;
-  right: 0 !important;
-  transform: none !important;
-  margin: 0 auto !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
   width: auto !important;
   text-align: center !important;
   padding: 0.35rem 0.8rem;
-  z-index: 10;
+  z-index: 2000;
 }
 
 #tarifasOperadoresTable_wrapper {
@@ -87,16 +85,41 @@ th {
 
 #tarifasOperadoresTable_processing,
 #tarifasOperadoresTable_wrapper .dataTables_processing {
-  position: absolute !important;
-  top: 0.25rem !important;
-  left: 0 !important;
-  right: 0 !important;
-  transform: none !important;
-  margin: 0 auto !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
   width: auto !important;
   text-align: center !important;
   padding: 0.35rem 0.8rem;
-  z-index: 10;
+  z-index: 2000;
+}
+
+#pagosOperadoresTable_processing,
+#pagosOperadoresTable_wrapper .dataTables_processing {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  width: auto !important;
+  text-align: center !important;
+  padding: 0.35rem 0.8rem;
+  z-index: 2000;
+}
+
+#facturasClientesTable_processing,
+#facturasClientesTable_wrapper .dataTables_processing {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  width: auto !important;
+  text-align: center !important;
+  padding: 0.35rem 0.8rem;
+  z-index: 2000;
 }
 
 .dropdown-menu {

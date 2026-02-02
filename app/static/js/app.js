@@ -1,7 +1,7 @@
 $(document).ready(function () {
     // ✅ SOLUCIÓN: Configurar jQuery para enviar el token CSRF en todas las peticiones AJAX
     $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
+        beforeSend: function (xhr, settings) {
             // Solo agregar el token para métodos que lo requieren
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
                 const csrfToken = $('input[name="csrf_token"]').val();
@@ -33,7 +33,7 @@ $(document).ready(function () {
         };
 
         //console.log("Datos a enviar:", data);
-        
+
         $.ajax({
             url: '/facturacion/facturasClientes/agregar-factura',
             type: 'PUT',
@@ -78,8 +78,8 @@ $(document).ready(function () {
                 });
             }
         });
-        
-        
+
+
     });
 });
 
@@ -171,7 +171,7 @@ $.extend(true, $.fn.DataTable.defaults, {
         infoEmpty: "No hay registros disponibles",
         emptyTable: "No hay datos disponibles en la tabla",
         zeroRecords: "No se encontraron registros coincidentes"
-        
+
     },
     lengthChange: false,
     ordering: true,
@@ -360,12 +360,12 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
     // Validar si hay datos antes de procesar columnas
     if (!json.data || json.data.length === 0) {
         //console.log("No hay datos disponibles para mostrar en la tabla");
-        
+
         // Crear tabla vacía con mensaje
         if ($(tabla).hasClass('dataTable')) {
             $(tabla).DataTable().clear().destroy();
         }
-        
+
         $(tabla).DataTable({
             data: [],
             columns: [{ data: null, defaultContent: '', title: 'Sin datos' }],
@@ -373,7 +373,7 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
                 emptyTable: "No hay datos disponibles en la tabla"
             }
         });
-        
+
         return Promise.resolve({
             tabla,
             columnas: [],
@@ -387,10 +387,10 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
         const columna = {
             data: campo,
             title: campo.charAt(0).toUpperCase() + campo.slice(1).replace('_', ' '),
-            render: function(data) {
+            render: function (data) {
                 // Debug opcional (solo si necesitas)
                 // //console.log(`Columna: ${campo}, Datos:`, data);
-                
+
                 // Manejo específico para pasajeros
                 if (campo === 'pasajeros') {
                     if (Array.isArray(data)) {
@@ -399,16 +399,16 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
                     }
                     return data;
                 }
-                
+
                 return data;
             }
         };
-                
+
         // Aplicar tipo de ordenamiento personalizado para la columna de fecha (índice 1)
         if (index === 1) {
             columna.type = 'date-dd-mm-yyyy';
         }
-        
+
         return columna;
     });
 
@@ -440,8 +440,8 @@ async function baseTablas(modelo, modulo = "", empresa_id = "") {
                 var acciones = `<a href="/empleados/tarifasOperadores" title="Ver tarifas del operador">
                     <i id="oper" class="bx bxs-car" style="cursor: pointer; color:${row.color_rel};"></i>
                 </a>`;
-            return acciones;
-            
+                return acciones;
+
             }
         });
     }
@@ -471,23 +471,23 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
     // console.log("Cargando tabla con modelo:", modelo, "módulo:", modulo, "columnas visibles:", VisibleColumns);
     baseTablas(modelo, modulo).then(({ tabla, columnas, columnDefs, jsonData }) => {
 
-    
+
         // Si se especifican columnas visibles, actualiza columnDefs
         let mobileColumnDefs = Array.isArray(columnDefs) ? [...columnDefs] : [];
         if (Array.isArray(VisibleColumns) && VisibleColumns.length > 0) {
             //console.log("Columnas visibles:", VisibleColumns);
             // Si columnDefs está vacío, agregamos un objeto por cada índice a ocultar
             if (mobileColumnDefs.length === 0) {
-            mobileColumnDefs = [{
-                targets: VisibleColumns,
-                responsivePriority: 1,
-            }];
+                mobileColumnDefs = [{
+                    targets: VisibleColumns,
+                    responsivePriority: 1,
+                }];
             } else {
-            // Si ya hay reglas, agregamos/ajustamos la visibilidad
-            mobileColumnDefs.push({
-                targets: VisibleColumns,
-                responsivePriority: 1,
-            });
+                // Si ya hay reglas, agregamos/ajustamos la visibilidad
+                mobileColumnDefs.push({
+                    targets: VisibleColumns,
+                    responsivePriority: 1,
+                });
             }
         }
 
@@ -507,7 +507,7 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
                 items: 'row',
                 className: 'selected'
             },
-            
+
             language: {
                 search: "",
                 // info: "",
@@ -534,11 +534,11 @@ function cargarTabla1(modelo, modulo = "", VisibleColumns = []) {
                 topStart: {
                     buttons: modelo == 'tarifas' ? botonesEspeciales() : []
                 },
-           
+
                 topEnd: {
                     buttons: [botonesAuxiliares()[1], botonesAuxiliares()[2]],
                     search: {
-                        
+
                         // Aquí puedes personalizar la búsqueda
                     }
                 }
@@ -556,22 +556,22 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
     baseTablas(modelo, modulo, empresa_id).then(({ tabla, columnas, columnDefs, jsonData }) => {
         // Configuración base de DataTable
 
-         // Si se especifican columnas visibles, actualiza columnDefs
+        // Si se especifican columnas visibles, actualiza columnDefs
         let mobileColumnDefs = Array.isArray(columnDefs) ? [...columnDefs] : [];
         if (Array.isArray(VisibleColumns) && VisibleColumns.length > 0) {
             //console.log("Columnas visibles:", VisibleColumns);
             // Si columnDefs está vacío, agregamos un objeto por cada índice a ocultar
             if (mobileColumnDefs.length === 0) {
-            mobileColumnDefs = [{
-                targets: VisibleColumns,
-                responsivePriority: 1,
-            }];
+                mobileColumnDefs = [{
+                    targets: VisibleColumns,
+                    responsivePriority: 1,
+                }];
             } else {
-            // Si ya hay reglas, agregamos/ajustamos la visibilidad
-            mobileColumnDefs.push({
-                targets: VisibleColumns,
-                responsivePriority: 1,
-            });
+                // Si ya hay reglas, agregamos/ajustamos la visibilidad
+                mobileColumnDefs.push({
+                    targets: VisibleColumns,
+                    responsivePriority: 1,
+                });
             }
         }
 
@@ -586,7 +586,7 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
                 ajax: {
                     url: '/programacion/get_data',
                     type: 'GET',
-                    data: function(d) {
+                    data: function (d) {
                         // Agregar filtro adicional si existe
                         if (window.filtroActual) {
                             d.filtro = window.filtroActual;
@@ -780,24 +780,24 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
 
 function botonBs() {
     return [
-            {
-                init: function (dt, node, config) {
-                    const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
-                    $(node).attr('class', clase);
-                },
-                text: 'Bolivares',
-                action: function (e, dt, node, config) {
-                    const current = localStorage.getItem('Bs') === 'true';
-                    localStorage.setItem('Bs', !current);
-                    $(node)
-                        .toggleClass('btn-success', !current)
-                        .toggleClass('btn-outline-secondary', current);
-                    if (tablaInstancia) {
-                        tablaInstancia.rows().invalidate().draw(false);
-                    }
+        {
+            init: function (dt, node, config) {
+                const clase = localStorage.getItem('Bs') === 'true' ? 'btn btn-success btn-sm mb-1' : 'btn btn-outline-secondary btn-sm mb-1';
+                $(node).attr('class', clase);
+            },
+            text: 'Bolivares',
+            action: function (e, dt, node, config) {
+                const current = localStorage.getItem('Bs') === 'true';
+                localStorage.setItem('Bs', !current);
+                $(node)
+                    .toggleClass('btn-success', !current)
+                    .toggleClass('btn-outline-secondary', current);
+                if (tablaInstancia) {
+                    tablaInstancia.rows().invalidate().draw(false);
                 }
             }
-        ];
+        }
+    ];
 }
 
 function crearTabla(url, tablaId, columnas) {
@@ -806,43 +806,43 @@ function crearTabla(url, tablaId, columnas) {
     if ($(tablaId).hasClass('dataTable')) {
         $(tablaId).DataTable().clear().destroy();
     }
-        $(tablaId).DataTable({
-            ajax: {
-                url: url,
-                dataSrc: 'data'
+    $(tablaId).DataTable({
+        ajax: {
+            url: url,
+            dataSrc: 'data'
+        },
+        columns: columnas,
+        responsive: true,
+        paging: true,
+        searching: true,
+        // VisibleColumns: [1,2,3,4,11,12,13,14],
+        // targets: [1,2,3,4,11,12,13,14],
+        // responsivePriority: 1,
+        columnDefs: [
+            {
+                // columns: columnas,
+                targets: [1, 2, 3, 4, 11, 12, 13, 14, 15],
+                visible: true,
+                responsivePriority: 1,
             },
-            columns: columnas,
-            responsive: true,
-            paging: true,
-            searching: true,
-            // VisibleColumns: [1,2,3,4,11,12,13,14],
-            // targets: [1,2,3,4,11,12,13,14],
-            // responsivePriority: 1,
-            columnDefs: [
-                {
-                    // columns: columnas,
-                    targets: [1,2,3,4,11,12,13,14,15],
-                    visible: true,
-                    responsivePriority: 1,
+        ],
+        select: {
+            layout: {
+                topStart: {
+                    buttons: botonesEspeciales()
                 },
-            ],
-            select: {
-                layout: {
-                    topStart: {
-                        buttons: botonesEspeciales() 
-                    },
-                    topEnd: {
-                        // buttons: botonBs(),
-                        search: true
-                    }
-
-            
+                topEnd: {
+                    // buttons: botonBs(),
+                    search: true
                 }
-            },
-        });
+
+
+            }
+        },
+    });
 }
 
-function botonesAcciones(){
+function botonesAcciones() {
     return [
         {
             text: 'Eliminar',
@@ -926,7 +926,7 @@ function botonesAcciones(){
                                 confirmButtonText: 'Aceptar'
                             });
                         }
-                    });  
+                    });
                 }
             }
         },
@@ -968,7 +968,7 @@ function getTablaBotones() {
                 aplicarFiltro(dt, node, '', 'VIAJES');
             }
         },
-        
+
         {
             init: function (dt, node, config) {
                 $(node).attr('class', 'btn btn-outline-primary btn-sm mb-1');
@@ -1013,34 +1013,80 @@ function botonesEspeciales() {
             },
             extend: 'excelHtml5',
             text: 'Excel',
-            titleAttr: 'Exportar a Excel',
+            titleAttr: 'Excel',
+            className: 'btn btn-outline-primary btn-sm mb-1',
             exportOptions: {
-                columns: ':visible:not(.no-export)',
+                modifier: {
+                    page: 'all',
+                    search: 'applied',
+                    order: 'applied'
+                },
+                columns: ':visible:not(.no-export)', // Mantenemos tu filtro de visibles
                 format: {
                     body: function (data, row, column, node) {
-               
-                if (data === null || data === undefined) return '';
+                        if (data === null || data === undefined) return '';
 
-                // 2. Limpiar etiquetas HTML (como los <br> de pasajeros)
-                if (typeof data === 'string') {
-                    data = data.replace(/<[^>]+>/g, '');
-                }
+                        // 1. Limpiar etiquetas HTML (como los <br> de pasajeros)
+                        if (typeof data === 'string') {
+                            data = data.replace(/<[^>]+>/g, '');
+                        }
 
-                /* 3. Lógica para montos (Costo base, Total, etc.)
-                   Detectamos si la columna usa 'formatearMonto'.
-                */
-                if (typeof data === 'string' && /^-?\d{1,3}(\.\d{3})*,\d{2}$/.test(data)) {
-                    return data.replace(/\./g, '').replace(',', '.');
-                }
+                        // 2. Lógica para montos (Convierte "1.234,56" a "1234.56" para que Excel lo reconozca como número)
+                        if (typeof data === 'string' && /^-?\d{1,3}(\.\d{3})*,\d{2}$/.test(data)) {
+                            return data.replace(/\./g, '').replace(',', '.');
+                        }
 
-                // 4. Manejo de Arrays (Pasajeros)
-                if (Array.isArray(data)) {
-                    return data.map(p => p.nombre || p).join(', ');
-                }
+                        // 3. Manejo de Arrays (Pasajeros)
+                        if (Array.isArray(data)) {
+                            return data.map(p => p.nombre || p).join(', ');
+                        }
 
-                return data;
-            }
+                        return data;
+                    }
                 }
+            },
+            action: function (e, dt, button, config) {
+                var self = this;
+                var oldStart = dt.settings()[0]._iDisplayStart;
+                var oldLength = dt.settings()[0]._iDisplayLength;
+
+                // Cambiamos el estado visual del botón
+                $(button).prop('disabled', true).text('Procesando...');
+
+                var finalizarBoton = function () {
+                    dt.buttons.info(false);
+                    $(button).removeClass('processing');
+                    $(button).prop('disabled', false).text('Excel');
+                };
+
+                // 1. Preparar petición para exportar todo lo filtrado
+                dt.one('preXhr', function (e, s, data) {
+                    data.start = 0;
+                    data.length = 10000;
+                });
+
+                // 2. Capturar el evento de llegada de datos
+                dt.one('xhr', function (e, settings, json) {
+                    setTimeout(function () {
+                        // LLAMADA CLAVE: Se pasa el callback como 5to argumento para detener el spin
+                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(self, e, dt, button, config, function () {
+                            finalizarBoton();
+                        });
+
+                        // 3. Restaurar la paginación original del usuario
+                        dt.one('preXhr', function (e, s, data) {
+                            data.start = oldStart;
+                            data.length = oldLength;
+                        });
+
+                        setTimeout(function () {
+                            dt.ajax.reload(null, false);
+                        }, 200);
+                    }, 50);
+                });
+
+                // Disparar la recarga para traer los datos de exportación
+                dt.ajax.reload();
             }
         },
         {
@@ -1050,24 +1096,11 @@ function botonesEspeciales() {
             extend: 'print',
             text: 'Imprimir',
             titleAttr: 'Imprimir',
-            className: 'btn btn-danger btn-sm mb-1',
+            className: 'btn btn-outline-primary btn-sm mb-1',
             exportOptions: {
                 rows: { search: 'applied' },
                 columns: ':visible:not(.no-export)',
-                format: {
-                    body: function (data) {
-                        if (typeof data === 'string') {
-                            return data.replace(/<[^>]+>/g, '');
-                        }
-                        if (Array.isArray(data)) {
-                            return data.join(', ');
-                        }
-                        if (typeof data === 'object' && data !== null) {
-                            return Object.values(data).join(', ');
-                        }
-                        return data;
-                    }
-                }
+                // ... resto de tu formato ...
             }
         }
     ];
@@ -1109,7 +1142,7 @@ function botonesAuxiliares() {
             $(node).text('Seleccionar todos');
         },
         text: 'Seleccionar todos',
-        action: function(e, dt, node, config) {
+        action: function (e, dt, node, config) {
             if (dt.rows({ search: 'applied' }).count() > 0) {
                 if ($(node).text() === 'Seleccionar todos') {
                     dt.rows({ search: 'applied' }).select();
@@ -1279,7 +1312,7 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                         this.selectize.clear();
                     }
                 });
-                
+
                 if (metodo === 'PUT') {
                     $(".formulario").addClass("visually-hidden");
                     window.registroIdEditar = null;
@@ -1287,12 +1320,12 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                     $(".botonForm").text('Registrar');
                     // $(`#${modelo}Form`).attr('method', 'POST');
                 }
-                
+
                 // Recargar solo la tabla sin refrescar la página
                 const columnasVisibles = {
                     programacion: [1, 3, 9, 10, 12, 15, 27]
                 };
-                
+
                 if (modelo === 'programacion') {
                     //cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
                     console.log("Recargando tabla de programación después de guardar...");
@@ -1338,7 +1371,7 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
 function eliminarFacturasRecibos(factura_id, recibo_id, modelo, varModulo) {
     const url_facturas = `/facturacion/facturasClientes`;
     const url_recibos = `/facturacion/pagosOperadores`;
-    
+
     $.ajax({
         url: url_facturas,
         type: 'DELETE',
@@ -1413,7 +1446,7 @@ function eliminarFacturasRecibos(factura_id, recibo_id, modelo, varModulo) {
 function eliminarSeleccionados(modelo) {
     const tabla = `#${modelo}Table`;
     const dt = $(tabla).DataTable();
-    
+
     if (dt.rows({ selected: true }).count() === 0) {
         Swal.fire({
             icon: 'warning',
@@ -1426,7 +1459,7 @@ function eliminarSeleccionados(modelo) {
 
     // Extraer los IDs correctamente
     const registroIds = [];
-    dt.rows({ selected: true }).every(function() {
+    dt.rows({ selected: true }).every(function () {
         const data = this.data();
         registroIds.push(data.id);
     });
@@ -1450,7 +1483,7 @@ function eliminarSeleccionados(modelo) {
         if (result.isConfirmed) {
             const basePath = (window.modulo && window.modulo !== modelo) ? `/${window.modulo}/${modelo}` : `/${modelo}`;
             const url = basePath;
-            
+
             $.ajax({
                 url: url,
                 type: 'DELETE',
@@ -1501,7 +1534,7 @@ function eliminarSeleccionados(modelo) {
 }
 
 function editar(id) {
- 
+
 
     llenarFormulario(id);
 
@@ -1511,7 +1544,7 @@ function editar(id) {
     $(".botonForm").text('Actualizar');
     $(`#${window.modelo}Form`).attr('method', 'PUT');
 
-    modelo === 'programacion' ?   modoFlatPickr(): null;
+    modelo === 'programacion' ? modoFlatPickr() : null;
 }
 
 
@@ -1530,13 +1563,13 @@ function llenarFormulario(id) {
             if (response.success) {
                 console.log("Datos obtenidos:", response.data);
                 const data = response.data;
-                
+
                 // Guardar el status original en el formulario para detectar cambios
                 if (data.status) {
                     $(`#${modelo}Form`).data('status-original', data.status);
                     //console.log(`Status original guardado: ${data.status}`);
                 }
-                
+
                 Object.keys(data).forEach(key => {
                     const $campo = $(`#${modelo}Form [name="${key}"]`);
                     // console.log(`Procesando campo: ${$campo[0].name} para la clave: ${key} con valor: ${data[key]}`);
@@ -1545,12 +1578,12 @@ function llenarFormulario(id) {
                         console.warn(`⚠️ Campo no encontrado en el formulario para la clave: ${key}`);
                     }
 
-                    
+
                     if ($campo.length) {
                         // CASO ESPECIAL PARA CHECKBOX
                         if ($campo.attr('type') === 'Checkbox') {
                             //console.log(`🔘 Checkbox detectado: ${key}, valor: ${data[key]}`);
-                            
+
                             // Convertir el valor a booleano
                             const isChecked = Boolean(data[key]);
                             $campo.prop('checked', isChecked);
@@ -1609,7 +1642,7 @@ function llenarFormulario(id) {
             }
 
         }
-        
+
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.error("Error al obtener los datos:", textStatus, errorThrown);
         Swal.fire({

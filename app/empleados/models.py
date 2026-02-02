@@ -28,6 +28,10 @@ class empleadosModel(db.Model, UserMixin):
         self.rol = rol if rol else None
         self.is_admin = self.check_admin()
 
+    @property
+    def nombres_(self):
+        return self.nombres.title() if self.nombres else ""
+    
     def check_admin(self):
         return True if self.rol == 'Admin' else False
 
@@ -44,7 +48,7 @@ class empleadosModel(db.Model, UserMixin):
     def check_password(self, contrasena):
         approved = check_password_hash(self.contrasena, contrasena) 
         # current_app.logger.debug(f'Contraseña: {self.contrasena}, Ingreso: {contrasena}, Aprobado: {approved}')
-        current_app.logger.debug(f'Contraseña verificada para {self.usuario}: {approved}')
+        # current_app.logger.debug(f'Contraseña verificada para {self.usuario}: {approved}')
         return approved
 
     def save(self):

@@ -94,6 +94,7 @@
                   <th></th>
                   <th></th>
                   <th></th>
+                  <th></th>
 
                   <!-- Repite esto para cada columna -->
                   <th id=""></th> <!-- Esta será la columna del total -->
@@ -110,7 +111,7 @@
 
 {% block JS %}
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-  <script src="{{ url_for('facturacion.static', filename='js/facturacionTables.js') }}"></script>
+  <script src="{{ url_for('facturacion.static', filename='js/pagoOperadores.js') }}"></script>
   <script src="{{ url_for('static', filename='js/datatable-doubleclick.js') }}"></script>
   <script src="{{ url_for('facturacion.static', filename='js/facturacion.js') }}"></script>
 {% endblock %}

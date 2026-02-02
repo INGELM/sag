@@ -13,6 +13,10 @@ $(document).ready(async function () {
 		return;
 	}
 
+	if (modelo === 'pagosOperadores') {
+		return;
+	}
+
 	window.tablaId = `#${modelo}Table`;
 
 	await cargarTasaGlobal();
@@ -47,6 +51,15 @@ function formatearMonto(valor) {
 
 function columnasFacturasClientes() {
 	return [
+			{
+			data: null,
+			title: '#',
+			orderable: false,
+			searchable: false,
+			render: function (_, __, ___, meta) {
+				return meta.row + 1 + meta.settings._iDisplayStart;
+			}
+		},
 		{ data: 'id', visible: false },
 		{ data: 'fecha', title: 'Fecha' },
 		{ data: 'cliente', title: 'Cliente' },
@@ -55,7 +68,7 @@ function columnasFacturasClientes() {
 			title: 'Pasajeros',
 			render: function (data) {
 				if (Array.isArray(data)) {
-					return data.map(p => p.nombre).join('<br>');
+					return data.map(p => p.nombre).join('|<br>');
 				}
 				return '';
 			}
@@ -80,41 +93,9 @@ function columnasFacturasClientes() {
 	];
 }
 
-function columnasPagosOperadores() {
-	return [
-		{ data: 'id', visible: false },
-		{ data: 'fecha', title: 'Fecha' },
-		{ data: 'Operador', title: 'Operador' },
-		{ data: 'cliente', title: 'Cliente' },
-		{
-			data: 'pasajeros',
-			title: 'Pasajeros',
-			render: function (data) {
-				if (Array.isArray(data)) {
-					return data.map(p => p.nombre).join('<br>');
-				}
-				return '';
-			}
-		},
-		{ data: 'guia', title: 'Guía' },
-		{ data: 'hora_salida', title: 'Hora salida' },
-		{ data: 'hora_retorno', title: 'Hora retorno' },
-		{ data: 'horario', title: 'Horario' },
-		{ data: 'desplazamiento', title: 'Desplaz.' },
-		{ data: 'origen', title: 'Origen' },
-		{ data: 'destino', title: 'Destino' },
-		{ data: 'distancia', title: 'Distancia' },
-		{ data: 'desvíos', title: 'Desvíos' },
-		{ data: 'total_desvios', title: 'Total desvíos', render: formatearMonto },
-		{ data: 'tiempo_espera', title: 'T. espera' },
-		{ data: 'total_espera', title: 'Total espera', render: formatearMonto },
-		{ data: 'costo_base', title: 'Costo base', render: formatearMonto },
-		{ data: 'total_', title: 'Total', render: formatearMonto },
-	];
-}
-
 function columnasCobroDetalle() {
 	return [
+	
 		{ data: 'id', visible: false },
 		{ data: 'fecha', title: 'Fecha' },
 		{ data: 'cliente', title: 'Cliente' },
@@ -135,7 +116,9 @@ function columnasCobroDetalle() {
 }
 
 function inicializarTablaServerSide(modelo) {
-	const columnas = modelo === 'pagosOperadores' ? columnasPagosOperadores() : columnasFacturasClientes();
+	const columnas = columnasFacturasClientes();
+	const fechaIndex = columnas.findIndex(col => col.data === 'fecha');
+	const orderBy = fechaIndex !== -1 ? [[fechaIndex, 'desc']] : [[1, 'desc']];
 	const tablaSel = $(window.tablaId);
 	if (tablaSel.hasClass('dataTable')) {
 		tablaSel.DataTable().clear().destroy();
@@ -153,7 +136,7 @@ function inicializarTablaServerSide(modelo) {
 			}
 		},
 		columns: columnas,
-		order: [[1, 'desc']],
+		order: orderBy,
 		pageLength: 40,
 		pagingType: 'numbers',
 		responsive: true,
@@ -165,17 +148,28 @@ function inicializarTablaServerSide(modelo) {
 		},
 		language: {
 			search: '',
+			processing: "",
 			select: {
 				rows: {
-					_: 'Has seleccionado %d filas',
-					0: 'Haz clic en una fila para seleccionarla',
+					_: '%d filas seleccionadas',
+					// 0: 'Haz clic en una fila para seleccionarla',
 					1: '1 fila seleccionada'
+				},
+				cells: {
+					0: ""
+				},				
+				columns: {
+					0: ""
 				}
 			}
 		},
 		columnDefs: (function () {
-			const priorityTargets = [1, 2, 5, 9, 10, 11, 18, 19].filter(idx => idx < columnas.length);
-			const defs = [{ targets: [0], visible: false, searchable: false }];
+			const priorityKeys = ['fecha', 'cliente', 'guia', 'desplazamiento', 'origen', 'destino', 'costo_base', 'total_'];
+			const priorityTargets = priorityKeys
+				.map(key => columnas.findIndex(col => col.data === key))
+				.filter(idx => idx >= 0);
+			const idIndex = columnas.findIndex(col => col.data === 'id');
+			const defs = idIndex !== -1 ? [{ targets: [idIndex], visible: false, searchable: false }] : [];
 			if (priorityTargets.length) {
 				defs.push({ targets: priorityTargets, responsivePriority: 1 });
 			}
@@ -227,7 +221,7 @@ function inicializarTablaServerSide(modelo) {
 		// Si tiene footer de totales, recalcula al redibujar
 		dt.columns.adjust();
 	});
-	agregarDobleClickPersonalizado(window.tablaId, 'abrir_modal');
+	// agregarDobleClickPersonalizado(window.tablaId, 'abrir_modal');
 }
 
 function inicializarTablaCobroDetalle() {
@@ -263,9 +257,15 @@ function inicializarTablaCobroDetalle() {
 			search: '',
 			select: {
 				rows: {
-					_: 'Has seleccionado %d filas',
-					0: 'Haz clic en una fila para seleccionarla',
+					_: 'Seleccionada %d filas',
+					// 0: 'Haz clic en una fila para seleccionarla',
 					1: '1 fila seleccionada'
+				},
+				columns: {
+					0: ""
+				},
+				cells: {
+					0: ""
 				}
 			}
 		},

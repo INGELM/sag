@@ -43,7 +43,7 @@ class programacionForm(FlaskForm):
     fecha_salida = StringField('Fecha de Salida', validators=[DataRequired(message='La fecha de salida es obligatoria.')], render_kw={"class": "form-control", "id": "fecha_salida", "placeholder": "Fecha de Salida"})
     hora_salida = TimeField('Hora de Salida', render_kw={"class": "form-control"})
     hora_retorno = TimeField('Hora de Retorno', validators=[Optional()], render_kw={"class": "form-control", "id": "hora-retorno-form"})
-    empresa = QuerySelectField('Empresa', query_factory=get_empresas, get_label='empresa', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"class": "form-control ", "id": "empresa-select"})
+    empresa = QuerySelectField('Empresa', query_factory=get_empresas, get_label='empresa_', validators=[DataRequired(message='La empresa es obligatoria.')], render_kw={"class": "form-control ", "id": "empresa-select"})
     pasajeros = QuerySelectMultipleField(
         'Pasajeros',
         query_factory=get_pasajeros,
@@ -53,7 +53,7 @@ class programacionForm(FlaskForm):
         validators=[DataRequired(message='Debe seleccionar al menos un pasajero.')],
         render_kw={"class": "form-control pasajero-select", "id": "pasajeros-select", "multiple": True}
     )
-    operador = QuerySelectField('Operador', query_factory=get_operadores, allow_blank=True, blank_text="Seleccione Operador", get_label='nombres',render_kw={"class": "form-control operador-select", "id": "operador-select"})
+    operador = QuerySelectField('Operador', query_factory=get_operadores, allow_blank=True, blank_text="Seleccione Operador", get_label='nombres_',render_kw={"class": "form-control operador-select", "id": "operador-select"})
     direccion_origen = SelectMultipleField(
         'Dirección Origen',
         choices=[],
@@ -62,7 +62,7 @@ class programacionForm(FlaskForm):
         render_kw={"class": "form-control", "id": "direccion-origen"}
     )
     # direccion_origen = StringField('Dirección Origen', render_kw={"placeholder": "Dirección Origen", "class": "form-control", "id":"direccion-origen"}, validators=[Optional()])
-    origen = QuerySelectField('Ciudad Origen', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre', validators=[DataRequired(message='La ciudad de origen es obligatoria.')], render_kw={"class": "form-control origen-select", "id": "ciudad-origen-select"})
+    origen = QuerySelectField('Ciudad Origen', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre_', validators=[DataRequired(message='La ciudad de origen es obligatoria.')], render_kw={"class": "form-control origen-select", "id": "ciudad-origen-select"})
     direccion_destino = SelectMultipleField(
         'Dirección Destino',
         choices=[],
@@ -70,7 +70,7 @@ class programacionForm(FlaskForm):
         validate_choice=False,
         render_kw={"class": "form-control", "id": "direccion-destino"}
     )
-    destino = QuerySelectField('Ciudad Destino', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre', validators=[DataRequired(message='La ciudad de destino es obligatoria.')], render_kw={"class": "form-control destino-select", "id": "ciudad-destino-select"})
+    destino = QuerySelectField('Ciudad Destino', query_factory=get_ciudades, allow_blank=True, blank_text="Seleccione Ciudad", get_label='nombre_', validators=[DataRequired(message='La ciudad de destino es obligatoria.')], render_kw={"class": "form-control destino-select", "id": "ciudad-destino-select"})
     vehiculo = QuerySelectField('Vehículo', query_factory=get_vehiculos, allow_blank=True, blank_text="Seleccione Vehículo", get_label='tipo', render_kw={"class": "form-control vehiculo-select"})
     distancia = FloatField('Distancia', render_kw={"placeholder": "Distancia", "class": "form-control"}, validators=[Optional()], default=0.0)
     tiempo_espera = IntegerField('Tiempo de Espera', render_kw={"placeholder": "Tiempo de Espera", "class": "form-control"}, validators=[Optional()], default=0)

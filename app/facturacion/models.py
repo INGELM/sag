@@ -157,7 +157,7 @@ class pagosOperadoresModel(db.Model):
             "hora_salida": self.programacion_rel.hora_salida.strftime('%H:%M') if self.programacion_rel else None,
             "hora_retorno": self.programacion_rel.hora_retorno.strftime('%H:%M') if self.programacion_rel.hora_retorno else "--",
             "horario": self.programacion_rel.turno if self.programacion_rel else None,
-            "desplazamiento": self.programacion_rel.desplazamiento if self.programacion_rel else None,
+            "desplazamiento": "Ida y Vuelta"if self.programacion_rel.desplazamiento == "idav" else "Ida",
             "origen": self.programacion_rel.origen_rel.nombre if self.programacion_rel else None,
             "destino": self.programacion_rel.destino_rel.nombre if self.programacion_rel else None,
             "distancia": self.programacion_rel.distancia if self.programacion_rel.distancia else "--",

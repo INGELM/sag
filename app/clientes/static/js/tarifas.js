@@ -76,7 +76,7 @@ $(document).ready(function () {
 			select: {
 				rows: {
 					_: 'Has seleccionado %d filas',
-					0: 'Haz clic en una fila para seleccionarla',
+					// 0: 'Haz clic en una fila para seleccionarla',
 					1: '1 fila seleccionada'
 				}
 			}

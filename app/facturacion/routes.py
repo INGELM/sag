@@ -3,7 +3,7 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 from app.clientes.models import clientesModel, pasajerosModel, tarifasModel, recargoVehiculosModel
 from app.auxiliares.models import ciudadesModel
-from app.empleados.models import tarifasOperadoresModel
+from app.empleados.models import empleadosModel, tarifasOperadoresModel
 from app.facturacion import facturacion_bp
 from app.extensions import db
 from flask_login import login_required, current_user
@@ -480,10 +480,11 @@ def pagos_operadores_data():
 
     base_query = pagosOperadoresModel.query.join(programacionModel)
     base_query = (base_query
-                  .outerjoin(programacionModel.pasajeros)
-                  .outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
-                  .outerjoin(origen_alias, programacionModel.origen == origen_alias.id)
-                  .outerjoin(destino_alias, programacionModel.destino == destino_alias.id))
+                .outerjoin(programacionModel.pasajeros)
+                .outerjoin(clientesModel, pasajerosModel.empresa == clientesModel.id)
+                .outerjoin(origen_alias, programacionModel.origen == origen_alias.id)
+                .outerjoin(destino_alias, programacionModel.destino == destino_alias.id)
+                .outerjoin(empleadosModel, programacionModel.operador == empleadosModel.id))
 
     total_records = pagosOperadoresModel.query.count()
 
@@ -503,7 +504,8 @@ def pagos_operadores_data():
                 clientesModel.empresa.ilike(like_term),
                 pasajerosModel.nombres.ilike(like_term),
                 origen_alias.nombre.ilike(like_term),
-                destino_alias.nombre.ilike(like_term)
+                destino_alias.nombre.ilike(like_term),
+                empleadosModel.nombres.ilike(like_term)
             ))
 
         if term_filters:

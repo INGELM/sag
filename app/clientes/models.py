@@ -37,19 +37,22 @@ class clientesModel(db.Model):
         self.telefono = telefono if telefono else None
 
     @property
-    def empresa_normalized(self):
-        # empresa = self.empresa.split() if self.empresa else ''
-        # empresa_titulo = []
-        # for palabra in empresa:
-        #     if palabra.isupper() and len(palabra) < 4:
-        #         empresa_titulo.append(palabra.upper())
-        #     elif palabra.lower() in ['de', 'la', 'del', 'y', 'el', 'los', 'las', 'a', 'en', 'al']:
-        #         empresa_titulo.append(palabra.lower())
-        #     else:
-        #         empresa_titulo.append(palabra.capitalize())
-        # print(empresa_titulo)
-        # return ' '.join(empresa_titulo)
-        return self.empresa.title() if self.empresa else ''
+    def empresa_(self):
+        empresa = self.empresa.split() if self.empresa else ''
+        empresa_titulo = []
+        for palabra in empresa:
+            palabra = palabra.strip(",")
+            if palabra.lower() in ['de', 'la', 'del', 'y', 'el', 'los', 'las', 'a', 'en', 'al']:
+                empresa_titulo.append(palabra.lower())
+            elif palabra in ['S.A.', 'C.A.', 'S.R.L.', 'E.U.', 'E.I.R.L.']:
+                empresa_titulo.append(palabra.upper())
+            elif len(palabra) < 4:
+                print(palabra)
+                empresa_titulo.append(palabra.upper())
+            else:
+                empresa_titulo.append(palabra.capitalize())
+        return ' '.join(empresa_titulo)
+        # return self.empresa.title() if self.empresa else ''
 
     
     
@@ -146,6 +149,10 @@ class pasajerosModel(db.Model):
         self.ciudad = ciudad.id if hasattr(ciudad, 'id') else ciudad
         self.direccion = direccion.title() if direccion else None
 
+    @property
+    def nombres_(self):
+        return self.nombres.title() if self.nombres else None
+    
     def save(self):
         db.session.add(self)
         db.session.commit()
