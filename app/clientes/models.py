@@ -3,6 +3,7 @@ from app.empleados.models import tarifasOperadoresModel
 from app.extensions import db
 from sqlalchemy import or_
 from flask_login import current_user
+import unicodedata
 
 
 
@@ -53,6 +54,14 @@ class clientesModel(db.Model):
                 empresa_titulo.append(palabra.capitalize())
         return ' '.join(empresa_titulo)
         # return self.empresa.title() if self.empresa else ''
+
+    # @property
+    # def empresa_normalized(self):
+    #     if not self.empresa:
+    #         return ''
+    #     normalized = unicodedata.normalize('NFKD', self.empresa)
+    #     normalized = ''.join(c for c in normalized if not unicodedata.combining(c))
+    #     return ' '.join(normalized.lower().split())
 
     
     
