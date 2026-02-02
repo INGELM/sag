@@ -145,7 +145,7 @@ function inicializarTablaPagosOperadores(modelo) {
 				search: true
 			},
 			bottomStart: {
-				pageLength: true,
+				// pageLength: true,
 				info: true
 			}
 		},

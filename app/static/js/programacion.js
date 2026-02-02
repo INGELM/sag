@@ -123,7 +123,9 @@ function initProgramacionTable() {
 		},
 		layout: {
 			topStart: {
-				buttons: typeof getTablaBotones === 'function' ? getTablaBotones() : []
+				buttons: [typeof getTablaBotones === 'function' ? getTablaBotones() : [],
+				botonesEspeciales()
+			]
 			},
 			topEnd: {
 				buttons: typeof botonesAuxiliares === 'function' ? botonesAuxiliares() : [],
