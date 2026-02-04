@@ -1021,7 +1021,7 @@ function botonesEspeciales() {
                     search: 'applied',
                     order: 'applied'
                 },
-                columns: ':visible:not(.no-export)', // Mantenemos tu filtro de visibles
+                columns: ':not(.no-report)', // Mantenemos tu filtro de visibles
                 format: {
                     body: function (data, row, column, node) {
                         if (data === null || data === undefined) return '';

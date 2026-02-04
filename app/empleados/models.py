@@ -166,7 +166,7 @@ class tarifasOperadoresModel(db.Model):
             for key, value in kwargs.items():
                 if hasattr(self, key) and value is not None:
                     setattr(self, key, value)
-                    current_app.logger.debug(f"Actualizando {key} a {value}")
+                    # current_app.logger.debug(f"Actualizando {key} a {value}")
             db.session.commit()
         except Exception as e:
             db.session.rollback()

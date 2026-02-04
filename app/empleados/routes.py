@@ -40,7 +40,7 @@ def empleados():
             # current_app.logger.debug("Solicitud PUT recibida.")
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
         # empleado_data = request.get_json()
-        current_app.logger.debug(f'Recibido datos de empleado para actualizar: {empleado_data}')
+        # current_app.logger.debug(f'Recibido datos de empleado para actualizar: {empleado_data}')
         if not empleado_data or 'id' not in empleado_data:
             return jsonify(success=False, mensaje='Datos de empleado inválidos.')
 
@@ -67,7 +67,7 @@ def empleados():
             return jsonify(success=True, mensaje='Empleado actualizado exitosamente.')
 
         except Exception as e:
-            current_app.logger.debug(f'Error al actualizar empleado: {e}')
+            # current_app.logger.debug(f'Error al actualizar empleado: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': "No se pudo actualizar el empleado.",
@@ -80,7 +80,7 @@ def empleados():
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
 
         empleado_id = request.get_json().get('id')
-        current_app.logger.debug(f'Recibido ID de empleado para eliminar: {empleado_id}')
+        # current_app.logger.debug(f'Recibido ID de empleado para eliminar: {empleado_id}')
         if not empleado_id:
             return jsonify(success=False, mensaje='ID de empleado inválido.')
 
@@ -151,12 +151,12 @@ def all_empleados():
     try:
         if current_user.is_admin:
             empleados = empleadosModel.query.all()
-            current_app.logger.debug("todos los empleados")
+            # current_app.logger.debug("todos los empleados")
         else:
             empleados = empleadosModel.query.filter_by(
                 usuario=current_user.usuario).all()
 
-            current_app.logger.debug("empleados del usuario", empleados)
+            # current_app.logger.debug("empleados del usuario", empleados)
 
         empleados_serialized = [e.serialize() for e in empleados]
 
@@ -338,7 +338,7 @@ def tarifas_operador():
 def tarifas_operadores():
     form = tarifasOperadoresForm()
 
-    current_app.logger.debug(f'Datos recibidos para registrar tarifa: {form.data}')
+    # current_app.logger.debug(f'Datos recibidos para registrar tarifa: {form.data}')
 
     if request.method == 'POST' and form.validate_on_submit():
         # Procesar los datos del formulario
@@ -356,12 +356,12 @@ def tarifas_operadores():
             nueva_tarifa.save()
             return jsonify(success=True, mensaje='Tarifa registrada exitosamente.')
         except Exception as e:
-            current_app.logger.debug(f'Error al registrar tarifa: {e}')
+            # current_app.logger.debug(f'Error al registrar tarifa: {e}')
             return jsonify(success=False, mensaje='Error al registrar la tarifa.', errores=str(e))
 
     elif request.method == 'DELETE':
         tarifa_id = request.get_json().get('id')
-        current_app.logger.debug(f'Recibido ID de tarifa para eliminar: {tarifa_id}')
+        # current_app.logger.debug(f'Recibido ID de tarifa para eliminar: {tarifa_id}')
         if not tarifa_id:
             return jsonify(success=False, mensaje='ID de tarifa inválido.')
 
@@ -383,7 +383,7 @@ def tarifas_operadores():
 
     elif request.method == 'PUT' and form.validate_on_submit():
         request_data = request.get_json()
-        current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {request_data}')
+        # current_app.logger.debug(f'Recibido datos de tarifa para actualizar: {request_data}')
 
         tarifa_id = request_data.get('id')
         if not tarifa_id:
@@ -410,11 +410,11 @@ def tarifas_operadores():
             tarifa.update()
             return jsonify(success=True, mensaje='Tarifa actualizada exitosamente.')
         except Exception as e:
-            current_app.logger.debug(f'Error al actualizar tarifa: {e}')
+            # current_app.logger.debug(f'Error al actualizar tarifa: {e}')
             return jsonify(success=False, mensaje='Error al actualizar la tarifa.', errores=str(e))
 
     elif form.errors:
         first_field, first_errors = next(iter(form.errors.items()))
-        current_app.logger.debug(f'Errores en el formulario: {first_field} : {first_errors}')
+        # current_app.logger.debug(f'Errores en el formulario: {first_field} : {first_errors}')
         return jsonify(success=False, mensaje='Error de validación.', errores=f'{first_field} : {first_errors}')
 

@@ -29,8 +29,8 @@ function initProgramacionTable() {
 				return meta.row + 1 + meta.settings._iDisplayStart;
 			}
 		},
-		{ data: 'id', visible: false },
-		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy' },
+		{ data: 'id', visible: false, className: 'no-report' },
+		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy', className: 'exportable' },
 		{ data: 'empresa', title: 'Empresa' },
 		{ data: 'workflow', title: 'Workflow' },
 		{ data: 'guia', title: 'Guía' },
@@ -55,17 +55,17 @@ function initProgramacionTable() {
 		{ data: 'horario', title: 'Horario' },
 		{ data: 'desplazamiento', title: 'Desplaz.', visible: false, searchable: false },
 		// { data: 'distancia', title: 'Km' },
-		{ data: 'tiempo_espera', title: 'T. Espera' },
+		{ data: 'tiempo_espera', title: 'Tiempo Espera' },
 		{ data: 'desvios', title: 'Desvíos' },
 		{ data: 'status', title: 'Status', visible: false, searchable: false },
 		{ data: 'observaciones', title: 'Observaciones' },
 		// Ocultas para mantener datos base
-		{ data: 'empresa_rel', visible: false, searchable: false },
-		{ data: 'origen_rel', visible: false, searchable: false },
-		{ data: 'destino_rel', visible: false, searchable: false },
-		{ data: 'operador_rel', visible: false, searchable: false },
-		{ data: 'vehiculo_rel', visible: false, searchable: false },
-		{ data: 'fecha_salida_rel', visible: false, searchable: false },
+		{ data: 'empresa_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'origen_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'destino_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'operador_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'vehiculo_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'fecha_salida_rel', visible: false, searchable: false, className: 'no-report' },
 	];
 
 	const dt = tablaSel.DataTable({

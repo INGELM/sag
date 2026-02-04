@@ -1,0 +1,147 @@
+[33md2824f0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mwa[m[33m)[m proccessing centrado
+[33mdb06bab[m page lenght
+[33m3a3c0bc[m #fila
+[33mabf485b[m #fila
+[33m7557651[m control3
+[33m5d7be28[m Control2
+[33m81c890b[m control
+[33m9365565[m modf gitignore
+[33m1bad2e0[m[33m ([m[1;32m20260131produccion[m[33m)[m fix/exportar excel
+[33m34820ef[m add/titulos de tablas
+[33m96f6b41[m release C/ Normalizacion-Texto-Tablas C1
+[33mb03e9b7[m Control/listo Bs
+[33m8c77da5[m TarfasOP
+[33m5aedd65[m serverSide TarifasOP
+[33mfa08977[m release B
+[33mbb72da2[m fix/filtro tarifas
+[33m3d9f032[m fix/filtro tarifas
+[33m1a3234f[m ServerSida/all
+[33me33de13[m[33m ([m[1;32mfacturacionServerS[m[33m)[m facturacion listo
+[33m016a0f5[m control1
+[33mb4bd7d0[m[33m ([m[1;32mfiltroFechas[m[33m)[m fix/Prog-filtros
+[33m9a22096[m release/fix col priority
+[33m1c6534d[m release/delete col km
+[33m9629b74[m release/fix env
+[33m7a974f1[m 20260121relase
+[33m66fa939[m[33m ([m[1;32mwhatsapp[m[33m)[m control2
+[33m0a91d35[m c1/comentando_debug
+[33m4339ba4[m[33m ([m[1;32mtransporte[m[33m)[m fix/separador decimal
+[33m802c6d3[m c1/transporte
+[33m83c1f15[m new/Transporte
+[33m433d96b[m Control/Pendiente Transporte
+[33md687174[m[33m ([m[1;32mserverSideLoad[m[33m)[m Fix/prioridad
+[33mf1af876[m ServerSideOKOK
+[33m1446193[m chore: limpieza de conflictos residuales tras revert
+[33mc51abf6[m ServerSide OK
+[33ma7bd0fc[m tarifas ServerSide+filtro
+[33m42b3a1b[m tarifas/serverSide
+[33mec2c36b[m programacion/serverSide
+[33m0790610[m[33m ([m[1;32missue/turno[m[33m)[m fix/finalizar sin tarifas operador y cliente
+[33m3260b49[m add/boton excel a tabla tarifas
+[33mf5e2317[m fix/formato fecha
+[33m5489137[m fix/turno
+[33m5ad85ab[m control 1
+[33m650905b[m fix/caracter especial Ó
+[33mf4eb2db[m fix/caracter especial
+[33m0ef6ffe[m fix/asci error
+[33m0d4ef5a[m 20260116 control/avance produccion
+[33m0879859[m[33m ([m[1;32mtablas-update[m[33m)[m 20260116 control/Corte Producción
+[33m5cb81e5[m Control modo transporte
+[33mfee60c4[m add/campos adicionales en tarifas op
+[33mad196fe[m 20260115 Control
+[33mda8b72d[m fix/editar registros
+[33m8500b56[m fix .env
+[33me6241b9[m normalizado nombre empresa
+[33mba28cfe[m corregido correlativo de tarifa, valores por defecto vacios
+[33m8c9211d[m rev06: GrupoA listo
+[33m885ffe4[m fix/ida y vuelta, add/columnas a tarifasOp
+[33m986ea53[m Corregido ciudad origen/destino en detalle Modal
+[33m87d647a[m revision05, lista
+[33m671615e[m Columnas y selectores ordenados, no mantiene datos del formulario
+[33m0283515[m Workflow unico
+[33m2e8173f[m ordenar selectores
+[33m4397277[m lista revision05
+[33m22a97e5[m Mejora visibilidad column Facturacion
+[33m1162fb5[m ajuste visibilidad de columnas
+[33m85cd25b[m Factura autom al agr Numero
+[33md22b88b[m mejora/Ordenar alfabetico selectize
+[33mae37795[m issue/GuardarRegistro corregido
+[33ma77ec35[m[33m ([m[1;32mrevision04[m[33m)[m control 1: corregida
+[33md197bf1[m mensaje sin datos
+[33m6a8d0bc[m funcion eliminar funciona correctamente
+[33meac7f00[m permite agr varios pasajeros al editar
+[33m7bb790c[m actualizar correctamente ida e idav
+[33mc21d29e[m Filtro por fechas solucionado
+[33mb1f1f71[m ordenar por fechas
+[33m5f57f26[m corrgida uso de Tasa
+[33mec0b48d[m corrgida uso de Tasa
+[33m08badd3[m corregido filtro por fechas
+[33m5c1e840[m issue/eliminar finalizados
+[33me9d2d94[m permiso eliminar para Programador
+[33m730adec[m Permiso Eliminar para Programador
+[33made7e4f[m[33m ([m[1;32mrevision03[m[33m)[m Control2: actualiza prog y facturas 50 registros por pagina
+[33m67ff31c[m control
+[33m178d5f2[m version estable sin menu recargo
+[33m8982b40[m agregado rif a clientes
+[33m925c7b9[m solved/direccion destino (programacion)
+[33m6d2d65f[m chg/direccion_destino type JSON
+[33mbfe2e5b[m issue/error ascii
+[33ma609018[m chg/secret_key
+[33mf70c34e[m chg/database_uri
+[33mb5eb58e[m chg/port=
+[33m862d0eb[m add/req.txt
+[33mc82f21b[m chg/passenger_wsgi.py
+[33m8d85c27[m chg/puerto 5000
+[33mbe8cec2[m incluido .env
+[33m5149c23[m chg/cpanel.yml
+[33ma620763[m chg/requerimientos.txt
+[33m12a1e16[m chg01/debug, puerto
+[33md0db14e[m[33m ([m[1;32missue/conexionBDD[m[33m)[m listo
+[33m8e146cd[m[33m ([m[1;31morigin/issue/conexionBDD[m[33m)[m P4
+[33mf5182eb[m P3
+[33mb588e8a[m P2
+[33m8b16977[m P1
+[33m7ee5b92[m[33m ([m[1;31morigin/whatsapp[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'whatsapp' of ssh://globalst.com.ve:4398/home2/globalstweb/repositorios/sag into whatsapp
+[33m6038422[m C4: CAMBIO DATABASE_URL
+[33m516df43[m C3 AGREGADA FUNCIONALIDAD WS
+[33me8f6d9e[m C3 AGREGADA FUNCIONALIDAD WS
+[33m85fb649[m[33m ([m[1;32mdetalleViaje[m[33m)[m C2: AGREGADA PRUEBA DE CONEXIÓN BDD
+[33m7cf0314[m C1: funcionalidad detalle OK
+[33m08ad925[m control 1: primer diseño
+[33m13529e5[m[33m ([m[1;31mgithub/master[m[33m, [m[1;32mcambio_JsonType[m[33m)[m listo
+[33m8080b64[m C9: CARGA Y EDITA DIRECCION
+[33mf343374[m[33m ([m[1;32mfeat/direccion[m[33m)[m C8: avance
+[33md0f55d5[m Control7: direccion vista, guarda y editar OK
+[33m6857bfb[m Control: antes de cambiar programcionModel
+[33m9863939[m[33m ([m[1;32mrev02[m[33m)[m C5
+[33m4d70787[m[33m ([m[1;32mfeature/NumeroTrabajador[m[33m)[m c4: tabla, pendiente validar estructura final
+[33m70e7b59[m c3
+[33mc50733a[m c2
+[33mad91e1a[m C1
+[33m838a3b1[m rev02/listo2
+[33md073753[m rev02/listo
+[33m91ae666[m facturacion/cambio status
+[33m13f0d8a[m facturacion/(eliminar lotes, editar por dropdown)
+[33m5265ec0[m facturacion/status(seleccionar todos)
+[33m7cd6d8a[m Seleccionar Todos
+[33ma933cd6[m +Col Workflow, Observaciones
+[33m30a5156[m Colores en filas programacion
+[33m28b5eb8[m clientesForm/codigomax 4 caracteres
+[33m00385d2[m agr/texto boton Agregar
+[33m81a11bc[m control 3
+[33m6e55d84[m[33m ([m[1;32mcodigo_desc[m[33m)[m llenarFormulario/turno
+[33mec1ef9a[m tarifasForm/desvio, espera no obligatorio
+[33m7f7c5d3[m[33m ([m[1;32missue/login[m[33m)[m listo
+[33m5d3a85e[m chg/yml
+[33me5c25f1[m add/.env
+[33m41dddc1[m Revert "config/getenv"
+[33m1e29d37[m config/getenv
+[33m2ab55d2[m chg/config
+[33mdc7256d[m[33m ([m[1;32mrev01[m[33m)[m rev01/listo
+[33mf983872[m C2: pendiente factura
+[33m17adb94[m C1: pendiente factura
+[33ma60111f[m prioridad-columnas
+[33mc3b1fb3[m inicio/wsgi
+[33m537b2a6[m inicio/DATABASEURL
+[33me2bec44[m inicio
+[33m8fbe90c[m init

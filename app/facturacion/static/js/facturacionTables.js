@@ -60,7 +60,7 @@ function columnasFacturasClientes() {
 				return meta.row + 1 + meta.settings._iDisplayStart;
 			}
 		},
-		{ data: 'id', visible: false },
+		{ data: 'id', visible: false, searchable: false, className: 'no-report' },
 		{ data: 'fecha', title: 'Fecha' },
 		{ data: 'cliente', title: 'Cliente' },
 		{
@@ -83,7 +83,7 @@ function columnasFacturasClientes() {
 		{ data: 'destino', title: 'Destino' },
 		{ data: 'distancia', title: 'Distancia' },
 		{ data: 'total_distancia', title: 'Total distancia', render: formatearMonto },
-		{ data: 'tiempo_espera', title: 'T. espera' },
+		{ data: 'tiempo_espera', title: 'Tiempo espera' },
 		{ data: 'total_espera', title: 'Total espera', render: formatearMonto },
 		{ data: 'desvíos', title: 'Desvíos' },
 		{ data: 'total_desvios', title: 'Total desvíos', render: formatearMonto },
@@ -96,7 +96,7 @@ function columnasFacturasClientes() {
 function columnasCobroDetalle() {
 	return [
 	
-		{ data: 'id', visible: false },
+		{ data: 'id', visible: false, searchable: false, className: 'no-report' },
 		{ data: 'fecha', title: 'Fecha' },
 		{ data: 'cliente', title: 'Cliente' },
 		{ data: '#_Pasajero', title: '# Pasajero' },

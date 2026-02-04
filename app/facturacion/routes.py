@@ -30,7 +30,7 @@ def create_codigo_desc(form):
         horario = "E"
 
     codigo_desc = f"{form.empresa.data.codigo}{form.origen.data.codigo}{form.destino.data.codigo}-{form.vehiculo.data.codigo}-{desplazamiento}-{horario}".upper()
-    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
+    # current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
     return codigo_desc
 
 @staticmethod
@@ -38,10 +38,10 @@ def crear_factura_cliente(form):
 
     codigo_desc = create_codigo_desc(form)
 
-    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
+    # current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
 
     tarifas = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
-    current_app.logger.debug(f"Tarifas para factura encontradas: {tarifas}")
+    # current_app.logger.debug(f"Tarifas para factura encontradas: {tarifas}")
    
     factura_existente = facturasClientesModel.query.join(
         facturasClientesModel.programacion_rel
@@ -50,7 +50,7 @@ def crear_factura_cliente(form):
     ).first()
     
     if factura_existente:
-        current_app.logger.debug(f"Ya existe una factura para la Guia: {form.guia.data}")
+        # current_app.logger.debug(f"Ya existe una factura para la Guia: {form.guia.data}")
         raise ValueError(f"Ya existe una factura para la Guia: {form.guia.data}, elimínela para modificar la programación.")
 
     if not tarifas:
@@ -95,7 +95,7 @@ def crear_factura_cliente(form):
         "status": "Por facturar",
     }
     
-    current_app.logger.debug("Datos de la nueva factura:", nueva_factura)
+    # current_app.logger.debug("Datos de la nueva factura:", nueva_factura)
     
     return nueva_factura
     
@@ -140,8 +140,8 @@ def facturasClientes_agregar_factura():
     numero_factura = request.json.get('factura')
     id_facturas = request.json.get('ids', [])
     
-    current_app.logger.debug("Número de factura recibido:", numero_factura)
-    current_app.logger.debug("ID de facturas recibido:", id_facturas)
+    # current_app.logger.debug("Número de factura recibido:", numero_factura)
+    # current_app.logger.debug("ID de facturas recibido:", id_facturas)
     
     if not numero_factura or not id_facturas:
         return jsonify(success=False, mensaje='Número de factura o ID no proporcionado.')
@@ -228,14 +228,14 @@ def facturasClientes_update():
                             crear_pago_operador(form_data_pago)
                             
                             mensaje = "Factura actualizada y Pago Operador generado exitosamente."
-                            current_app.logger.debug(f"Pago al operador creado para programación: {programacion.id}")
+                            # current_app.logger.debug(f"Pago al operador creado para programación: {programacion.id}")
                             
                         except Exception as e:
                             current_app.logger.error(f"Error al crear pago operador: {str(e)}")
                             # No fallar la actualización de la factura si falla el pago
                             mensaje = f"Factura actualizada, pero error al crear pago operador: {str(e)}"
                     else:
-                        current_app.logger.debug(f"Ya existe un pago para esta programación: {pago_existente.id}")
+                        # current_app.logger.debug(f"Ya existe un pago para esta programación: {pago_existente.id}")
             
             return jsonify(success=True, mensaje=mensaje, icon='success')
         except Exception as e:
@@ -246,23 +246,23 @@ def facturasClientes_update():
 
 @facturacion_bp.route('/facturasClientes', methods=['DELETE'])
 def facturasClientes_delete():
-    if not current_user.is_admin:
-            current_app.logger.debug("Solicitud DELETE recibida.")
+        if not current_user.is_admin:
+            # current_app.logger.debug("Solicitud DELETE recibida.")
             return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
 
     form = facturasClientesForm()
     user = current_user
-    current_app.logger.debug("Solicitud DELETE recibida por:", user, "rol:", user.is_admin)
+    # current_app.logger.debug("Solicitud DELETE recibida por:", user, "rol:", user.is_admin)
     
     if not current_user.is_admin:
-        current_app.logger.debug("Solicitud DELETE recibida.")
+        # current_app.logger.debug("Solicitud DELETE recibida.")
         raise PermissionError('No tienes permiso para realizar esta acción.')
 
     id_facturacion = request.json.get('id')
     if not isinstance(id_facturacion, list):
         id_facturacion = [id_facturacion]
     
-    current_app.logger.debug("ID de facturación a eliminar:", id_facturacion)
+    # current_app.logger.debug("ID de facturación a eliminar:", id_facturacion)
 
     if not id_facturacion:
         return jsonify(success=False, mensaje='ID de facturación no proporcionado.')
@@ -280,7 +280,7 @@ def facturasClientes_delete():
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.debug("Error al eliminar la factura:", e)
+        # current_app.logger.debug("Error al eliminar la factura:", e)
         return jsonify(success=False, mensaje='No se pudo eliminar la factura.', error=str(e))
     
     
@@ -406,11 +406,11 @@ def get_factura_cliente(id):
 
 @facturacion_bp.route('/facturasClientes', methods=['GET'])
 def facturas_clientes():
-    current_app.logger.debug("Obteniendo facturas de clientes...")
+    # current_app.logger.debug("Obteniendo facturas de clientes...")
         
     cliente = request.args.get('cliente')
     
-    current_app.logger.debug("Cliente recibido:", cliente)
+    # current_app.logger.debug("Cliente recibido:", cliente)
 
     if cliente:
         facturas = facturasClientesModel.query.join(
@@ -429,7 +429,7 @@ def facturas_clientes():
         'data': [factura.serialize(x) for x, factura in enumerate(facturas)]
     }
 
-    current_app.logger.debug("Datos de respuesta:", response_data['data'])
+    # current_app.logger.debug("Datos de respuesta:", response_data['data'])
     return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
 
 
@@ -554,13 +554,13 @@ def pagos_operadores_all():
 def crear_pago_operador(form):
     
     codigo_desc = create_codigo_desc(form)
-    current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
+    # current_app.logger.debug(f"Código de descripción generado: {codigo_desc}")
     programacion = programacionModel.query.filter_by(guia=form.guia.data).first()
     
-    current_app.logger.debug(f"Programación encontrada: {programacion}")
+    # current_app.logger.debug(f"Programación encontrada: {programacion}")
     
     tipo_operador = programacion.operador_rel.tipo if programacion and programacion.operador_rel else None
-    current_app.logger.debug(f"Tipo de operador: {tipo_operador}")
+    # current_app.logger.debug(f"Tipo de operador: {tipo_operador}")
     
     tarifas_clientes = tarifasModel.query.filter_by(codigo_desc=codigo_desc).first()
     tarifa_cliente_id = tarifas_clientes.id if tarifas_clientes else None
@@ -568,10 +568,10 @@ def crear_pago_operador(form):
     try:
         tarifas_operador = tarifasOperadoresModel.query.filter_by(codigo=tarifa_cliente_id, tipo=tipo_operador).first()
     except Exception as e:
-        current_app.logger.debug(f"Error al obtener tarifas del operador: {str(e)}")
+        # current_app.logger.debug(f"Error al obtener tarifas del operador: {str(e)}")
         raise ValueError("No se encontró tarifas del operador.")
     
-    current_app.logger.debug(f"Tarifas Operador encontradas: {tarifas_operador}")
+    # current_app.logger.debug(f"Tarifas Operador encontradas: {tarifas_operador}")
 
     if not tarifas_clientes:
         raise ValueError("No se encontraron tarifas para Clientes con el código proporcionado.")
@@ -613,7 +613,7 @@ def crear_pago_operador(form):
         return True
     except Exception as e:
         db.session.rollback()
-        current_app.logger.debug(f"Error al crear el pago: {str(e)}")
+        # current_app.logger.debug(f"Error al crear el pago: {str(e)}")
         raise ValueError(f"Error al crear el pago")
 
 @facturacion_bp.route('/pagosOperadores', methods=['DELETE'])
@@ -622,7 +622,7 @@ def pagosOperadores_delete():
     user = current_user
 
     id_pago = request.json.get('id')
-    current_app.logger.debug("ID de pago a eliminar:", id_pago)
+    # current_app.logger.debug("ID de pago a eliminar:", id_pago)
 
     if not id_pago:
         return jsonify(success=False, mensaje='ID de pago no proporcionado.')
@@ -639,7 +639,7 @@ def pagosOperadores_delete():
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.debug("Error al eliminar el pago:", e)
+        # current_app.logger.debug("Error al eliminar el pago:", e)
         return jsonify(success=False, mensaje='No se pudo eliminar el pago.', error=str(e))
 
 @facturacion_bp.route('/pagosOperadores', methods=['PUT'])
@@ -647,7 +647,7 @@ def pagosOperadores_update():
     form = pagosOperadoresForm()
     user = current_user
     
-    current_app.logger.debug("Solicitud PUT recibida por:", user, "rol:", user.is_admin)
+    # current_app.logger.debug("Solicitud PUT recibida por:", user, "rol:", user.is_admin)
         
     if form.validate_on_submit():
         form_data = form.data

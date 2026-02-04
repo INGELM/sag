@@ -47,7 +47,7 @@ def ciudades():
             return jsonify(success=True, mensaje='Ciudad actualizada exitosamente.')
 
         except Exception as e:
-            current_app.logger.debug(f'Error al actualizar ciudad: {e}')
+            # current_app.logger.debug(f'Error al actualizar ciudad: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar la ciudad.',
@@ -115,7 +115,7 @@ def ciudades():
             nueva_ciudad.save()
             return jsonify(success=True, mensaje='Ciudad registrada exitosamente.')
         except Exception as e:
-            current_app.logger.debug(f'Error al registrar ciudad: {e}')
+            # current_app.logger.debug(f'Error al registrar ciudad: {e}')
             return jsonify(success=False, mensaje='Error al registrar la ciudad.', errores=str(e))
 
     elif form.errors:
@@ -176,7 +176,7 @@ def buscar_ciudad():
 
     except Exception as e:
         error = str(e)
-        current_app.logger.debug(f'Error al buscar ciudades: {error}')
+        # current_app.logger.debug(f'Error al buscar ciudades: {error}')
         return jsonify(success=False, mensaje='Error al buscar ciudades.', errores=error), 500
 
 @ciudades_bp.route('/origen', methods=['GET'])
@@ -266,7 +266,7 @@ def vehiculos():
             return jsonify(success=True, mensaje='Vehiculo actualizado exitosamente.')
 
         except Exception as e:
-            current_app.logger.debug(f'Error al actualizar vehiculo: {e}')
+            # current_app.logger.debug(f'Error al actualizar vehiculo: {e}')
             return jsonify({
                 'success': False,
                 'mensaje': 'Error al actualizar la vehiculo.',
@@ -276,7 +276,7 @@ def vehiculos():
             
     if request.method == 'DELETE':
             vehiculo_id = request.get_json().get('id')
-            current_app.logger.debug(f'Recibido ID de vehiculo para eliminar: {vehiculo_id}')
+            # current_app.logger.debug(f'Recibido ID de vehiculo para eliminar: {vehiculo_id}')
             
             if not vehiculo_id:
                 return jsonify(success=False, mensaje='ID de vehiculo inválido.')
@@ -294,7 +294,7 @@ def vehiculos():
                 return jsonify(success=True, mensaje='Vehiculo eliminada exitosamente.')
 
             except Exception as e:
-                current_app.logger.debug(f'Error al eliminar vehiculo: {e}')
+                # current_app.logger.debug(f'Error al eliminar vehiculo: {e}')
                 return jsonify({
                     'success': False,
                     'mensaje': 'Error al eliminar la vehiculo.',
@@ -311,7 +311,7 @@ def vehiculos():
             nueva_ciudad.save()
             return jsonify(success=True, mensaje='Ciudad registrada exitosamente.')
         except Exception as e:
-            current_app.logger.debug(f'Error al registrar vehiculo: {e}')
+            # current_app.logger.debug(f'Error al registrar vehiculo: {e}')
             return jsonify(success=False, mensaje='Error al registrar la vehiculo.', errores=str(e))
 
     elif form.errors:
@@ -351,7 +351,7 @@ def all_vehiculos():
         elif 'timeout' in error.lower():
             return jsonify(success=False, mensaje='Tiempo de espera agotado al intentar acceder a la base de datos.')
         else:
-            current_app.logger.debug(f'Error desconocido: {error}')
+            # current_app.logger.debug(f'Error desconocido: {error}')
             return jsonify(success=False, mensaje=error)
 
 # TASA DE CAMBIO
@@ -384,8 +384,8 @@ def tasa():
             current_app.logger.error(f'Error al consultar tarifas BCV: {e}')
             tasa_bcv = "Error al obtener datos"
             fecha_bcv = "Error de conexión"
-        finally:
-            current_app.logger.debug(f'Tasa BCV: {tasa_bcv}, Fecha BCV: {fecha_bcv}')
+        # finally:
+            # current_app.logger.debug(f'Tasa BCV: {tasa_bcv}, Fecha BCV: {fecha_bcv}')
         
         data = tasaModel.query.order_by(tasaModel.id.desc()).first()
         
@@ -433,6 +433,6 @@ def all_tasa():
 
         return Response(json.dumps(response_data, sort_keys=False, ensure_ascii=False), mimetype='application/json')
     except Exception as e:
-        current_app.logger.debug(f'Error al obtener tasas: {e}')
+        # current_app.logger.debug(f'Error al obtener tasas: {e}')
         return jsonify(success=False, mensaje='Error al obtener las tasas.', errores=str(e))
     

@@ -44,7 +44,7 @@ function columnasPagosOperadores() {
 				return meta.row + 1 + meta.settings._iDisplayStart;
 			}
 		},
-		{ data: 'id', visible: false },
+		{ data: 'id', visible: false, searchable: false, className: 'no-report' },
 		{ data: 'fecha', title: 'Fecha' },
 		{ data: 'Operador', title: 'Operador' },
 		{ data: 'cliente', title: 'Cliente' },

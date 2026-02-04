@@ -6,7 +6,7 @@ $(document).ready(function () {
 	window.tablaId = '#tarifasTable';
 
 	const columnas = [
-		{ data: 'id', title: 'ID' },
+		{ data: 'id', title: 'ID', visible: false, searchable: false, className: 'no-report' },
 		{ data: 'codigo', title: 'Código' },
 		{ data: 'empresa', title: 'Empresa' },
 		{ data: 'origen', title: 'Origen' },
@@ -19,17 +19,17 @@ $(document).ready(function () {
 		{ data: 'base', title: 'Base' },
 		{ data: 'tarifa_km', title: 'Tarifa/Km' },
 		// Campos auxiliares para ocultar pero permitir ordenamiento/consistencia
-		{ data: 'empresa_rel', visible: false, searchable: false },
-		{ data: 'origen_rel', visible: false, searchable: false },
-		{ data: 'destino_rel', visible: false, searchable: false },
-		{ data: 'vehiculo_rel', visible: false, searchable: false },
-		{ data: 'color_rel', visible: false, searchable: false },
+		{ data: 'empresa_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'origen_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'destino_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'vehiculo_rel', visible: false, searchable: false, className: 'no-report' },
+		{ data: 'color_rel', visible: false, searchable: false, className: 'no-report' },
 		// Acciones
 		{
 			data: null,
 			title: '',
 			orderable: false,
-			className: 'no-export',
+			className: 'no-report',
 			searchable: false,
 			render: function (_data, _type, row) {
 				const color = row.color_rel || 'gray';

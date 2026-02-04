@@ -48,7 +48,7 @@ class clientesModel(db.Model):
             elif palabra in ['S.A.', 'C.A.', 'S.R.L.', 'E.U.', 'E.I.R.L.']:
                 empresa_titulo.append(palabra.upper())
             elif len(palabra) < 4:
-                print(palabra)
+                # print(palabra)
                 empresa_titulo.append(palabra.upper())
             else:
                 empresa_titulo.append(palabra.capitalize())
@@ -72,10 +72,10 @@ class clientesModel(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
-            current_app.logger.debug(f'Cliente guardado: {self.serialize()} - usuario: {current_user.usuario}')
+            # current_app.logger.debug(f'Cliente guardado: {self.serialize()} - usuario: {current_user.usuario}')
         except Exception as e:
             db.session.rollback()
-            current_app.logger.debug(f'Error al guardar cliente: {e}')
+            # current_app.logger.debug(f'Error al guardar cliente: {e}')
             raise ValueError("Error inesperado al guardar el cliente.")
 
     def update(self, **kwargs):
@@ -100,16 +100,16 @@ class clientesModel(db.Model):
 
         try:
             db.session.commit()
-            current_app.logger.debug(f'Cliente actualizado: {self.serialize()} - usuario: {current_user.usuario}')
+            # current_app.logger.debug(f'Cliente actualizado: {self.serialize()} - usuario: {current_user.usuario}')
         except Exception as e:
             db.session.rollback()
-            current_app.logger.debug(f'Error al actualizar cliente: {e}')
+            # current_app.logger.debug(f'Error al actualizar cliente: {e}')
             raise ValueError("Error inesperado al actualizar el cliente.")
 
     def delete(self):
         db.session.delete(self)
         db.session.commit()
-        current_app.logger.debug(f'Cliente eliminado: {self.serialize()} - usuario: {current_user.usuario}')
+        # current_app.logger.debug(f'Cliente eliminado: {self.serialize()} - usuario: {current_user.usuario}')
 
     def serialize(self):
         return {
@@ -264,14 +264,14 @@ class tarifasModel(db.Model):
         
     def save(self):
         existing= tarifasModel.query.filter(or_(tarifasModel.codigo_desc==self.codigo_desc, tarifasModel.codigo==self.codigo)).first()
-        print(existing)
+        # print(existing)
         
         if existing:
             raise ValueError("Esta tarifa ya existe.")
         try:
             db.session.add(self)
             db.session.commit()
-            current_app.logger.debug(f'Tarifa guardada: {self.serialize()} - usuario: {current_user.usuario}')
+            # current_app.logger.debug(f'Tarifa guardada: {self.serialize()} - usuario: {current_user.usuario}')
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"Error al guardar tarifa: {e}")
@@ -290,7 +290,7 @@ class tarifasModel(db.Model):
         if empresa_obj and origen_obj and destino_obj:
             self.codigo = f"{empresa_obj.codigo}{origen_obj.codigo}{destino_obj.codigo}".upper()
         db.session.commit()
-        current_app.logger.debug(f'Tarifa actualizada: {self.serialize()} - usuario: {current_user.usuario}')
+        # current_app.logger.debug(f'Tarifa actualizada: {self.serialize()} - usuario: {current_user.usuario}')
 
     def delete(self):
         db.session.delete(self)
@@ -313,7 +313,7 @@ class tarifasModel(db.Model):
             elif len(tarifas_operadores) > 1:
                 color = 'green'
         except Exception as e:
-            current_app.logger.debug(f'Error al obtener color de tarifa: {e}')
+            # current_app.logger.debug(f'Error al obtener color de tarifa: {e}')
             color = 'gray'  
             raise ValueError("Error inesperado al obtener el color de la tarifa.")
         return color
