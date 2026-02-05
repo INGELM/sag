@@ -208,48 +208,8 @@ def facturasClientes_update():
             
             mensaje = "Factura actualizada exitosamente."
             
-            # Si el status es Finalizado, crear el pago al operador si no existe
-            # if form_data['status'] == 'Finalizado':
-            #     programacion = factura.programacion_rel
-                
-            #     if programacion:
-            #         # Verificar si ya existe un pago para esta programación
-            #         pago_existente = pagosOperadoresModel.query.filter_by(programacion=programacion.id).first()
-                    
-            #         if not pago_existente:
-            #             try:
-            #                 # Crear un objeto form-like para pasar a la función de creación
-            #                 from types import SimpleNamespace
-                            
-            #                 form_data_pago = SimpleNamespace()
-            #                 form_data_pago.guia = SimpleNamespace(data=programacion.guia)
-            #                 form_data_pago.empresa = SimpleNamespace(data=programacion.pasajeros[0].cliente if programacion.pasajeros else None)
-            #                 form_data_pago.origen = SimpleNamespace(data=programacion.origen_rel)
-            #                 form_data_pago.destino = SimpleNamespace(data=programacion.destino_rel)
-            #                 form_data_pago.vehiculo = SimpleNamespace(data=programacion.vehiculo_rel)
-            #                 form_data_pago.hora_salida = SimpleNamespace(data=programacion.hora_salida)
-            #                 form_data_pago.retorno = SimpleNamespace(data=programacion.retorno)
-            #                 form_data_pago.desvios = SimpleNamespace(data=programacion.desvios if programacion.desvios else 0)
-            #                 form_data_pago.tiempo_espera = SimpleNamespace(data=programacion.tiempo_espera if programacion.tiempo_espera else 0)
-                            
-            #                 # Crear pago al operador
-            #                 crear_pago_operador(form_data_pago)
-                            
-            #                 mensaje = log = "Factura actualizada y Pago Operador generado exitosamente."
-            #                 # current_app.logger.debug(f"Pago al operador creado para programación: {programacion.id}")
-                            
-            #             except Exception as e:
-            #                 # current_app.logger.error(f"Error al crear pago operador: {str(e)}")
-            #                 # No fallar la actualización de la factura si falla el pago
-            #                 error = format_error_simple(e)
-            #                 log = f"Factura {factura.id} actualizada correctamente, Error al crear pago operador: {error}"
-            #                 mensaje = f"Factura actualizada, pero error al crear pago operador"
-            #         else:
-            #             mensaje = "Factura actualizada exitosamente. Ya existe un pago de Operador para esta programación."
-            #             return jsonify(success=True, mensaje=mensaje, icon='success')
-            #             # current_app.logger.debug(f"Ya existe un pago para esta programación: {pago_existente.id}")
-            
-            return jsonify(success=True, mensaje=mensaje, icon='success', log=f"Factura {factura.id} actualizada correctamente.")
+            log = mensaje + f" - " + f"Factura ID {factura.id} actualizada con status {factura.status} y número de factura {factura.factura if factura.factura else 'N/A'}, monto: {factura.costo_total if factura.costo_total else 'N/A'}."
+            return jsonify(success=True, mensaje=mensaje, icon='success', log=log)
         except Exception as e:
             db.session.rollback()
             error = format_error_simple(e)
@@ -259,11 +219,8 @@ def facturasClientes_update():
     return render_template('facturacion.html', User=user, form=form)
 
 @facturacion_bp.route('/facturasClientes', methods=['DELETE'])
+@log_action('ELIMINAR', 'FacturasClientes')
 def facturasClientes_delete():
-    if not current_user.is_admin:
-        # current_app.logger.debug("Solicitud DELETE recibida.")
-        return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.")
-
     form = facturasClientesForm()
     user = current_user
     # current_app.logger.debug("Solicitud DELETE recibida por:", user, "rol:", user.is_admin)
@@ -271,7 +228,7 @@ def facturasClientes_delete():
     if not current_user.is_admin:
         # current_app.logger.debug("Solicitud DELETE recibida.")
         # raise PermissionError('No tienes permiso para realizar esta acción.')
-        log = "Usuario sin permisos de administrador intentó eliminar una factura."
+        log = f"Usuario sin permisos de administrador intentó eliminar una factura. {form.id.data}"
         return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.", log=log)
 
     id_facturacion = request.json.get('id')
@@ -289,10 +246,13 @@ def facturasClientes_delete():
         return jsonify(success=False, mensaje='Factura no encontrada.')
 
     try:
+        
+        log = f"Facturas Clientes - IDs {id_facturacion}, clientes: {[factura.programacion_rel.pasajeros[0].cliente.empresa if factura.programacion_rel.pasajeros and factura.programacion_rel.pasajeros[0].cliente else '(sin empresa)' for factura in facturas]}, guias: {[factura.programacion_rel.guia if factura.programacion_rel.guia else 'N/A' for factura in facturas]}"
+        
         for factura in facturas:
             db.session.delete(factura)
         db.session.commit()
-        log = f"Facturas con IDs {id_facturacion} eliminadas correctamente."
+        
         return jsonify(success=True, mensaje='Facturas eliminadas correctamente.', log=log)
 
     except Exception as e:
@@ -658,11 +618,12 @@ def pagosOperadores_delete():
         return jsonify(success=False, mensaje='Pago no encontrado.')
 
     try:
+        
+        log = f"ID {id_pago}, guia: {pago.programacion_rel.guia if pago.programacion_rel else 'N/A'}, cliente: {pago.programacion_rel.pasajeros[0].cliente.empresa if pago.programacion_rel and pago.programacion_rel.pasajeros and pago.programacion_rel.pasajeros[0].cliente else 'N/A'}, cliente ID: {pago.programacion_rel.pasajeros[0].cliente.id if pago.programacion_rel and pago.programacion_rel.pasajeros and pago.programacion_rel.pasajeros[0].cliente else 'N/A'}"
+        
         db.session.delete(pago)
         db.session.commit()
-        log = f"Pago con ID {id_pago} eliminado correctamente."
         return jsonify(success=True, mensaje='Pago eliminado correctamente.', log=log)
-
     except Exception as e:
         db.session.rollback()
         error = format_error_simple(e)
@@ -693,7 +654,7 @@ def pagosOperadores_update():
             pago.costo_total = form_data['costo_total']
 
             db.session.commit()
-            log = f"Pago {pago.id} actualizado correctamente a: Costo Total: {pago.costo_total}."
+            log = f"Pago Operador Actualizado - Id: {pago.id}, Costo Total: {pago.costo_total}, guia: {pago.programacion_rel.guia if pago.programacion_rel else 'N/A'}, cliente: {pago.programacion_rel.pasajeros[0].cliente.empresa if pago.programacion_rel and pago.programacion_rel.pasajeros and pago.programacion_rel.pasajeros[0].cliente else 'N/A'}"
             return jsonify(success=True, mensaje="Pago actualizado exitosamente.", icon='success', log=log)
         except Exception as e:
             db.session.rollback()

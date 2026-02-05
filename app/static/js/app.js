@@ -1328,9 +1328,13 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                 };
 
                 if (modelo === 'programacion') {
+                    $(".formulario").addClass("visually-hidden");
                     //cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
                     console.log("Recargando tabla de programación después de guardar...");
-                    window.location.reload();
+                    // window.location.reload();
+                    
+                    dt = $(`#${modelo}Table`).DataTable();
+                    dt.ajax.reload(null, false);
                 } else {
                     window.location.reload();
                 }
@@ -1505,10 +1509,19 @@ function eliminarSeleccionados(modelo) {
                                 programacion: [1, 3, 9, 10, 12, 15, 27]
                             };
                             // cargarTabla2(modelo, "", "", columnasVisibles[modelo] || []);
-                            //console.log(" 🔍Modelo:", window.modelo, "Modulo:", window.modulo);
-                            // cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
-                            window.location.reload();
+                            
                         });
+                            // cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
+                            // dt = $(`#${modelo}Table`).DataTable();
+                            // dt.ajax.reload(null, false);
+
+                            dt.ajax ? dt.ajax.reload(null, false) : window.location.reload();
+
+                            
+                            //
+                            
+                            // window.location.reload();
+                            console.log(" 🔍Modelo:", window.modelo, "Modulo:", window.modulo);
                     } else {
                         Swal.fire({
                             title: "Error al eliminar",
