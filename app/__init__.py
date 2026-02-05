@@ -52,9 +52,9 @@ def create_app():
             os.makedirs(log_path)
         
         # RotatingFileHandler: 5MB por archivo, mantiene hasta 5 copias de seguridad
-        file_handler = RotatingFileHandler(os.path.join(log_path, 'app.log'), maxBytes=5242880, backupCount=5)
+        file_handler = RotatingFileHandler(os.path.join(log_path, 'app.log'), maxBytes=5242880, backupCount=5, encoding='utf-8')
         
-        # Formato: Fecha Hora | Nivel | Archivo:Línea | Mensaje
+        # Formato: Fecha Hora | Nivel | Mensaje
         formatter = logging.Formatter(
             '%(asctime)s | %(levelname)-8s | %(message)s'
         )

@@ -6,7 +6,7 @@ from app.clientes.models import clientesModel, pasajerosModel, tarifasModel
 from app.empleados.models import empleadosModel, tarifasOperadoresModel
 from app.facturacion.models import facturasClientesModel, pagosOperadoresModel
 from app.facturacion.routes import crear_factura_cliente, crear_pago_operador
-from app.helpers.logger_utils import format_error_simple, log_action
+from app.helpers.logger_utils import format_error_simple, log_action, registrar_log
 from app.programacion import programacion_bp
 from app.programacion.form import programacionForm
 from datetime import datetime
@@ -73,17 +73,24 @@ def validar_coherencias(form):
             raise ValueError(f'No hay tarifas definidas en la ruta seleccionada para el operador: {form.operador.data.nombres} ({tipo_operador}).')
 
     #guia repetida
-    if form.guia.data and form.id.data is None:
-        guia_existente = programacionModel.query.filter_by(guia=form.guia.data).first()
+    if form.guia.data:
+        query = programacionModel.query.filter_by(guia=form.guia.data)
+        
+        if form.id.data:
+            query = query.filter(programacionModel.id != form.id.data)
+        
+        guia_existente = query.first()
+        registrar_log("VALIDAR GUIA", "PROGRAMACION",f'Validando guía repetida: {form.guia.data} ==> {guia_existente.guia if guia_existente else "No existe"}')
         if guia_existente:
-            raise ValueError('La guía ya está registrada en otra programación.')
+            raise ValueError(f'La guía {form.guia.data} ya está registrada en otra programación.')
     
     # WorkFlow repetido
     if form.workflow.data:
+        registrar_log("VALIDAR WORKFLOW", "PROGRAMACION",f'Validando workflow repetido: {form.workflow.data}')
         workflow_existente = programacionModel.query.filter_by(workflow=form.workflow.data).first()
-                
+        registrar_log("VALIDAR WORKFLOW", "PROGRAMACION",f'Workflow existente: {workflow_existente.workflow if workflow_existente else "No existe"}')
         if workflow_existente and (workflow_existente.id != form.id.data):
-            print ('Workflow existente:', workflow_existente.id, 'Formulario ID:', form.id.data)
+  
             raise ValueError('El WorkFlow ingresado ya está registrado en otra programación.')
     
     if form.retorno.data and not form.hora_retorno.data:
@@ -320,7 +327,8 @@ def programacion():
         try:
             validar_coherencias(form)
         except ValueError as e:
-            return jsonify(success=False, mensaje='Error de validación.', errores=str(e))
+            log = f"Error de validación para programación de cliente {form.empresa.data.empresa if form.empresa.data else '(sin empresa)'}: {str(e)}"
+            return jsonify(success=False, mensaje='Error de validación.', errores=str(e), log=log)
 
         for field in ['csrf_token', 'submit', 'id', 'empresa', 'pasajeros']:
             programacion_data.pop(field, None)
@@ -592,7 +600,7 @@ def update_programacion(id):
     
     try:
         validar_coherencias(form)
-        # print(f'Validación exitosa para la programación ID: {form.workflow.data}')
+        print(f'Validación exitosa para la programación ID: {form.id.data}')
     except ValueError as e:
         return jsonify(success=False, mensaje=str(e), errores=str(e))
     
@@ -758,7 +766,7 @@ def update_programacion(id):
             if programacion.pasajeros and programacion.pasajeros[0].cliente
             else "(sin empresa)"
         )
-        log = f"Programación ID {id} actualizada exitosamente para cliente {empresa_nombre}."
+        log = f"Programación ID {id} actualizada exitosamente para cliente: {empresa_nombre}."
         
         # Solo crear factura si el status es Finalizado y no existe una factura previa
         if programacion.status == 'Finalizado' and not factura_existing:
