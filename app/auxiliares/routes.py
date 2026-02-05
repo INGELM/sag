@@ -2,8 +2,7 @@ from flask import Response, current_app, flash, json, jsonify, render_template, 
 from flask_login import login_required, current_user
 import requests
 from app.auxiliares.models import ciudadesModel, tasaModel
-from app.clientes.models import clientesModel, tarifasModel
-from app.empleados.models import tarifasOperadoresModel
+from app.clientes.models import tarifasModel
 from . import ciudades_bp, vehiculos_bp, tasa_bp
 from .form import *
 from app.auxiliares.form import ciudadesForm, vehiculosForm

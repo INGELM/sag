@@ -19,7 +19,7 @@ $(document).ready(function () {
     window.tablaId = `#${lastSegment}Table`;
 
     if (lastSegment != 'programacion') {
-        cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
+        // cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
     }
 
     

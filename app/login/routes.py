@@ -1,4 +1,6 @@
 from flask import render_template,redirect, request, url_for, flash
+
+from app.helpers.logger_utils import registrar_log
 from . import login_bp
 from .form import *
 from datetime import datetime
@@ -16,6 +18,24 @@ def login():
     if current_user.is_authenticated:
         return render_template('./base/dashboard_base.html', year=datetime.now().year, User=current_user)
     form = LoginForm()
+    
+    if request.method == 'GET':
+        try:
+            empleadosModel.query.all()
+            # flash(f'Conectado correctamente a la Base de datos: \n {Config.SQLALCHEMY_DATABASE_URI}', 'success' )
+            flash(f'Conectado correctamente a la Base de datos {Config.CONECTADO_A}', 'success' )
+            if Config.CONECTADO_A == 'PRODUCCIÓN':
+                mostrar = ''
+            else:
+                mostrar = 'd-none'
+        except Exception as e:
+            mensaje = 'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador.'
+            registrar_log('LOGIN', 'Acceso', f'Fallo en la conexión a la Base de Datos: {str(e)}')
+            flash(mensaje, 'danger')
+            
+       
+        return render_template('login.html', form=form, year=datetime.now().year)
+
     
     if form.validate_on_submit():
         username = form.username.data
@@ -36,31 +56,21 @@ def login():
             else:
                 session['admin'] = False
             
+            registrar_log('LOGIN', 'Acceso', f'Inicio de sesión exitoso para el usuario: {username}')
+            
             return redirect(url_for('login.inicio'))
         else:
             flash('Usuario o contraseña incorrectos', 'danger')
-            current_app.logger.warning(f'Intento de inicio de sesión fallido para el usuario y contraseña:', username)
+            registrar_log('LOGIN', 'Acceso', f'Usuario o contraseña incorrectos {username}')
             return render_template('login.html', form=form, year=datetime.now().year)
     else:
         if form.username.errors:
             form.username.errors.append('Por favor, complete el campo de usuario')
         if form.password.errors:
             form.password.errors.append('Por favor, complete el campo de contraseña')
-
-    if request.method == 'GET':
-        try:
-            empleadosModel.query.all()
-            # flash(f'Conectado correctamente a la Base de datos: \n {Config.SQLALCHEMY_DATABASE_URI}', 'success' )
-            flash(f'Conectado correctamente a la Base de datos {Config.CONECTADO_A}', 'success' )
-            if Config.CONECTADO_A == 'PRODUCCIÓN':
-                mostrar = ''
-            else:
-                mostrar = 'd-none'
-        except Exception as e:
-            flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador.', 'danger')
-            #    flash(f'Error en la conexión con la Base de Datos, recargue la página, si el problema persiste contacte al administrador', 'danger')
         return render_template('login.html', form=form, year=datetime.now().year)
 
+    
 @login_bp.route('/logout')
 def logout():
     logout_user()
