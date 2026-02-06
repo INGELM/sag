@@ -42,6 +42,7 @@ def create_app():
     from .extensions import db, migrate
     db.init_app(app)
     migrate.init_app(app, db)
+  
     
     #CONFIGURACIÓN DEL LOGGER (SOLO EN PRODUCCIÓN/MODO NO-DEBUG)
     if not app.debug:
@@ -89,10 +90,11 @@ def create_app():
     from .auxiliares import tasa_bp
     app.register_blueprint(tasa_bp, url_prefix='/tasa')
     
-    from .WA import wa_bp
+    from .wa import wa_bp, init_wa
     app.register_blueprint(wa_bp, url_prefix = '/wa' )
     csrf.exempt(wa_bp)
     
+    init_wa(app)
     #MANEJADORES DE ERRORES (ERROR HANDLERS)
     
     @app.errorhandler(404)
