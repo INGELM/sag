@@ -4,11 +4,9 @@ import logging
 import traceback
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user
-from flask_wtf.csrf import CSRFProtect
+# from flask_wtf.csrf import CSRFProtect
 from werkzeug.exceptions import HTTPException
-
-csrf = CSRFProtect()
-
+from app.extensions import csrf
 
 
 def create_app():
@@ -90,11 +88,25 @@ def create_app():
     from .auxiliares import tasa_bp
     app.register_blueprint(tasa_bp, url_prefix='/tasa')
     
+     
     from .wa import wa_bp, init_wa
-    app.register_blueprint(wa_bp, url_prefix = '/wa' )
-    csrf.exempt(wa_bp)
     
+    app.register_blueprint(wa_bp, url_prefix = '/wa' )
     init_wa(app)
+
+    # Exime el endpoint real del webhook (registrado por pywa) del CSRF.
+    webhook_exempted = False
+    for rule in app.url_map.iter_rules():
+        if rule.rule.startswith('/wa/webhook'):
+            csrf.exempt(app.view_functions[rule.endpoint])
+            app.logger.info('CSRF exempted for webhook endpoint: %s -> %s', rule.rule, rule.endpoint)
+            webhook_exempted = True
+
+    if not webhook_exempted:
+        app.logger.warning('No webhook endpoint found to exempt from CSRF.')
+    
+    
+    
     #MANEJADORES DE ERRORES (ERROR HANDLERS)
     
     @app.errorhandler(404)
@@ -121,5 +133,9 @@ def create_app():
         # db.session.rollback()
         
         return render_template('errors/500.html'), 500
+    
+    # with app.app_context():
+    #     for rule in app.url_map.iter_rules():
+    #         print(f"Endpoint: {rule.endpoint} | Ruta: {rule}")
 
     return app

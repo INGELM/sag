@@ -127,7 +127,7 @@ class programacionModel(db.Model):
             'Ciudad_Destino': self.destino_rel.nombre if self.destino_rel else None,
             'destino_rel': self.destino,
             'distancia': self.distancia,
-            'operador': self.operador_rel.nombres if self.operador_rel else None,
+            'operador': [{'nombre': self.operador_rel.nombres.title(), 'telefono': self.operador_rel.telefono}] if self.operador_rel else None,
             'operador_rel': self.operador,
             'vehiculo': self.vehiculo_rel.tipo if self.vehiculo_rel else None,
             'vehiculo_rel': self.vehiculo if self.vehiculo_rel else None,

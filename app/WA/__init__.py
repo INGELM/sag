@@ -2,10 +2,13 @@
 
 from flask import Blueprint
 from pywa import WhatsApp
+from app.extensions import csrf
 import httpx
 
 
 wa_bp = Blueprint('wa', __name__)
+
+
 
 wa = None
 
@@ -25,6 +28,7 @@ def init_wa(app):
         webhook_challenge_delay=500
         
     )
+    
     from .routes import register_wa_handlers
     register_wa_handlers(wa)
     return wa

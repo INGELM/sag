@@ -33,3 +33,4 @@ class Config:
     
     PHONE_ID = os.environ.get('PHONE_ID')
     TOKEN = os.environ.get('TOKEN')
+    WTF_CSRF_ENABLED = True  # Habilitar CSRF para formularios normales, pero se excluirá el webhook de WhatsApp

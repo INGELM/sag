@@ -498,6 +498,9 @@ def pagos_operadores_data():
 
     column_map = {
         'fecha': programacionModel.fecha_salida,
+        'Operador': empleadosModel.nombres,
+        'origen': origen_alias.nombre,
+        'destino': destino_alias.nombre,
         'cliente': clientesModel.codigo,
         'guia': programacionModel.guia,
         'total_': pagosOperadoresModel.costo_total,

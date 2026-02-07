@@ -207,7 +207,7 @@ function mostrarModalDetalle(data) {
                                 <i class="bx bx-user-circle text-muted me-2"></i>
                                 <div>
                                     <small class="text-muted">Operador</small>
-                                    <div class="fw-semibold">${data.operador}</div>
+                                    <div class="fw-semibold">${data.operador[0].nombre} </div>
                                 </div>
                             </div>
                         </div>
@@ -372,7 +372,7 @@ function mostrarModalDetalle(data) {
         } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
             // Botón "Enviar" presionado
             // enviarRegistro(data);
-            // enviarWA(data)
+            enviarWA(data)
             // alert("Funcion enviar registro no implementada aún")
         }
         // Si se presiona el botón X (cerrar) o se hace clic fuera del modal, no se ejecuta ninguna acción
@@ -381,6 +381,8 @@ function mostrarModalDetalle(data) {
 
 function enviarWA(data){
     let jsonData = JSON.stringify(data)
+    console.log(jsonData)
+    console.log(data)
     let URL = "/wa/send-programacion"
     //console.log(URL)
 
@@ -388,7 +390,7 @@ function enviarWA(data){
         type: "POST",
         url: URL,
         data: jsonData,
-        contentType: "application/Json",
+        contentType: "application/json",
         success: function (response) {
             if (response.success){
                 Swal.fire({
@@ -403,7 +405,7 @@ function enviarWA(data){
             else {
                 Swal.fire({
                     icon: 'error',
-                    title: "Operación Fallida",
+                    title: "Mensaje no enviado",
                     text: response.mensaje,
                     timer: 3500,
                     timerProgressBar: true
