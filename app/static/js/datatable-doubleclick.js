@@ -92,7 +92,7 @@ function mostrarModalDetalle(data) {
     //     });
     // };
 
-    //console.log(data.Ciudad_Origen)
+    console.log(data)
 
     const formatearHora = (hora) => {
         if (!hora) return '';

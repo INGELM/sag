@@ -3,6 +3,7 @@
 from flask import request, jsonify
 from sqlalchemy import select
 from app.helpers.logger_utils import format_error_simple, registrar_log
+from app.programacion.models import programacionModel
 from app.wa import wa_bp
 from pywa import WhatsApp, types, handlers
 from pywa.types import Template
@@ -83,19 +84,29 @@ def send_programacion_message():
     empresa = db.session.execute(stmt).scalar_one_or_none()
     fecha_salida = data.get('fecha_salida')
     hora_salida = data.get('hora_salida')
-    hora_retorno = data.get('hora_retorno', '--')
+    hora_retorno = data.get('hora_retorno') if data.get('hora_retorno') else '--'
     ruta = f"{data.get('Ciudad_Origen')} {icono} {data.get('Ciudad_Destino')}"
     pasajeros = " / ".join([f"{p['nombre']} {p['telefono'].strip("()-")}" for p in data.get('pasajeros', [])])
-    observaciones = data.get('observaciones', '--')
+    observaciones = data.get('observaciones') if data.get('observaciones') else '--'
    
-    
     params = [
         BodyText.params(empresa=empresa, fecha=fecha_salida, hora_salida=hora_salida, ruta=ruta, pasajeros=pasajeros, hora_retorno=hora_retorno, observaciones=observaciones),
     ]
     
     try:
-        msg_id = wa_module.wa.send_template(
+        response = wa_module.wa.send_template(
         to=to, name=template_name, language=language, params=params)
+        msg_id = response.id
+        prog_id = data.get('id')
+        stmt = select(programacionModel).where(programacionModel.id == prog_id)
+        programacion = db.session.execute(stmt).scalar_one_or_none()
+        
+        if programacion:
+            programacion.wa_msg_id = str(msg_id)
+            programacion.wa_status = 'sent'
+            db.session.commit()
+        
+        
     except Exception as e:
         error = format_error_simple(str(e))
         registrar_log("ENVIAR WS", "WHATSAPP", f"Error al enviar mensaje de programación a {to}: {error}")
