@@ -381,8 +381,8 @@ function mostrarModalDetalle(data) {
 
 function enviarWA(data){
     let jsonData = JSON.stringify(data)
-    console.log(jsonData)
-    console.log(data)
+    // console.log(jsonData)
+    // console.log(data)
     let URL = "/wa/send-programacion"
     //console.log(URL)
 
