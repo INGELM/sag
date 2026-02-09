@@ -30,6 +30,8 @@ class programacionModel(db.Model):
     distancia = db.Column(db.Float, nullable=True)
     status = db.Column(db.String(20), nullable=True)
     observaciones = db.Column(db.String(255), nullable=True)
+    wa_msg_id = db.Column(db.String(255), nullable=True)  # Campo para almacenar el ID del mensaje de WhatsApp
+    wa_status = db.Column(db.String(50), nullable=True)  # Campo para almacenar el estado del mensaje en WhatsApp
     # Relaciones
 
     pasajeros = db.relationship('pasajerosModel', secondary=programacion_pasajeros, backref='programaciones')
@@ -38,7 +40,7 @@ class programacionModel(db.Model):
     operador_rel = db.relationship('empleadosModel', foreign_keys=[operador])
     vehiculo_rel = db.relationship('vehiculosModel', foreign_keys=[vehiculo])
 
-    def __init__(self, status, guia, direccion_origen, direccion_destino, origen, destino, fecha_salida, workflow, hora_salida, distancia, hora_retorno=None, tiempo_espera=None, desvios=None, operador=None, vehiculo=None,  retorno=None, observaciones=None):
+    def __init__(self, status, guia, direccion_origen, direccion_destino, origen, destino, fecha_salida, workflow, hora_salida, distancia, hora_retorno=None, tiempo_espera=None, desvios=None, operador=None, vehiculo=None,  retorno=None, observaciones=None, wa_msg_id=None, wa_status=None):
         self.guia = guia if guia is not None else None
         self.workflow = workflow if workflow is not None else None
         self.direccion_origen = direccion_origen if direccion_origen is not None else None
@@ -59,7 +61,9 @@ class programacionModel(db.Model):
         self.desplazamiento = self.f_desplazamiento()
         self.observaciones = observaciones
         self.status = status
-        
+        self.wa_msg_id = wa_msg_id
+        self.wa_status = wa_status
+
     @property
     def codigo_tarifa(self):
         if self.pasajeros:
@@ -110,6 +114,8 @@ class programacionModel(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'wa_msg_id': self.wa_msg_id if self.wa_msg_id else None,
+            'wa_status': self.wa_status if self.wa_status else None,
             'fecha_salida': self.fecha_salida.strftime('%d-%m-%Y') if self.fecha_salida else None,
             'fecha_salida_rel': self.fecha_salida.isoformat() if self.fecha_salida else None,
             'empresa': self.pasajeros[0].cliente.codigo.upper() if self.pasajeros else None,

@@ -30,6 +30,27 @@ function initProgramacionTable() {
 			}
 		},
 		{ data: 'id', visible: false, className: 'no-report' },
+		{ data: 'wa_msg_id', visible: false, className: 'no-report' },
+		{ data: 'wa_status', title: 'Wa', orderable: false, searchable: false, className: 'no-report',
+			render: function (valor) {
+				console.log('Renderizando WhatsApp:', valor);
+				if (valor === null || valor === undefined) {
+					return '';
+				}
+				else if (valor === 'sent') {
+					return '<i class="bx bx-check" />';
+				}
+				else if (valor === 'delivered') {
+					return '<i class="bx bx-checks bx-sm" />';
+				}
+				else if (valor === 'read') {
+					return '<i class="bx bx-checks bx-remove-padding bx-sm" style="color:#1100ff;" />';
+				}
+				else if (valor === 'failed') {
+					return `<i class="bx bx-x" style="color: red;" />`;
+				}
+			}
+		},
 		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy', className: 'exportable' },
 		{ data: 'empresa', title: 'Empresa' },
 		{ data: 'workflow', title: 'Workflow' },
@@ -52,10 +73,13 @@ function initProgramacionTable() {
 		{ data: 'Ciudad_Destino', title: 'Destino' },
 		{ data: 'operador', title: 'Operador',
 			render: function (data) {
-				if (Array.isArray(data)) {
-					return data.map(o => `${o.nombre}`).join('|<br>');
-				}
-			}
+				console.log('Renderizando operador:', data);
+        		if (data[0] && data[0].nombre) {
+            		return `${data[0].nombre}`;
+					//  <span class="badge bg-danger">1</span>`
+        }
+        return '<span class="text-muted">Sin asignar</span>';
+    }
 		},
 		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
@@ -93,7 +117,15 @@ function initProgramacionTable() {
 		columns: columnas,
 		// Prioridad de visualización para columnas clave
 		columnDefs: (function () {
-			const visibleColumns = [3, 10,  12, 7, 8, 13, 20]; // Índices de columnas importantes
+			const priority_col = ['fecha_salida', 'empresa', 'guia', 'hora_salida', 'hora_retorno', 'Ciudad_Origen', 'Ciudad_Destino', 'operador', 'observaciones'];
+			const col_indices = columnas.reduce((indices, col, idx) => {
+				if (priority_col.includes(col.data)) {
+					indices.push(idx);
+				}
+				return indices;
+			}, []);
+			console.log('Índices de columnas visibles:', col_indices);
+			const visibleColumns = col_indices; // Índices de columnas importantes
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
 		})(),
@@ -160,4 +192,25 @@ function initProgramacionTable() {
 	});
 
 	window.tablaInstancia = dt;
+
+	const socket = io(); // Conexión Socket.IO para actualizaciones en tiempo real
+	socket.on('message_status_update', function (data) {
+		const msgId = data.msg_id;
+		const newStatus = data.status;
+		// console.log(`Socket.IO - Actualización de estado recibida para msg_id ${msgId}: ${newStatus}`);
+
+		// Encuentra la fila correspondiente al mensaje actualizado
+		dt.rows().every(function () {
+			const rowData = this.data();
+			// console.log('Verificando fila con datos:', rowData);
+			// console.log('Verificando fila con msg_id:', rowData.wa_msg_id);
+			// console.log(`Recibida actualización de estado para msg_id ${msgId}: ${newStatus}`);
+			if (rowData.wa_msg_id === msgId) {
+				rowData.wa_status = newStatus;
+				this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
+
+				// console.log(`Fila actualizada para msg_id ${msgId} con nuevo estado: ${newStatus}`);
+			}
+		});
+	});
 }

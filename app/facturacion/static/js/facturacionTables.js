@@ -165,7 +165,7 @@ function inicializarTablaServerSide(modelo) {
 		},
 		columns: columnas,
 		order: orderBy,
-		pageLength: 6,
+		pageLength: 40,
 		pagingType: 'numbers',
 		responsive: true,
 		select: {

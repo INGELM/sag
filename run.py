@@ -1,6 +1,7 @@
 from app import create_app
 from flask import redirect, flash
-from app.extensions import db
+from app.extensions import socketio 
+
 
 app = create_app()
 
@@ -14,5 +15,5 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    socketio.run(app, host='0.0.0.0', port=5000)
 

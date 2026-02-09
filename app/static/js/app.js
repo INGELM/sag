@@ -1030,6 +1030,7 @@ function botonesEspeciales() {
 
                         // 1. Limpiar etiquetas HTML (como los <br> de pasajeros)
                         if (typeof data === 'string') {
+                            data = data.replace(/<br\s*\/?>/gi, '\n'); // Reemplaza <br> por " / "
                             data = data.replace(/<[^>]+>/g, '');
                         }
 

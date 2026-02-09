@@ -6,13 +6,15 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user
 # from flask_wtf.csrf import CSRFProtect
 from werkzeug.exceptions import HTTPException
-from app.extensions import csrf
+from .extensions import csrf, socketio
 
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
     csrf.init_app(app)
     app.config.from_object('config.Config')
+    
+    socketio.init_app(app)  # Inicializa SocketIO con la aplicación Flask
 
     
     login_manager = LoginManager()
