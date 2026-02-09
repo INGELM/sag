@@ -11,6 +11,8 @@ from pywa.types.templates import *
 import app.wa as wa_module
 from app.clientes.models import clientesModel
 from app.extensions import db, csrf
+from app.extensions import socketio
+
 
 
 
@@ -128,6 +130,19 @@ def register_wa_handlers(wa: WhatsApp):
 
     @wa.on_message_status()
     def on_message_status_update(_: WhatsApp, status: types.MessageStatus):
+        stmt = select(programacionModel).where(programacionModel.wa_msg_id == str(status.id))
+        programacion = db.session.execute(stmt).scalar_one_or_none()
+        
+        if programacion:
+            programacion.wa_status = status.status
+            db.session.commit()
+            
+        socketio.emit('message_status_update', {
+            'msg_id': str(status.id), 
+            'status': status.status})
         
         print(f"ACTUALIZACIÓN DE ESTADO DE MENSAJE PARA: {status.id}")
         print(f"ESTADO NUEVO: {status.status}")
+        if status.status == "failed":
+            print(f"Motivo de falla: {getattr(status, 'error', 'No especificado')}")
+            

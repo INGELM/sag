@@ -244,39 +244,7 @@ function mostrarModalDetalle(data) {
                 </div>
     `;
 
-    // Información adicional (Guía, Workflow, etc.)
-    // if (data.guia || data.workflow || data.distancia) {
-    //     contenido += `
-    //             <div class="row mb-4">
-    //                 ${data.guia ? `
-    //                 <div class="col-md-4 mb-2">
-    //                     <div class="text-center p-2 bg-primary bg-opacity-10 rounded">
-    //                         <small class="text-muted">Guía</small>
-    //                         <div class="fw-bold text-primary">${data.guia}</div>
-    //                     </div>
-    //                 </div>
-    //                 ` : ''}
-    //                 ${data.workflow ? `
-    //                 <div class="col-md-4 mb-2">
-    //                     <div class="text-center p-2 bg-info bg-opacity-10 rounded">
-    //                         <small class="text-muted">Workflow</small>
-    //                         <div class="fw-bold text-info">${data.workflow}</div>
-    //                     </div>
-    //                 </div>
-    //                 ` : ''}
-    //                 ${data.distancia ? `
-    //                 <div class="col-md-4 mb-2">
-    //                     <div class="text-center p-2 bg-warning bg-opacity-10 rounded">
-    //                         <small class="text-muted">Distancia</small>
-    //                         <div class="fw-bold text-warning">${data.distancia} km</div>
-    //                     </div>
-    //                 </div>
-    //                 ` : ''}
-    //             </div>
-    //     `;
-    // }
-
-    // Sección de Observaciones
+ 
     if (data.observaciones) {
         contenido += `
                 <!-- Observaciones -->
@@ -298,9 +266,7 @@ function mostrarModalDetalle(data) {
 
     // Determinar el título del modal
     let titulo = 'Detalle del Viaje <hr class="mt-4 mb-0">';
-    // if (data.guia) titulo = `Programación - Guía: ${data.guia}`;
-    // else if (data.factura) titulo = `Factura: ${data.factura}`;
-    // else if (data.numero_factura) titulo = `Factura: ${data.numero_factura}`;
+
     
     Swal.fire({
         title: titulo,
@@ -322,6 +288,11 @@ function mostrarModalDetalle(data) {
             closeButton: 'swal-close-button-custom'
         },
         didOpen: () => {
+            // Deshabilitar el botón "Enviar" (cancel)
+            // const cancelBtn = Swal.getCancelButton();
+            // if (cancelBtn) {
+            // cancelBtn.disabled = true;
+            // }
             // Agregar estilos personalizados
             const style = document.createElement('style');
             style.textContent = `

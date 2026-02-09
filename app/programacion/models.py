@@ -114,6 +114,8 @@ class programacionModel(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'wa_msg_id': self.wa_msg_id if self.wa_msg_id else None,
+            'wa_status': self.wa_status if self.wa_status else None,
             'fecha_salida': self.fecha_salida.strftime('%d-%m-%Y') if self.fecha_salida else None,
             'fecha_salida_rel': self.fecha_salida.isoformat() if self.fecha_salida else None,
             'empresa': self.pasajeros[0].cliente.codigo.upper() if self.pasajeros else None,
