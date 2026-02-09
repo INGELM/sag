@@ -1016,8 +1016,8 @@ function botonesEspeciales() {
             text: 'Excel',
             titleAttr: 'Excel',
             className: 'btn btn-outline-primary btn-sm mb-1',
+            footer: false,
             exportOptions: {
-                footer: false,
                 modifier: {
                     page: 'all',
                     search: 'applied',

@@ -237,6 +237,7 @@ function inicializarTablaServerSide(modelo) {
 			const totalColumnIndex = columnas.findIndex(col => col.data === 'total_');
 			console.log('Calculando total para columna index:', totalColumnIndex, 'Total acumulado:', total);
 			if (totalColumnIndex !== -1) {
+				$(api.column(totalColumnIndex-1).footer()).html(`<strong>Total:</strong>`);
 				$(api.column(totalColumnIndex).footer()).html(`<strong>${total.toFixed(2)}</strong>`);
 			}
 		}
