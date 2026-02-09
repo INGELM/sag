@@ -115,11 +115,39 @@ function columnasCobroDetalle() {
 	];
 }
 
+function asegurarEstructuraTabla(tablaSel, columnas) {
+	const colCount = columnas.length;
+	const thead = tablaSel.find('thead');
+	if (!thead.length) {
+		tablaSel.prepend('<thead></thead>');
+	}
+
+	const headCells = tablaSel.find('thead tr th');
+	if (headCells.length !== colCount) {
+		const headHtml = columnas
+			.map(col => `<th>${col.title || ''}</th>`)
+			.join('');
+		tablaSel.find('thead').html(`<tr>${headHtml}</tr>`);
+	}
+
+	const tfoot = tablaSel.find('tfoot');
+	if (!tfoot.length) {
+		tablaSel.append('<tfoot></tfoot>');
+	}
+
+	const footCells = tablaSel.find('tfoot tr th');
+	if (footCells.length !== colCount) {
+		const footHtml = new Array(colCount).fill('<th></th>').join('');
+		tablaSel.find('tfoot').html(`<tr>${footHtml}</tr>`);
+	}
+}
+
 function inicializarTablaServerSide(modelo) {
 	const columnas = columnasFacturasClientes();
 	const fechaIndex = columnas.findIndex(col => col.data === 'fecha');
 	const orderBy = fechaIndex !== -1 ? [[fechaIndex, 'desc']] : [[1, 'desc']];
 	const tablaSel = $(window.tablaId);
+	asegurarEstructuraTabla(tablaSel, columnas);
 	if (tablaSel.hasClass('dataTable')) {
 		tablaSel.DataTable().clear().destroy();
 	}
@@ -137,7 +165,7 @@ function inicializarTablaServerSide(modelo) {
 		},
 		columns: columnas,
 		order: orderBy,
-		pageLength: 40,
+		pageLength: 6,
 		pagingType: 'numbers',
 		responsive: true,
 		select: {
@@ -207,6 +235,7 @@ function inicializarTablaServerSide(modelo) {
 			}, 0);
 			const api = this.api();
 			const totalColumnIndex = columnas.findIndex(col => col.data === 'total_');
+			console.log('Calculando total para columna index:', totalColumnIndex, 'Total acumulado:', total);
 			if (totalColumnIndex !== -1) {
 				$(api.column(totalColumnIndex).footer()).html(`<strong>${total.toFixed(2)}</strong>`);
 			}

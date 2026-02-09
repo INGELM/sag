@@ -736,10 +736,10 @@ function cargarTabla2(modelo, modulo = "", empresa_id = "", VisibleColumns = [])
 
 
         // Agregar footerCallback solo para facturasClientes y pagosOperadores
-        if (modelo === 'facturasClientes' || modelo === 'pagosOperadores') {
+        if (modelo === 'pagosOperadores') {
             // Encontrar la columna que contiene el total
             const totalColumnIndex = columnas.findIndex(col => col.data === 'total_');
-            //console.log("Total Column Index:", totalColumnIndex);
+            console.log("Total Column Index:", totalColumnIndex);
 
             if (totalColumnIndex !== -1) {
                 config.footerCallback = function (row, data, start, end, display) {
@@ -1017,6 +1017,7 @@ function botonesEspeciales() {
             titleAttr: 'Excel',
             className: 'btn btn-outline-primary btn-sm mb-1',
             exportOptions: {
+                footer: false,
                 modifier: {
                     page: 'all',
                     search: 'applied',
