@@ -50,7 +50,13 @@ function initProgramacionTable() {
 		{ data: 'Ciudad_Origen', title: 'Origen' },
 		{ data: 'direccion_destino', title: 'Dir. Destino' },
 		{ data: 'Ciudad_Destino', title: 'Destino' },
-		{ data: 'operador', title: 'Operador' },
+		{ data: 'operador', title: 'Operador',
+			render: function (data) {
+				if (Array.isArray(data)) {
+					return data.map(o => `${o.nombre}`).join('|<br>');
+				}
+			}
+		},
 		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
 		{ data: 'desplazamiento', title: 'Desplaz.', visible: false, searchable: false },
