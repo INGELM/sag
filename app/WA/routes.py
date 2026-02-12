@@ -156,3 +156,25 @@ def register_wa_handlers(wa: WhatsApp):
         if status.status == "failed":
             print(f"Motivo de falla: {getattr(status, 'error', 'No especificado')}")
             
+    @wa.on_callback_button
+    def on_callback_button(_: WhatsApp, callback: types.CallbackButton):
+        stmt = select(programacionModel).where(programacionModel.wa_msg_id == str(callback.id))
+        programacion = db.session.execute(stmt).scalar_one_or_none()
+        
+        if programacion:
+            print(f"Botón de plantilla pulsado para mensaje ID: {callback.id} asociado a programación ID: {programacion.id}")
+            if callback.data == "Aceptar":
+                print("Acción de confirmación detectada.")
+                programacion.wa_callback_button = "aceptada"
+            else:
+                print("Acción de rechazo detectada.")
+                programacion.wa_callback_button = "rechazada"
+            
+            db.session.commit()
+            socketio.emit('message_status_update',
+                          {
+                              'msg_id': str(callback.id),
+                              'status': f"callback_{programacion.wa_callback_button}"
+                          })
+        print(f"Botón de plantilla pulsado por: {callback.from_user.wa_id}")
+        print(f"Payload del botón: {callback.payload}")
