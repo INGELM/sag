@@ -33,7 +33,7 @@ function initProgramacionTable() {
 		{ data: 'wa_msg_id', visible: false, className: 'no-report' },
 		{ data: 'wa_status', title: 'Wa', orderable: false, searchable: false, className: 'no-report',
 			render: function (valor) {
-				console.log('Renderizando WhatsApp:', valor);
+				// console.log('Renderizando WhatsApp:', valor);
 				if (valor === null || valor === undefined) {
 					return '';
 				}
@@ -73,7 +73,7 @@ function initProgramacionTable() {
 		{ data: 'Ciudad_Destino', title: 'Destino' },
 		{ data: 'operador', title: 'Operador',
 			render: function (data) {
-				console.log('Renderizando operador:', data);
+				// console.log('Renderizando operador:', data);
         		if (data[0] && data[0].nombre) {
             		return `${data[0].nombre}`;
 					//  <span class="badge bg-danger">1</span>`
@@ -124,7 +124,7 @@ function initProgramacionTable() {
 				}
 				return indices;
 			}, []);
-			console.log('Índices de columnas visibles:', col_indices);
+			// console.log('Índices de columnas visibles:', col_indices);
 			const visibleColumns = col_indices; // Índices de columnas importantes
 			const validTargets = visibleColumns.filter(idx => idx >= 0 && idx < columnas.length);
 			return validTargets.length ? [{ targets: validTargets, responsivePriority: 1 }] : [];
@@ -197,20 +197,21 @@ function initProgramacionTable() {
 	socket.on('message_status_update', function (data) {
 		const msgId = data.msg_id;
 		const newStatus = data.status;
-		// console.log(`Socket.IO - Actualización de estado recibida para msg_id ${msgId}: ${newStatus}`);
+		console.log(`Socket.IO - Actualización de estado recibida para msg_id ${msgId}: ${newStatus}`);
+		dt.ajax.reload(null, false); // Recarga los datos sin reiniciar la paginación
 
 		// Encuentra la fila correspondiente al mensaje actualizado
-		dt.rows().every(function () {
-			const rowData = this.data();
+		// dt.rows().every(function () {
+			// const rowData = this.data();
 			// console.log('Verificando fila con datos:', rowData);
 			// console.log('Verificando fila con msg_id:', rowData.wa_msg_id);
 			// console.log(`Recibida actualización de estado para msg_id ${msgId}: ${newStatus}`);
-			if (rowData.wa_msg_id === msgId) {
-				rowData.wa_status = newStatus;
-				this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
+			// if (rowData.wa_msg_id === msgId) {
+				// rowData.wa_status = newStatus;
+				// this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
 
 				// console.log(`Fila actualizada para msg_id ${msgId} con nuevo estado: ${newStatus}`);
-			}
-		});
+			// }
+		// });
 	});
 }

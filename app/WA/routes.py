@@ -106,7 +106,17 @@ def send_programacion_message():
         if programacion:
             programacion.wa_msg_id = str(msg_id)
             programacion.wa_status = 'sent'
+            
+            socketio.emit('message_status_update', {
+                'msg_id': str(msg_id),
+                'status': 'sent'
+            })
+            
             db.session.commit()
+        else:
+            registrar_log("ENVIAR WS", "WHATSAPP", f"No se encontró la programación con ID {prog_id} para actualizar el estado del mensaje.")
+            return jsonify({'success':False, 'mensaje': "No se encontro la programación" })
+            
         
         
     except Exception as e:
