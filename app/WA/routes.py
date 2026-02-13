@@ -6,7 +6,7 @@ from app.helpers.logger_utils import format_error_simple, registrar_log
 from app.programacion.models import programacionModel
 from app.wa import wa_bp
 from pywa import WhatsApp, types, handlers
-from pywa.types import Template
+from pywa.types import Template, CallbackData, CallbackButton, Button
 from pywa.types.templates import *
 import app.wa as wa_module
 from app.clientes.models import clientesModel
@@ -156,13 +156,18 @@ def register_wa_handlers(wa: WhatsApp):
         if status.status == "failed":
             print(f"Motivo de falla: {getattr(status, 'error', 'No especificado')}")
             
-    @wa.on_callback_button
+    @wa.on_callback_button()
     def on_callback_button(_: WhatsApp, callback: types.CallbackButton):
-        stmt = select(programacionModel).where(programacionModel.wa_msg_id == str(callback.id))
+        # msg_id = str(callback.reply_to_message.id)
+        msg_id = callback.reply_to_message.message_id if callback.reply_to_message else None
+        # print(f"ID del mensaje asociado al callback: {callback.id}")
+        stmt = select(programacionModel).where(programacionModel.wa_msg_id == msg_id)
         programacion = db.session.execute(stmt).scalar_one_or_none()
         
+        print(f"Callback recibido para mensaje ID: {msg_id} con acción: {callback.data}")
+        
         if programacion:
-            print(f"Botón de plantilla pulsado para mensaje ID: {callback.id} asociado a programación ID: {programacion.id}")
+            print(f"Botón de plantilla pulsado para mensaje ID: {msg_id} asociado a programación ID: {programacion.id}")
             if callback.data == "Aceptar":
                 print("Acción de confirmación detectada.")
                 programacion.wa_callback_button = "aceptada"
@@ -173,8 +178,8 @@ def register_wa_handlers(wa: WhatsApp):
             db.session.commit()
             socketio.emit('message_status_update',
                           {
-                              'msg_id': str(callback.id),
+                              'msg_id': msg_id,
                               'status': f"callback_{programacion.wa_callback_button}"
                           })
         print(f"Botón de plantilla pulsado por: {callback.from_user.wa_id}")
-        print(f"Payload del botón: {callback.payload}")
+        # print(f"Payload del botón: {callback.payload}")
