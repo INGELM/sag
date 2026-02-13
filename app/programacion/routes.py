@@ -617,6 +617,7 @@ def update_programacion(id):
         
         programacion.wa_status = ""
         programacion.wa_msg_id = ""
+        programacion.wa_callback_button = ""
         
         # Debug antes del commit
         # current_app.logger.info(f"Valor de origen antes de commit: {programacion.origen} (tipo: {type(programacion.origen)})")

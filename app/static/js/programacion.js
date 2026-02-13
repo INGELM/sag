@@ -31,7 +31,8 @@ function initProgramacionTable() {
 		},
 		{ data: 'id', visible: false, className: 'no-report' },
 		{ data: 'wa_msg_id', visible: false, className: 'no-report' },
-		{ data: 'wa_status', title: 'Wa', orderable: false, searchable: false, className: 'no-report',
+		{
+			data: 'wa_status', title: 'Wa', visible: false, orderable: false, searchable: false, className: 'no-report',
 			render: function (valor) {
 				// console.log('Renderizando WhatsApp:', valor);
 				if (valor === null || valor === undefined) {
@@ -50,6 +51,9 @@ function initProgramacionTable() {
 					return `<i class="bx bx-x" style="color: red;" />`;
 				}
 			}
+		},
+		{
+			data: 'wa_callback_button', visible: false, searchable: false, className: 'no-report',
 		},
 		{ data: 'fecha_salida', title: 'Fecha', type: 'date-dd-mm-yyyy', className: 'exportable' },
 		{ data: 'empresa', title: 'Empresa' },
@@ -71,15 +75,57 @@ function initProgramacionTable() {
 		{ data: 'Ciudad_Origen', title: 'Origen' },
 		{ data: 'direccion_destino', title: 'Dir. Destino' },
 		{ data: 'Ciudad_Destino', title: 'Destino' },
-		{ data: 'operador', title: 'Operador',
-			render: function (data) {
-				// console.log('Renderizando operador:', data);
-        		if (data[0] && data[0].nombre) {
-            		return `${data[0].nombre}`;
+		{
+			data: 'operador', title: 'Operador',
+			render: function (data, __, row) {
+				// //console.log('Renderizando operador:', data);
+				if (data[0] && data[0].nombre) {
+					let valor = row.wa_status;
+					let operador = data[0].nombre;
+					let callback_msg = row.wa_callback_button
+
+					console.log("CALLBACK MSG:", callback_msg)
+
+					var estilos = {
+						'aceptada': 'bg-success txt-white',
+						'rechazada': 'bg-danger-subtle text-danger',
+						'': 'text-dark', // Estilo para,
+						null: 'text-dark', // Estilo para null
+					};
+
+					var claseSeleccionada = estilos[callback_msg] || '';
+
+
+
+					if (valor === null || valor === undefined) {
+						return operador;
+					}
+					else if (valor === 'sent') {
+						return `<span class="badge ${claseSeleccionada}  fw-light d-inline-flex align-items-center" style="font-size: 0.8rem">
+  							${operador} 
+							<i class="bx bx-check bx-remove-padding ms-2 bx-sm text-secondary";"></i>
+						</span>`;;
+					}
+					else if (valor === 'delivered') {
+						return `<span class="badge ${claseSeleccionada}  fw-light d-inline-flex align-items-center" style="font-size: 0.8rem">
+  							${operador} 
+							<i class="bx bx-checks bx-remove-padding ms-2 bx-sm text-secondary";"></i>
+						</span>`;
+					}
+					else if (valor === 'read') {
+						return `<span class="badge ${claseSeleccionada}  fw-light d-inline-flex align-items-center" style="font-size: 0.8rem">
+  							${operador} 
+							<i class="bx bx-checks bx-remove-padding ms-2 bx-sm" style="color:#1100ff;"></i>
+						</span>`;
+					}
+					else if (valor === 'failed') {
+						return ` <span class="badge ${claseSeleccionada}">${operador}<i class="bx bx-x" style="color: red;" /></span>`;
+					}
+					// return `${data[0].nombre}`;
 					//  <span class="badge bg-danger">1</span>`
-        }
-        return '<span class="text-muted">Sin asignar</span>';
-    }
+				}
+				return '<span class="text-muted">Sin asignar</span>';
+			}
 		},
 		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
@@ -109,7 +155,7 @@ function initProgramacionTable() {
 					d.filtro = window.filtroActual;
 				}
 				d.fecha_desde = $('#f-desde').val();
-                d.fecha_hasta = $('#f-hasta').val();
+				d.fecha_hasta = $('#f-hasta').val();
 				// console.log('Enviando datos AJAX:', d);
 				// return d;
 			}
@@ -163,7 +209,7 @@ function initProgramacionTable() {
 			topStart: {
 				buttons: [typeof getTablaBotones === 'function' ? getTablaBotones() : [],
 				botonesEspeciales()
-			]
+				]
 			},
 			topEnd: {
 				buttons: typeof botonesAuxiliares === 'function' ? botonesAuxiliares() : [],
@@ -202,16 +248,16 @@ function initProgramacionTable() {
 
 		// Encuentra la fila correspondiente al mensaje actualizado
 		// dt.rows().every(function () {
-			// const rowData = this.data();
-			// console.log('Verificando fila con datos:', rowData);
-			// console.log('Verificando fila con msg_id:', rowData.wa_msg_id);
-			// console.log(`Recibida actualización de estado para msg_id ${msgId}: ${newStatus}`);
-			// if (rowData.wa_msg_id === msgId) {
-				// rowData.wa_status = newStatus;
-				// this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
+		// const rowData = this.data();
+		// console.log('Verificando fila con datos:', rowData);
+		// console.log('Verificando fila con msg_id:', rowData.wa_msg_id);
+		// console.log(`Recibida actualización de estado para msg_id ${msgId}: ${newStatus}`);
+		// if (rowData.wa_msg_id === msgId) {
+		// rowData.wa_status = newStatus;
+		// this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
 
-				// console.log(`Fila actualizada para msg_id ${msgId} con nuevo estado: ${newStatus}`);
-			// }
+		// console.log(`Fila actualizada para msg_id ${msgId} con nuevo estado: ${newStatus}`);
+		// }
 		// });
 	});
 }

@@ -104,6 +104,7 @@ def send_programacion_message():
         programacion = db.session.execute(stmt).scalar_one_or_none()
         
         if programacion:
+            programacion.wa_callback_button = ""
             programacion.wa_msg_id = str(msg_id)
             programacion.wa_status = 'sent'
             
@@ -171,6 +172,7 @@ def register_wa_handlers(wa: WhatsApp):
             if callback.data == "Aceptar":
                 print("Acción de confirmación detectada.")
                 programacion.wa_callback_button = "aceptada"
+                callback.mark_as_read()
             else:
                 print("Acción de rechazo detectada.")
                 programacion.wa_callback_button = "rechazada"
