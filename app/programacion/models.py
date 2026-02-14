@@ -33,6 +33,7 @@ class programacionModel(db.Model):
     wa_msg_id = db.Column(db.String(255), nullable=True)  # Campo para almacenar el ID del mensaje de WhatsApp
     wa_status = db.Column(db.String(50), nullable=True)  # Campo para almacenar el estado del mensaje en WhatsApp
     wa_callback_button = db.Column(db.String(50), nullable=True)  # Campo para almacenar la acción del botón pulsado en WhatsApp
+    wa_data = db.Column(JSONType, nullable=True)  # Campo para almacenar datos adicionales relacionados con WhatsApp
     # Relaciones
 
     pasajeros = db.relationship('pasajerosModel', secondary=programacion_pasajeros, backref='programaciones')
