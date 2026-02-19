@@ -37,10 +37,12 @@ $(document).ready(function () {
         // //console.log("Datos del formulario:", formData);
         const metodo = formulario.attr('method');
 
+        $(".botonForm").prop("disabled", true);
+
         if (metodo === 'PUT') {
             ActualizarRegistro(formData);
         } else {
-            guardarRegistro(lastSegment);
+            guardarRegistro(lastSegment); 
         }
     });
 
@@ -131,7 +133,10 @@ $(document).ready(function () {
                         var urlSegments = window.location.pathname.split('/').filter(Boolean);
                         var lastSegment = urlSegments[urlSegments.length - 1];
                         // cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
-                        window.location.reload();
+                        // window.location.reload();
+                        dt = $(`#programacionTable`).DataTable();
+                        dt.ajax.reload(null, false); // Recargar datos sin resetear la paginación
+
                           
                         
                         //console.log("Tabla recargada exitosamente");
@@ -152,6 +157,9 @@ $(document).ready(function () {
                     text: 'Error de conexión',
                     icon: 'error'
                 });
+            },
+            complete: function() {
+                $(".botonForm").prop("disabled", false);
             }
         });
     }

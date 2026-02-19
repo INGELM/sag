@@ -1373,6 +1373,9 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
             icon: 'error',
         });
     }
+    finally {        // Reiniciar el estado del botón de guardar
+        $(".botonForm").prop('disabled', false).text(metodo === 'POST' ? 'Registrar' : 'Actualizar');
+    }
 }
 
 function eliminarFacturasRecibos(factura_id, recibo_id, modelo, varModulo) {

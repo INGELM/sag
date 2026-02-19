@@ -343,8 +343,8 @@ function mostrarModalDetalle(data) {
         } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
             // Botón "Enviar" presionado
             // enviarRegistro(data);
-            enviarWA(data)
-            // alert("Funcion enviar registro no implementada aún")
+            // enviarWA(data)
+            alert("Funcion enviar registro no disponible")
         }
         // Si se presiona el botón X (cerrar) o se hace clic fuera del modal, no se ejecuta ninguna acción
     });
