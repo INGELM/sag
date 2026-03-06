@@ -107,6 +107,32 @@ def create_app():
     if not webhook_exempted:
         app.logger.warning('No webhook endpoint found to exempt from CSRF.')
     
+    @app.before_request
+    def enforce_firefox():
+        try:
+            # Only intervene on GET requests (avoid breaking webhooks/APIs/POSTs)
+            if request.method != 'GET':
+                return
+
+            ua = (request.headers.get('User-Agent') or '').lower()
+            # If browser is Firefox, allow normally
+            if 'firefox' in ua:
+                return
+
+            # Allow requests for static files and the mensaje template itself
+            if request.path.startswith('/static') or request.path.endswith('mensaje-firefox.html'):
+                return
+
+            # Allow WA endpoints and webhooks (no UI)
+            if request.path.startswith('/wa/'):
+                return
+
+            app.logger.info('Navegador no-Firefox detectado; mostrando mensaje de compatibilidad.')
+            return render_template('mensaje-firefox.html')
+        except Exception as e:
+            app.logger.error('Error comprobando navegador: %s', e)
+            return
+    
     
     
     #MANEJADORES DE ERRORES (ERROR HANDLERS)
