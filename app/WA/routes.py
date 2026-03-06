@@ -126,16 +126,16 @@ def send_programacion_message():
         
         return jsonify({'success':False, 'mensaje': "Error Desconocido" })
     
-    print(f"Mensaje de plantilla enviado a {to} con ID: {msg_id}")
+    # print(f"Mensaje de plantilla enviado a {to} con ID: {msg_id}")
     return jsonify({'success': True, 'mensaje': 'Mensaje enviado!', 'message_id': str(msg_id)}), 200
         
 
 def register_wa_handlers(wa: WhatsApp):
     @wa.on_message()
     def on_message(_: WhatsApp, message: types.Message):
-        print(f"MENSAJE RECIBIDO DE: {message.from_user.wa_id}")
-        print(f"CONTENIDO: {message.text}")
-        print("Mensaje ID:", message.id)
+        # print(f"MENSAJE RECIBIDO DE: {message.from_user.wa_id}")
+        # print(f"CONTENIDO: {message.text}")
+        # print("Mensaje ID:", message.id)
         message.reply("¡Conexión total!")
 
 
@@ -152,10 +152,11 @@ def register_wa_handlers(wa: WhatsApp):
             'msg_id': str(status.id), 
             'status': status.status})
         
-        print(f"ACTUALIZACIÓN DE ESTADO DE MENSAJE PARA: {status.id}")
-        print(f"ESTADO NUEVO: {status.status}")
+        # print(f"ACTUALIZACIÓN DE ESTADO DE MENSAJE PARA: {status.id}")
+        # print(f"ESTADO NUEVO: {status.status}")
         if status.status == "failed":
-            print(f"Motivo de falla: {getattr(status, 'error', 'No especificado')}")
+            # print(f"Motivo de falla: {getattr(status, 'error', 'No especificado')}")
+            pass
             
     @wa.on_callback_button()
     def on_callback_button(_: WhatsApp, callback: types.CallbackButton):
@@ -165,16 +166,16 @@ def register_wa_handlers(wa: WhatsApp):
         stmt = select(programacionModel).where(programacionModel.wa_msg_id == msg_id)
         programacion = db.session.execute(stmt).scalar_one_or_none()
         
-        print(f"Callback recibido para mensaje ID: {msg_id} con acción: {callback.data}")
+        # print(f"Callback recibido para mensaje ID: {msg_id} con acción: {callback.data}")
         
         if programacion:
-            print(f"Botón de plantilla pulsado para mensaje ID: {msg_id} asociado a programación ID: {programacion.id}")
+            # print(f"Botón de plantilla pulsado para mensaje ID: {msg_id} asociado a programación ID: {programacion.id}")
             if callback.data == "Aceptar":
-                print("Acción de confirmación detectada.")
+                # print("Acción de confirmación detectada.")
                 programacion.wa_callback_button = "aceptada"
                 callback.mark_as_read()
             else:
-                print("Acción de rechazo detectada.")
+                # print("Acción de rechazo detectada.")
                 programacion.wa_callback_button = "rechazada"
             
             db.session.commit()
@@ -183,5 +184,5 @@ def register_wa_handlers(wa: WhatsApp):
                               'msg_id': msg_id,
                               'status': f"callback_{programacion.wa_callback_button}"
                           })
-        print(f"Botón de plantilla pulsado por: {callback.from_user.wa_id}")
+        # print(f"Botón de plantilla pulsado por: {callback.from_user.wa_id}")
         # print(f"Payload del botón: {callback.payload}")

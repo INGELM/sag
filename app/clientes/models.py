@@ -260,7 +260,20 @@ class tarifasModel(db.Model):
         else:
             next_code = 1
         return f"{empresa_codigo}{next_code:04d}".upper() if empresa_codigo else None
-        
+    
+    def codigo_descriptivo(self):
+        # Obtener códigos de relaciones de forma segura (evitar acceder a atributos sobre enteros)
+        empresa_codigo = None
+        if hasattr(self, 'cliente') and self.cliente:
+            empresa_codigo = getattr(self.cliente, 'codigo', None)
+
+        origen_codigo = getattr(self.origen_rel, 'codigo', '') if self.origen_rel else ''
+        destino_codigo = getattr(self.destino_rel, 'codigo', '') if self.destino_rel else ''
+        veh_codigo = getattr(self.vehiculo_rel, 'codigo', 'NA') if self.vehiculo_rel else 'NA'
+
+        codigo_desc = f"{empresa_codigo or ''}{origen_codigo}{destino_codigo}-{veh_codigo}-{self.desplazamiento}-{self.horario}".upper()
+        # print(f'Código descriptivo generado: {codigo_desc}')
+        return codigo_desc
         
     def save(self):
         existing= tarifasModel.query.filter(or_(tarifasModel.codigo_desc==self.codigo_desc, tarifasModel.codigo==self.codigo)).first()
@@ -287,10 +300,11 @@ class tarifasModel(db.Model):
         origen_obj = self.origen_rel if hasattr(self, 'origen_rel') and self.origen_rel else None
         destino_obj = self.destino_rel if hasattr(self, 'destino_rel') and self.destino_rel else None
         # Recalcula el código si los objetos existen
-        if empresa_obj and origen_obj and destino_obj:
-            self.codigo = f"{empresa_obj.codigo}{origen_obj.codigo}{destino_obj.codigo}".upper()
+        # if empresa_obj and origen_obj and destino_obj:
+        #     self.codigo = f"{empresa_obj.codigo}{origen_obj.codigo}{destino_obj.codigo}".upper()
+        self.codigo_desc = f"{empresa_obj.codigo}{origen_obj.codigo}{destino_obj.codigo}-{self.vehiculo_rel.codigo if self.vehiculo_rel else 'NA'}-{self.desplazamiento}-{self.horario}".upper()
         db.session.commit()
-        # current_app.logger.debug(f'Tarifa actualizada: {self.serialize()} - usuario: {current_user.usuario}')
+        current_app.logger.debug(f'Tarifa actualizada: {self.serialize()} - usuario: {current_user.usuario}')
 
     def delete(self):
         db.session.delete(self)

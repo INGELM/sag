@@ -446,6 +446,7 @@ def tarifas():
             tarifa.desvios = float(form.desvios.data or 0.0)
             tarifa.tarifa_km = float(form.tarifa_km.data or 0.0)
             tarifa.base = float(form.base.data or 0.0)
+            tarifa.codigo_desc = tarifa.codigo_descriptivo()  # Recalcular el código descriptivo basado en los datos actualizados
 
     
             # tarifa.codigo = form.codigo.data
