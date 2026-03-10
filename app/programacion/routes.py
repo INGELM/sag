@@ -349,6 +349,8 @@ def programacion():
             nueva_programacion = programacionModel(**programacion_data)
             nueva_programacion.fecha_salida = fecha_obj
             nueva_programacion.pasajeros = form.pasajeros.data if form.pasajeros.data else []
+            # Se asigna solo si el checkbox está marcado Y la hora no está vacía
+            nueva_programacion.hora_retorno = form.hora_retorno.data if form.retorno.data  else None
         
 
             if form.status.data == 'Finalizado':
@@ -618,6 +620,8 @@ def update_programacion(id):
         programacion.wa_status = ""
         programacion.wa_msg_id = ""
         programacion.wa_callback_button = ""
+        
+        current_app.logger.debug(f"Datos a actualizar para programación ID {id}: desplazamiento: {programacion.desplazamiento}, turno: {programacion.turno}, retorno: {programacion.retorno}, hora_retorno: {programacion.hora_retorno}")
         
         # Debug antes del commit
         # current_app.logger.info(f"Valor de origen antes de commit: {programacion.origen} (tipo: {type(programacion.origen)})")

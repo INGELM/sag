@@ -22,9 +22,9 @@ $(document).ready(function () {
         // cargarTabla2(lastSegment, "", "", [1, 3, 9, 10, 12, 15, 27]);
     }
 
-    
+
     //console.log("Tabla cargada para:", formulario);
-    
+
     // Agregar funcionalidad de doble click para editar registros
     setTimeout(() => {
         agregarDobleClickPersonalizado(`#${lastSegment}Table`, 'abrir_modal');
@@ -42,23 +42,23 @@ $(document).ready(function () {
         if (metodo === 'PUT') {
             ActualizarRegistro(formData);
         } else {
-            guardarRegistro(lastSegment); 
+            guardarRegistro(lastSegment);
         }
     });
 
     function ActualizarRegistro(formData) {
-       
+
         const id = formData.get('id');
         //console.log("ID para actualizar:", id);
         const URL_ACTUALIZAR = `programacion/${id}/update`;
-        
+
         // Debug: mostrar todos los datos del FormData
         //console.log("=== DEBUG FORM DATA ===");
         for (let [key, value] of formData.entries()) {
             //console.log(`${key}: ${value}`);
         }
         //console.log("=== FIN DEBUG ===");
-        
+
         // Especialmente importante: verificar pasajeros
         const pasajerosValues = formulario.find('[name="pasajeros"]').val();
         //console.log("Valores de pasajeros:", pasajerosValues);
@@ -66,7 +66,7 @@ $(document).ready(function () {
         // Obtener el status actual del formulario y el status original
         const statusNuevo = formData.get('status');
         const statusOriginal = formulario.data('status-original');
-        
+
         //console.log("Status original:", statusOriginal);
         //console.log("Status nuevo:", statusNuevo);
 
@@ -115,7 +115,7 @@ $(document).ready(function () {
                     }).then(() => {
                         // Cerrar el formulario
                         // $(".formulario").addClass("visually-hidden");
-                        
+
                         // // Resetear el formulario
                         // formulario[0].reset();
                         // formulario.find('.selectized').each(function () {
@@ -123,12 +123,12 @@ $(document).ready(function () {
                         //         this.selectize.clear();
                         //     }
                         // });
-                        
+
                         // Cambiar el método del formulario de vuelta a POST
                         // formulario.attr('method', 'POST');
                         // $(".tituloForm").text('Registrar Programacion');
                         // $(".botonForm").text('Registrar');
-                        
+
                         // Recargar solo la tabla sin refrescar la página
                         var urlSegments = window.location.pathname.split('/').filter(Boolean);
                         var lastSegment = urlSegments[urlSegments.length - 1];
@@ -137,8 +137,8 @@ $(document).ready(function () {
                         dt = $(`#programacionTable`).DataTable();
                         dt.ajax.reload(null, false); // Recargar datos sin resetear la paginación
 
-                          
-                        
+
+
                         //console.log("Tabla recargada exitosamente");
                     });
                 } else {
@@ -158,7 +158,7 @@ $(document).ready(function () {
                     icon: 'error'
                 });
             },
-            complete: function() {
+            complete: function () {
                 $(".botonForm").prop("disabled", false);
             }
         });
@@ -186,8 +186,8 @@ $(document).ready(function () {
     DIRECCION_ORIGEN.selectize(config_direccion);
 
     DIRECCION_DESTINO.selectize(config_direccion);
-        
- 
+
+
 
     PASAJEROS_SELECT.on('change', function () {
         var pasajerosSeleccionados = $(this).val();
@@ -199,7 +199,7 @@ $(document).ready(function () {
         }
     });
 
-   
+
     function cargarDirecciones(pasajeros, selectize, tipo) {
         if (!pasajeros || pasajeros.length === 0) {
             selectize.clearOptions();
@@ -207,7 +207,7 @@ $(document).ready(function () {
         }
 
         var URL_CONSULTA_DIRECCIONES = '/programacion/get/direcciones';
-        
+
         $.ajax({
             type: "GET",
             url: URL_CONSULTA_DIRECCIONES,
@@ -274,16 +274,18 @@ $(document).ready(function () {
         }
         else {
             $("#h-retorno").addClass("visually-hidden");
-            $("#h-retorno").val('');
+            $("#h-retorno input").val('');
 
         }
 
     });
 
 
-        
 
-   
+
+
+
+
 
 });
 

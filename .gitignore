@@ -21,3 +21,4 @@ migrations_mysql
 bdd/
 .env
 logs/
+BASES DE DATOS TABLAS/

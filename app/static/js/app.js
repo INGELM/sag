@@ -1192,6 +1192,13 @@ function aplicarFiltro(dt, node, filtro, textoTabla) {
 $(".agregar").click(function (e, modelo = window.modelo) {
     e.preventDefault();
     $(".formulario").removeClass("visually-hidden");
+    $("#h-retorno").addClass("visually-hidden");
+    $("#retorno-form").prop('checked', false);
+      
+
+
+    
+
     // $(".tituloForm").text(`Registrar ${modelo.charAt(0).toUpperCase() + modelo.slice(1)}`);
     $(".tituloForm").text(`Registrar`);
     $(".botonForm").text('Registrar');
@@ -1334,7 +1341,7 @@ async function guardarRegistro(modelo, varModulo = "", reintentar = false) {
                     //cargarTabla2(modelo, varModulo, "", columnasVisibles[modelo] || []);
                     console.log("Recargando tabla de programación después de guardar...");
                     // window.location.reload();
-                    
+
                     dt = $(`#${modelo}Table`).DataTable();
                     dt.ajax.reload(null, false);
                 } else {
@@ -1514,19 +1521,19 @@ function eliminarSeleccionados(modelo) {
                                 programacion: [1, 3, 9, 10, 12, 15, 27]
                             };
                             // cargarTabla2(modelo, "", "", columnasVisibles[modelo] || []);
-                            
+
                         });
-                            // cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
-                            // dt = $(`#${modelo}Table`).DataTable();
-                            // dt.ajax.reload(null, false);
+                        // cargarTabla2(window.modelo, window.modulo, "", columnasVisibles[window.modelo] || []);
+                        // dt = $(`#${modelo}Table`).DataTable();
+                        // dt.ajax.reload(null, false);
 
-                            dt.ajax ? dt.ajax.reload(null, false) : window.location.reload();
+                        dt.ajax ? dt.ajax.reload(null, false) : window.location.reload();
 
-                            
-                            //
-                            
-                            // window.location.reload();
-                            console.log(" 🔍Modelo:", window.modelo, "Modulo:", window.modulo);
+
+                        //
+
+                        // window.location.reload();
+                        console.log(" 🔍Modelo:", window.modelo, "Modulo:", window.modulo);
                     } else {
                         Swal.fire({
                             title: "Error al eliminar",
