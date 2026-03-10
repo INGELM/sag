@@ -129,7 +129,7 @@ function initProgramacionTable() {
 		},
 		{ data: 'vehiculo', title: 'Vehículo' },//13
 		{ data: 'horario', title: 'Horario' },
-		{ data: 'desplazamiento', title: 'Desplaz.', visible: false, searchable: false },
+		{ data: 'desplazamiento', title: 'Desplaz.', visible: true, searchable: false },
 		// { data: 'distancia', title: 'Km' },
 		{ data: 'tiempo_espera', title: 'Tiempo Espera' },
 		{ data: 'desvios', title: 'Desvíos' },
