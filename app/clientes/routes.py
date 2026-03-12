@@ -476,29 +476,30 @@ def tarifas():
                 'error': str(e)
             }), 500
 
-        if request.method == 'DELETE':
-            # current_app.logger.debug('Recibida solicitud de eliminación de tarifa')
-            tarifa_id = request.get_json().get('id')
-            # current_app.logger.debug(f'Recibido ID de tarifa para eliminar: {tarifa_id}')
-            if not tarifa_id:
-                return jsonify(success=False, mensaje='ID de tarifa inválido.')
+    if request.method == 'DELETE':
+        # current_app.logger.debug('Recibida solicitud de eliminación de tarifa')
+        tarifa_id = request.get_json().get('id')
+        # current_app.logger.debug(f'Recibido ID de tarifa para eliminar: {tarifa_id}')
+        if not tarifa_id:
+            return jsonify(success=False, mensaje='ID de tarifa inválido.')
 
-            tarifa = tarifasModel.query.get(tarifa_id)
+        tarifa = tarifasModel.query.get(tarifa_id)
 
-            if not tarifa:
-                return jsonify(success=False, mensaje='tarifa no encontrada.')
+        if not tarifa:
+            return jsonify(success=False, mensaje='tarifa no encontrada.')
 
-            try:
-                tarifa.delete()
-                return jsonify(success=True, mensaje='tarifa eliminada exitosamente.')
+        try:
+            tarifa.delete()
+            current_app.logger.info(f'AUDIT: Tarifa eliminada. ID: {tarifa_id}, usuario: {current_user.usuario}')
+            return jsonify(success=True, mensaje='tarifa eliminada exitosamente.')
 
-            except Exception as e:
-                # current_app.logger.debug(f'Error al eliminar cliente: {e}')
-                return jsonify({
-                    'success': False,
-                    'mensaje': 'Error al eliminar la tarifa.',
-                    'error': str(e)
-                }), 500
+        except Exception as e:
+            # current_app.logger.debug(f'Error al eliminar cliente: {e}')
+            return jsonify({
+                'success': False,
+                'mensaje': 'Error al eliminar la tarifa.',
+                'error': str(e)
+            }), 500
 
     elif form.validate_on_submit(): #METODO POST
         tarifa = {**form.data}
@@ -514,7 +515,7 @@ def tarifas():
             nuevo_tarifa.save()
             return jsonify(success=True, mensaje='tarifa registrada exitosamente.')
         except Exception as e:
-            # current_app.logger.debug(f'Error al registrar cliente: {e}')
+            current_app.logger.debug(f'Error al registrar cliente: {e}')
             return jsonify(success=False, mensaje='Error al registrar la tarifa.', errores=str(e))
 
     elif form.errors:
