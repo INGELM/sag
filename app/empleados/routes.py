@@ -20,6 +20,7 @@ from datetime import datetime
 from app.extensions import db
 from functools import wraps
 from sqlalchemy.orm import aliased
+from app.helpers.logger_utils import log_action
 
 
 
@@ -31,6 +32,7 @@ def before_request():
 
 @empleados_bp.route('/', methods=['GET', 'POST', 'DELETE', 'PUT'])
 @login_required
+@log_action('CRUD', 'Empleados')
 def empleados():
     form = empleadosForm()
     empleado_data = {**form.data}
@@ -335,6 +337,7 @@ def tarifas_operador():
 
 @empleados_bp.route('/tarifasOperadores', methods=['POST', 'DELETE', 'PUT'])
 @login_required
+@log_action('CRUD', 'TarifasOperadores')
 def tarifas_operadores():
     form = tarifasOperadoresForm()
 

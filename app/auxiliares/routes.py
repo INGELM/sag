@@ -9,12 +9,14 @@ from app.auxiliares.form import ciudadesForm, vehiculosForm
 from app.auxiliares.models import ciudadesModel, vehiculosModel, tasaModel
 from datetime import datetime
 from app.extensions import db
+from app.helpers.logger_utils import log_action
 
 
 
 
 @ciudades_bp.route('/', methods=['GET', 'POST', 'DELETE', 'PUT'])
 # @login_required
+@log_action('CRUD', 'Ciudades')
 def ciudades():
     form = ciudadesForm()
 
@@ -227,6 +229,7 @@ def get_ciudad_destino():
     
 #   VEHICULOS
 @vehiculos_bp.route('/', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@log_action('CRUD', 'Vehiculos')
 def vehiculos():
     form = vehiculosForm()
     if request.method == 'GET':
@@ -356,6 +359,7 @@ def all_vehiculos():
 # TASA DE CAMBIO
 
 @tasa_bp.route('/', methods=['GET', 'PUT'])
+@log_action('EDITAR', 'Tasa')
 def tasa():
     form = tasaForm()
     API_URL = "https://ve.dolarapi.com/v1/dolares"

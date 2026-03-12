@@ -7,6 +7,7 @@ from . import clientes_bp
 from .form import *
 from datetime import datetime
 from app.extensions import db
+from app.helpers.logger_utils import log_action
 
 # @clientes_bp.before_request
 # def before_request():
@@ -18,6 +19,7 @@ from app.extensions import db
 
 @clientes_bp.route('/', methods=['GET', 'POST', 'DELETE', 'PUT'])
 # @login_required
+@log_action('CRUD', 'Clientes')
 def clientes():
     
     if not current_user.is_admin and request.method in ['DELETE', 'PUT']:
@@ -215,6 +217,7 @@ def crear_recargo_sedan(nuevo_cliente):
 # PASAJEROS
 
 @clientes_bp.route('/pasajeros', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@log_action('CRUD', 'Pasajeros')
 def pasajeros():
     
     form = pasajerosForm()
@@ -396,6 +399,7 @@ def obtener_pasajeros():
 # TARIFAS
 
 @clientes_bp.route('/tarifas', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@log_action('CRUD', 'TarifasClientes')
 def tarifas():
     
     form = tarifasForm()
@@ -687,6 +691,7 @@ def handle_tarifas():
 #RECARGO VEHÍCULOS
 
 @clientes_bp.route('/recargoVehiculos', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@log_action('CRUD', 'RecargoVehiculos')
 def recargo_vehiculos():
     form = recargoVehiculosForm()
     formData = form.data
