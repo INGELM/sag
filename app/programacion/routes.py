@@ -44,8 +44,16 @@ def validar_coherencias(form):
     
     tarifa_base = tarifasModel.query.filter_by(codigo_desc=codigo_tarifa).first()
     
+    tarifa_operador = tarifasOperadoresModel.query.filter_by(codigo=tarifa_base.id).first() if tarifa_base else None
+    
     if not tarifa_base and form.status.data == 'Finalizado':
-        raise ValueError('No existe una tarifa base para la combinación del servicio seleccionado')
+        raise ValueError("No existe Tarifa Cobro para la combinación del servicio seleccionado")
+    
+    if not tarifa_operador and form.status.data == 'Finalizado':
+        raise ValueError("No existe Tarifa Pago para la combinación del servicio seleccionado")
+    
+    
+    
     
     if not form.operador.data and form.status.data == 'Finalizado':
         raise ValueError('El operador es obligatorio para finalizar un viaje.')
@@ -462,9 +470,10 @@ def update_programacion(id):
         log = f"Usuario sin permiso intentó actualizar programación ID {id} de {programacion.pasajeros[0].cliente.empresa if programacion.pasajeros and programacion.pasajeros[0].cliente else '(sin empresa)'} {current_user.usuario} (Rol: {current_user.rol})"
         return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.", log=log)
     
-    
+    print("actualizando programación ID")
     try:
         validar_coherencias(form)
+        print(f'Coherentencia validada para programación ID {id} de cliente {form.empresa.data.empresa if form.empresa.data else "(sin empresa)"}')
     except ValueError as e:
         return jsonify(success=False, mensaje=str(e), errores=str(e))
     
