@@ -470,10 +470,10 @@ def update_programacion(id):
         log = f"Usuario sin permiso intentó actualizar programación ID {id} de {programacion.pasajeros[0].cliente.empresa if programacion.pasajeros and programacion.pasajeros[0].cliente else '(sin empresa)'} {current_user.usuario} (Rol: {current_user.rol})"
         return jsonify(success=False, mensaje='No tienes permiso para realizar esta acción.', errores="Consulte a un administrador.", log=log)
     
-    print("actualizando programación ID")
+    # print("actualizando programación ID")
     try:
         validar_coherencias(form)
-        print(f'Coherentencia validada para programación ID {id} de cliente {form.empresa.data.empresa if form.empresa.data else "(sin empresa)"}')
+        # print(f'Coherentencia validada para programación ID {id} de cliente {form.empresa.data.empresa if form.empresa.data else "(sin empresa)"}')
     except ValueError as e:
         return jsonify(success=False, mensaje=str(e), errores=str(e))
     
