@@ -95,11 +95,12 @@ def send_programacion_message():
         BodyText.params(empresa=empresa, fecha=fecha_salida, hora_salida=hora_salida, ruta=ruta, pasajeros=pasajeros, hora_retorno=hora_retorno, observaciones=observaciones),
     ]
     
+    prog_id = data.get('id')
+
     try:
         response = wa_module.wa.send_template(
         to=to, name=template_name, language=language, params=params)
         msg_id = response.id
-        prog_id = data.get('id')
         stmt = select(programacionModel).where(programacionModel.id == prog_id)
         programacion = db.session.execute(stmt).scalar_one_or_none()
         
@@ -115,14 +116,24 @@ def send_programacion_message():
             
             db.session.commit()
         else:
-            registrar_log("ENVIAR WS", "WHATSAPP", f"No se encontró la programación con ID {prog_id} para actualizar el estado del mensaje.")
+            registrar_log(
+                "ENVIAR WS",
+                "WHATSAPP",
+                "No se encontró la programación para actualizar el estado del mensaje.",
+                programacion_id=prog_id,
+            )
             return jsonify({'success':False, 'mensaje': "No se encontro la programación" })
             
         
         
     except Exception as e:
         error = format_error_simple(str(e))
-        registrar_log("ENVIAR WS", "WHATSAPP", f"Error al enviar mensaje de programación a {to}: {error}")
+        registrar_log(
+            "ENVIAR WS",
+            "WHATSAPP",
+            f"Error al enviar mensaje de programación a {to}: {error}",
+            programacion_id=prog_id,
+        )
         
         return jsonify({'success':False, 'mensaje': "Error Desconocido" })
     

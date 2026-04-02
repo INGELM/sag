@@ -30,6 +30,8 @@ def before_request():
 
 @staticmethod
 def validar_coherencias(form):
+    programacion_id_log = form.id.data if getattr(form, 'id', None) and form.id.data else 'NUEVA'
+
     if form.vehiculo.data is None:
         raise ValueError('El vehículo es obligatorio.')
     
@@ -88,15 +90,30 @@ def validar_coherencias(form):
             query = query.filter(programacionModel.id != form.id.data)
         
         guia_existente = query.first()
-        registrar_log("VALIDAR GUIA", "PROGRAMACION",f'Validando guía repetida: {form.guia.data} ==> {guia_existente.guia if guia_existente else "No existe"}')
+        registrar_log(
+            "VALIDAR GUIA",
+            "PROGRAMACION",
+            f'Validando guía repetida: {form.guia.data} ==> {guia_existente.guia if guia_existente else "No existe"}',
+            programacion_id=programacion_id_log,
+        )
         if guia_existente:
             raise ValueError(f'La guía {form.guia.data} ya está registrada en otra programación.')
     
     # WorkFlow repetido
     if form.workflow.data:
-        registrar_log("VALIDAR WORKFLOW", "PROGRAMACION",f'Validando workflow repetido: {form.workflow.data}')
+        registrar_log(
+            "VALIDAR WORKFLOW",
+            "PROGRAMACION",
+            f'Validando workflow repetido: {form.workflow.data}',
+            programacion_id=programacion_id_log,
+        )
         workflow_existente = programacionModel.query.filter_by(workflow=form.workflow.data).first()
-        registrar_log("VALIDAR WORKFLOW", "PROGRAMACION",f'Workflow existente: {workflow_existente.workflow if workflow_existente else "No existe"}')
+        registrar_log(
+            "VALIDAR WORKFLOW",
+            "PROGRAMACION",
+            f'Workflow existente: {workflow_existente.workflow if workflow_existente else "No existe"}',
+            programacion_id=programacion_id_log,
+        )
         if workflow_existente and (workflow_existente.id != form.id.data):
   
             raise ValueError('El WorkFlow ingresado ya está registrado en otra programación.')

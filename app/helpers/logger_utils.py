@@ -5,21 +5,22 @@ from flask_login import current_user
 import sys
 import os
 
-def registrar_log(accion, entidad, detalle):
+def registrar_log(accion, entidad, detalle, programacion_id=None):
     """
     Estandariza el registro de acciones en el log de la aplicación.
     Acciones: 'CREAR', 'EDITAR', 'ELIMINAR', 'LOGIN'
     """
     usuario = current_user.usuario if current_user.is_authenticated else "Anonimo"
-    ip = request.remote_addr
-    
+    programacion_info = f"| PROGRAMACION_ID: {str(programacion_id if programacion_id is not None else 'N/A'):<10} "
+
     mensaje = (
         f"| ACCION: {accion:<10} "
         f"| ENTIDAD: {entidad:<15} "
+        f"{programacion_info}"
         f"| USUARIO: {usuario:<15} "
         f"| DETALLE: {detalle}"
     )
-    
+
     current_app.logger.info(mensaje)
     
 
