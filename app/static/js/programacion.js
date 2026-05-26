@@ -84,7 +84,7 @@ function initProgramacionTable() {
 					let operador = data[0].nombre;
 					let callback_msg = row.wa_callback_button
 
-					console.log("CALLBACK MSG:", callback_msg)
+					// console.log("CALLBACK MSG:", callback_msg)
 
 					var estilos = {
 						'aceptada': 'bg-success txt-white',
@@ -239,25 +239,32 @@ function initProgramacionTable() {
 
 	window.tablaInstancia = dt;
 
-	const socket = io(); // Conexión Socket.IO para actualizaciones en tiempo real
-	socket.on('message_status_update', function (data) {
-		const msgId = data.msg_id;
-		const newStatus = data.status;
-		console.log(`Socket.IO - Actualización de estado recibida para msg_id ${msgId}: ${newStatus}`);
-		dt.ajax.reload(null, false); // Recarga los datos sin reiniciar la paginación
+	// Solo conectar si se habilita explícitamente en ventana global.
+	if (window.ENABLE_PROGRAMACION_SOCKET === true && typeof io === 'function') {
+		console.log('Conectando a Socket.IO para actualizaciones en tiempo real de Programación...');
+		const socket = io(); // Conexión Socket.IO para actualizaciones en tiempo real
+		socket.on('message_status_update', function (data) {
+			const msgId = data.msg_id;
+			const newStatus = data.status;
+			console.log(`Socket.IO - Actualización de estado recibida para msg_id ${msgId}: ${newStatus}`);
+			dt.ajax.reload(null, false); // Recarga los datos sin reiniciar la paginación
 
-		// Encuentra la fila correspondiente al mensaje actualizado
-		// dt.rows().every(function () {
-		// const rowData = this.data();
-		// console.log('Verificando fila con datos:', rowData);
-		// console.log('Verificando fila con msg_id:', rowData.wa_msg_id);
-		// console.log(`Recibida actualización de estado para msg_id ${msgId}: ${newStatus}`);
-		// if (rowData.wa_msg_id === msgId) {
-		// rowData.wa_status = newStatus;
-		// this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
+			// Encuentra la fila correspondiente al mensaje actualizado
+			// dt.rows().every(function () {
+			// const rowData = this.data();
+			// console.log('Verificando fila con datos:', rowData);
+			// console.log('Verificando fila con msg_id:', rowData.wa_msg_id);
+			// console.log(`Recibida actualización de estado para msg_id ${msgId}: ${newStatus}`);
+			// if (rowData.wa_msg_id === msgId) {
+			// rowData.wa_status = newStatus;
+			// this.data(rowData).draw(false); // Actualiza la fila sin reiniciar la paginación
 
-		// console.log(`Fila actualizada para msg_id ${msgId} con nuevo estado: ${newStatus}`);
-		// }
-		// });
-	});
+			// console.log(`Fila actualizada para msg_id ${msgId} con nuevo estado: ${newStatus}`);
+			// }
+			// });
+		});
+	}
+	else {
+		console.log('Socket.IO no está disponible o ENABLE_PROGRAMACION_SOCKET no está habilitado. No se recibirán actualizaciones en tiempo real para Programación.');
+	}
 }

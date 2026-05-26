@@ -4,6 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Carga las variables del archivo .env
 
+
+def _as_bool(value, default=False):
+    if value is None:
+        return default
+    return str(value).strip().lower() in ('1', 'true', 'yes', 'on', 'si')
+
 # Obtén las partes separadas de la conexión
 db_host = os.getenv('DB_HOST')
 db_user = os.getenv('DB_USER')
@@ -11,8 +17,11 @@ db_password = os.getenv('DB_PASSWORD')
 db_name = os.getenv('DB_NAME')
 
 # Codifica la contraseña
-# encoded_password = quote(db_password)
-encoded_password = db_password
+# Asegura que la contraseña se URL-escapee si contiene caracteres especiales
+try:
+    encoded_password = quote(db_password or '')
+except Exception:
+    encoded_password = db_password or ''
 
 # Construye la cadena de conexión
 
@@ -34,3 +43,4 @@ class Config:
     PHONE_ID = os.environ.get('PHONE_ID')
     TOKEN = os.environ.get('TOKEN')
     WTF_CSRF_ENABLED = True  # Habilitar CSRF para formularios normales, pero se excluirá el webhook de WhatsApp
+    ENABLE_PROGRAMACION_SOCKET = _as_bool(os.environ.get('ENABLE_PROGRAMACION_SOCKET'), default=False)

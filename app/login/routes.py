@@ -9,6 +9,8 @@ from app.empleados.models import empleadosModel
 from flask import session
 from flask import current_app
 from config import Config
+from app.extensions import db
+from sqlalchemy import text, func
 
 
 
@@ -21,7 +23,9 @@ def login():
     
     if request.method == 'GET':
         try:
-            empleadosModel.query.all()
+            #empleadosModel.query.all()
+            db.session.execute(text('SELECT 1'))
+      
             # flash(f'Conectado correctamente a la Base de datos: \n {Config.SQLALCHEMY_DATABASE_URI}', 'success' )
             flash(f'Conectado correctamente a la Base de datos {Config.CONECTADO_A}', 'success' )
             if Config.CONECTADO_A == 'PRODUCCIÓN':
